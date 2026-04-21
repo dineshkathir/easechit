@@ -253,6 +253,48 @@ tbody td:first-child{color:var(--t1);font-family:'IBM Plex Sans',sans-serif;font
 .auth-meta .rr{padding:10px 0;}
 .auth-error{margin-top:12px;font-size:12px;color:var(--red);line-height:1.5;display:none;}
 .auth-error.show{display:block;}
+.auth-subactions{display:flex;gap:10px;margin-top:12px;}
+.auth-subactions .btn{flex:1;justify-content:center;}
+.access-note{margin-top:8px;font-size:11px;color:var(--t3);line-height:1.6;}
+.access-note strong{color:var(--t1);}
+.admin-portal{width:min(100%,960px);max-height:min(88vh,860px);overflow:auto;background:var(--bg2);border:1px solid var(--ln2);border-radius:24px;box-shadow:var(--shd);}
+.admin-portal::-webkit-scrollbar{width:4px;height:4px;}
+.admin-portal::-webkit-scrollbar-thumb{background:var(--scr);border-radius:3px;}
+.admin-portal-top{display:flex;justify-content:space-between;gap:16px;padding:24px 26px 18px;border-bottom:1px solid var(--ln);}
+.admin-portal-kicker{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--gold2);font-weight:700;margin-bottom:8px;}
+.admin-portal-title{font-family:'Playfair Display',serif;font-size:30px;line-height:1.08;color:var(--t1);}
+.admin-portal-copy{font-size:13px;line-height:1.7;color:var(--t2);margin-top:10px;max-width:620px;}
+.admin-portal-badge{align-self:flex-start;padding:9px 12px;border-radius:999px;background:rgba(212,168,67,.12);border:1px solid rgba(212,168,67,.22);font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--gold2);font-weight:700;white-space:nowrap;}
+.admin-portal-body{padding:22px 26px 26px;}
+.admin-grid{display:grid;grid-template-columns:320px 1fr;gap:18px;}
+.admin-pane{background:var(--bg);border:1px solid var(--ln);border-radius:18px;padding:18px;}
+[data-theme="light"] .admin-pane{background:var(--bg3);}
+.admin-login-note{font-size:11px;color:var(--t3);line-height:1.6;margin-top:10px;}
+.admin-login-hint{margin-top:12px;padding:12px 14px;border-radius:12px;background:rgba(79,156,249,.08);border:1px solid rgba(79,156,249,.18);font-size:11px;color:var(--t2);line-height:1.6;}
+.admin-plan-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:16px;}
+.admin-plan-card{background:var(--bg);border:1px solid var(--ln);border-radius:14px;padding:16px;min-height:106px;}
+[data-theme="light"] .admin-plan-card{background:var(--bg3);}
+.admin-plan-k{font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--t3);font-weight:700;margin-bottom:8px;}
+.admin-plan-v{font-family:'Playfair Display',serif;font-size:26px;line-height:1;color:var(--t1);margin-bottom:6px;}
+.admin-plan-v.gold{color:var(--gold2);}
+.admin-plan-v.teal{color:var(--teal);}
+.admin-plan-v.blue{color:var(--blue);}
+.admin-plan-sub{font-size:11px;color:var(--t2);line-height:1.5;}
+.admin-list{display:flex;flex-direction:column;gap:10px;max-height:360px;overflow:auto;padding-right:4px;}
+.admin-list-item{display:flex;align-items:flex-start;gap:12px;padding:14px;border:1px solid var(--ln);border-radius:14px;background:var(--bg);}
+[data-theme="light"] .admin-list-item{background:var(--bg3);}
+.admin-list-ico{width:38px;height:38px;border-radius:12px;background:rgba(23,196,162,.12);border:1px solid rgba(23,196,162,.2);display:flex;align-items:center;justify-content:center;color:var(--teal);font-weight:700;flex-shrink:0;}
+.admin-list-main{flex:1;min-width:0;}
+.admin-list-name{font-size:13px;font-weight:600;color:var(--t1);}
+.admin-list-email{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--t3);margin-top:2px;word-break:break-word;}
+.admin-list-meta{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;}
+.admin-pill{display:inline-flex;align-items:center;padding:3px 8px;border-radius:999px;font-size:9px;letter-spacing:.8px;text-transform:uppercase;font-weight:700;}
+.admin-pill.paid{background:rgba(212,168,67,.14);border:1px solid rgba(212,168,67,.22);color:var(--gold2);}
+.admin-pill.free{background:rgba(23,196,162,.12);border:1px solid rgba(23,196,162,.2);color:var(--teal);}
+.admin-pill.time{background:var(--bg3);border:1px solid var(--ln);color:var(--t3);}
+.admin-empty{padding:26px 16px;border:1px dashed var(--ln2);border-radius:14px;text-align:center;font-size:12px;color:var(--t3);line-height:1.6;}
+.admin-session-row{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px;}
+.admin-session-row .btn{white-space:nowrap;}
 
 /* ══════════ MODAL ══════════ */
 .modal-bg{display:none;position:fixed;inset:0;background:var(--ovl);z-index:9100;align-items:flex-end;justify-content:center;}
@@ -383,6 +425,10 @@ tbody td:first-child{color:var(--t1);font-family:'IBM Plex Sans',sans-serif;font
   .auth-title{font-size:24px;}
   .user-auth-actions{flex-direction:column;}
   .auth-chip{display:none;}
+  .auth-subactions{flex-direction:column;}
+  .admin-grid{grid-template-columns:1fr;}
+  .admin-plan-grid{grid-template-columns:1fr;}
+  .admin-portal-top{flex-direction:column;align-items:flex-start;}
 }
 
 
@@ -620,14 +666,79 @@ tbody td:first-child{color:var(--t1);font-family:'IBM Plex Sans',sans-serif;font
   <div class="auth-gate">
     <div class="auth-kicker">Secure Access</div>
     <div class="auth-title">Sign in with Google to unlock your chit data.</div>
-    <div class="auth-copy">This app now stores each signed-in user's members, funds, payments, and auctions in Firebase so the same data can be loaded again on another device.</div>
+    <div class="auth-copy">Members can use the member workspace for free. Foreman tools are a paid workspace and need administrator approval before that role is unlocked.</div>
     <div class="auth-meta">
       <div class="rr"><span class="rr-k">Authentication</span><span class="rr-v">Google via Firebase</span></div>
       <div class="rr"><span class="rr-k">Database</span><span class="rr-v gold">Cloud Firestore</span></div>
-      <div class="rr"><span class="rr-k">Scope</span><span class="rr-v">Private per user</span></div>
+      <div class="rr"><span class="rr-k">Plans</span><span class="rr-v">Foreman paid · Member free</span></div>
     </div>
     <button class="btn btn-gold btn-full auth-btn" type="button" onclick="signInWithGoogle()">Continue With Google</button>
+    <div class="auth-subactions">
+      <button class="btn btn-ghost btn-sm" type="button" onclick="openAdminPortal()">Administrator Portal</button>
+    </div>
+    <div class="access-note" id="authAccessNote"><strong>Access:</strong> Members are always free. Foreman access is granted by the administrator portal.</div>
     <div class="auth-error" id="authError"></div>
+  </div>
+</div>
+
+<div class="modal-bg center" id="adminPortalModal">
+  <div class="admin-portal">
+    <div class="admin-portal-top">
+      <div>
+        <div class="admin-portal-kicker">Administrator Portal</div>
+        <div class="admin-portal-title">Control paid Foreman access from one place.</div>
+        <div class="admin-portal-copy">Use the administrator credentials to open the management console, approve Foreman email addresses, and keep the normal member experience free.</div>
+      </div>
+      <div style="display:flex;align-items:flex-start;gap:10px;">
+        <div class="admin-portal-badge">Separate Admin Workspace</div>
+        <button class="btn btn-ghost btn-sm" type="button" onclick="closeModal('adminPortalModal')">Close</button>
+      </div>
+    </div>
+    <div class="admin-portal-body">
+      <div class="admin-grid">
+        <div class="admin-pane" id="adminLoginPane">
+          <div class="card-hd"><span class="pip"></span>Admin Credentials</div>
+          <div class="fg"><label>Username</label><input id="adminUser" placeholder="Administrator username"></div>
+          <div class="fg"><label>Password</label><input id="adminPass" type="password" placeholder="Administrator password"></div>
+          <button class="btn btn-gold btn-full" type="button" onclick="adminLogin()">Unlock Portal</button>
+          <div class="admin-login-note">Update the default administrator credentials in the `ADMIN_PORTAL_CONFIG` block before using this in production.</div>
+          <div class="admin-login-hint" id="adminLoginHint">Foreman tools are billed access. Normal members continue to use the member workspace for free.</div>
+        </div>
+        <div class="admin-pane" id="adminManagePane" style="display:none;">
+          <div class="admin-session-row">
+            <div>
+              <div class="card-hd" style="margin-bottom:6px;"><span class="pip"></span>Foreman Access Control</div>
+              <div style="font-size:12px;color:var(--t2);line-height:1.6;">Grant paid Foreman access by email. If an email is not approved here, that user can still use the free member workspace.</div>
+            </div>
+            <button class="btn btn-ghost btn-sm" type="button" onclick="adminLogout()">Lock Portal</button>
+          </div>
+          <div class="admin-plan-grid">
+            <div class="admin-plan-card">
+              <div class="admin-plan-k">Paid Foremen</div>
+              <div class="admin-plan-v gold" id="adminForemanCount">0</div>
+              <div class="admin-plan-sub">Approved paid Foreman accounts</div>
+            </div>
+            <div class="admin-plan-card">
+              <div class="admin-plan-k">Member Plan</div>
+              <div class="admin-plan-v teal">Free</div>
+              <div class="admin-plan-sub">Normal members keep free access</div>
+            </div>
+            <div class="admin-plan-card">
+              <div class="admin-plan-k">Registry Updated</div>
+              <div class="admin-plan-v blue" id="adminRegistryStamp">Now</div>
+              <div class="admin-plan-sub">Last local administrator change</div>
+            </div>
+          </div>
+          <div class="g2" style="margin-bottom:16px;">
+            <div class="fg" style="margin:0;"><label>Foreman Name</label><input id="adminForemanName" placeholder="Optional display name"></div>
+            <div class="fg" style="margin:0;"><label>Foreman Email</label><input id="adminForemanEmail" type="email" placeholder="name@example.com"></div>
+          </div>
+          <button class="btn btn-gold btn-sm" type="button" onclick="grantForemanAccess()">+ Grant Foreman Access</button>
+          <div class="access-note" style="margin-bottom:16px;"><strong>Note:</strong> This administrator portal currently stores the Foreman access roster in this browser so you can start using role-based access immediately.</div>
+          <div class="admin-list" id="adminForemanList"></div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -678,10 +789,12 @@ tbody td:first-child{color:var(--t1);font-family:'IBM Plex Sans',sans-serif;font
           <div class="user-name" id="sbName">Foreman Admin</div>
           <div class="user-role" id="sbRole">Fund Manager</div>
           <div class="sync-note" id="syncNote">Firebase is not connected yet.</div>
+          <div class="sync-note" id="accessNote">Members are free. Foreman requires administrator approval.</div>
         </div>
       </div>
       <div class="user-auth-actions">
         <button class="btn btn-gold btn-sm auth-btn" id="googleLoginBtn" onclick="signInWithGoogle()" type="button">Google Login</button>
+        <button class="btn btn-ghost btn-sm" onclick="openAdminPortal()" type="button">Admin Portal</button>
         <button class="btn btn-ghost btn-sm" id="logoutBtn" onclick="signOutUser()" type="button" style="display:none;">Logout</button>
       </div>
     </div>
@@ -1061,13 +1174,71 @@ const FIREBASE_CONFIG=window.CHITVAULT_FIREBASE_CONFIG||{
   messagingSenderId:'1094688786658',
   appId:'1:1094688786658:web:e24a829c4cf85af26176bb'
 };
+const ADMIN_PORTAL_CONFIG=window.CHITVAULT_ADMIN_PORTAL||{
+  username:'admin',
+  password:'Admin@123',
+  foremanPlanLabel:'Paid Access',
+  memberPlanLabel:'Free Access'
+};
 const DEFAULT_AVATAR={foreman:'F',member:'M'};
 let auth=null,db=null,googleProvider=null,currentUser=null,authReady=false,isApplyingRemoteState=false;
 let remoteUnsubscribe=null,saveTimer=null,lastSavedHash='',seededDemo=false;
+let adminSessionActive=false;
+let accessRegistry={foremen:[],updatedAt:null};
 const S={role:'foreman',theme:'dark',chits:[],members:[],payments:{},auctions:[],memberPayments:[],myChitFunds:[],liveBids:[],timerInterval:null,timerSecs:0,timerRunning:false,adCount:0,cur:'dashboard'};
+const ACCESS_STORAGE_KEY='cv_admin_access_registry_v1';
+const ADMIN_SESSION_KEY='cv_admin_portal_session_v1';
 const fmt=v=>'₹'+Number(v).toLocaleString('en-IN',{maximumFractionDigits:2});
 const fmtN=v=>Number(v).toLocaleString('en-IN',{maximumFractionDigits:2});
 const pct=v=>v.toFixed(2)+'%';
+function normalizeEmail(v){return String(v||'').trim().toLowerCase();}
+function isValidEmail(v){return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);}
+function formatWhen(v){
+  if(!v)return 'Not yet';
+  const d=new Date(v);
+  return Number.isNaN(d.getTime())?'Not yet':d.toLocaleString('en-IN',{dateStyle:'medium',timeStyle:'short'});
+}
+function loadAccessRegistry(){
+  try{
+    const raw=localStorage.getItem(ACCESS_STORAGE_KEY);
+    if(raw){
+      const parsed=JSON.parse(raw);
+      accessRegistry={
+        foremen:Array.isArray(parsed&&parsed.foremen)?parsed.foremen.map(item=>({
+          email:normalizeEmail(item.email),
+          name:(item.name||'').trim(),
+          plan:item.plan||'paid',
+          grantedAt:item.grantedAt||new Date().toISOString()
+        })).filter(item=>item.email):[],
+        updatedAt:parsed&&parsed.updatedAt?parsed.updatedAt:null
+      };
+    }
+  }catch(err){
+    console.error(err);
+    accessRegistry={foremen:[],updatedAt:null};
+  }
+  adminSessionActive=localStorage.getItem(ADMIN_SESSION_KEY)==='1';
+}
+function saveAccessRegistry(){
+  accessRegistry.updatedAt=new Date().toISOString();
+  localStorage.setItem(ACCESS_STORAGE_KEY,JSON.stringify(accessRegistry));
+  renderForemanAccessList();
+  updateAccessUI();
+}
+function getForemanGrant(email){
+  const key=normalizeEmail(email);
+  return accessRegistry.foremen.find(item=>item.email===key)||null;
+}
+function userHasForemanAccess(user=currentUser){
+  return !!(user&&user.email&&getForemanGrant(user.email));
+}
+function enforceForemanAccess(showToast){
+  if(S.role!=='foreman'||!currentUser)return true;
+  if(userHasForemanAccess(currentUser)) return true;
+  S.role='member';
+  if(showToast) toast('Foreman access requires administrator approval. Member access remains free.',true);
+  return false;
+}
 function firebaseConfigured(){
   return FIREBASE_CONFIG&&FIREBASE_CONFIG.apiKey&&FIREBASE_CONFIG.apiKey!=='YOUR_API_KEY'&&FIREBASE_CONFIG.projectId&&FIREBASE_CONFIG.projectId!=='YOUR_PROJECT_ID'&&FIREBASE_CONFIG.appId&&FIREBASE_CONFIG.appId!=='YOUR_APP_ID';
 }
@@ -1098,6 +1269,16 @@ function setAuthError(message){
   const el=document.getElementById('authError');if(!el)return;
   el.textContent=message||'';el.className='auth-error'+(message?' show':'');
 }
+function updateAccessUI(){
+  const authAccess=document.getElementById('authAccessNote');
+  const sideAccess=document.getElementById('accessNote');
+  const hasPaidAccess=userHasForemanAccess(currentUser);
+  const currentEmail=currentUser&&currentUser.email?currentUser.email:'';
+  const memberText=`Members stay on the ${ADMIN_PORTAL_CONFIG.memberPlanLabel.toLowerCase()} plan.`;
+  const foremanText=hasPaidAccess&&currentEmail?`Foreman unlocked for ${currentEmail}.`:`Foreman requires administrator approval and uses the ${ADMIN_PORTAL_CONFIG.foremanPlanLabel.toLowerCase()} plan.`;
+  if(authAccess) authAccess.innerHTML=`<strong>Access:</strong> ${memberText} ${foremanText}`;
+  if(sideAccess) sideAccess.innerHTML=`<strong>Access:</strong> ${S.role==='foreman'&&hasPaidAccess?'Paid Foreman workspace active.':memberText+' '+foremanText}`;
+}
 function updateAuthUI(user){
   const loginBtn=document.getElementById('googleLoginBtn');
   const logoutBtn=document.getElementById('logoutBtn');
@@ -1107,8 +1288,9 @@ function updateAuthUI(user){
   if(overlay) overlay.classList.toggle('show',!user);
   if(user){
     const name=user.displayName||user.email||'Firebase User';
+    const grant=getForemanGrant(user.email);
     document.getElementById('sbName').textContent=name;
-    document.getElementById('sbRole').textContent=user.email||'Google account';
+    document.getElementById('sbRole').textContent=grant?`${grant.plan==='paid'?'Paid Foreman eligible':'Approved'} · ${user.email||'Google account'}`:`${ADMIN_PORTAL_CONFIG.memberPlanLabel} · ${user.email||'Google account'}`;
     document.getElementById('sbAvatar').textContent=(name.trim()[0]||DEFAULT_AVATAR[S.role]||'U').toUpperCase();
     updateSyncStatus('Connected to Firebase',true);
   }else{
@@ -1117,6 +1299,7 @@ function updateAuthUI(user){
     document.getElementById('sbAvatar').textContent=DEFAULT_AVATAR[S.role]||'F';
     updateSyncStatus(firebaseConfigured()?'Waiting for Google login':'Firebase config is still a placeholder',false);
   }
+  updateAccessUI();
 }
 function getUserDocRef(uid){return db.collection('users').doc(uid).collection('private').doc('appState');}
 function applyState(data){
@@ -1170,7 +1353,7 @@ function initializeFirebase(){
     updateSyncStatus('Loading cloud data...',true);
     remoteUnsubscribe=getUserDocRef(user.uid).onSnapshot(async snap=>{
       const payload=snap.data();
-      if(payload&&payload.state){lastSavedHash=stateHash(payload.state);applyState(payload.state);updateSyncStatus('Live sync active',true);}
+      if(payload&&payload.state){lastSavedHash=stateHash(payload.state);applyState(payload.state);if(!userHasForemanAccess(currentUser)&&S.role==='foreman') setRole('member',false);updateSyncStatus('Live sync active',true);}
       else if(!seededDemo){seededDemo=true;const demo=createDemoState();applyState(demo);await saveStateNow();addAct('Your Firebase workspace is ready. Demo data was seeded once.','teal');}
     },err=>{console.error(err);updateSyncStatus('Unable to read Firestore',false);toast('Could not load Firebase data.',true);});
   });
@@ -1185,6 +1368,94 @@ async function signInWithGoogle(){
   }
 }
 async function signOutUser(){if(auth) await auth.signOut();}
+
+function syncAdminPortalUI(){
+  const loginPane=document.getElementById('adminLoginPane');
+  const managePane=document.getElementById('adminManagePane');
+  if(loginPane) loginPane.style.display=adminSessionActive?'none':'';
+  if(managePane) managePane.style.display=adminSessionActive?'':'none';
+  const hint=document.getElementById('adminLoginHint');
+  if(hint) hint.textContent=adminSessionActive?'Portal unlocked. Manage paid Foreman access below.':'Foreman tools are billed access. Normal members continue to use the free member workspace.';
+  renderForemanAccessList();
+}
+function openAdminPortal(){
+  syncAdminPortalUI();
+  openModal('adminPortalModal');
+}
+function adminLogin(){
+  const username=(document.getElementById('adminUser').value||'').trim();
+  const password=document.getElementById('adminPass').value||'';
+  if(username===ADMIN_PORTAL_CONFIG.username&&password===ADMIN_PORTAL_CONFIG.password){
+    adminSessionActive=true;
+    localStorage.setItem(ADMIN_SESSION_KEY,'1');
+    document.getElementById('adminPass').value='';
+    syncAdminPortalUI();
+    toast('Administrator portal unlocked.');
+  }else{
+    toast('Administrator credentials are incorrect.',true);
+  }
+}
+function adminLogout(){
+  adminSessionActive=false;
+  localStorage.removeItem(ADMIN_SESSION_KEY);
+  syncAdminPortalUI();
+  toast('Administrator portal locked.');
+}
+function renderForemanAccessList(){
+  const list=document.getElementById('adminForemanList');
+  const count=document.getElementById('adminForemanCount');
+  const stamp=document.getElementById('adminRegistryStamp');
+  if(count) count.textContent=String(accessRegistry.foremen.length);
+  if(stamp) stamp.textContent=accessRegistry.updatedAt?new Date(accessRegistry.updatedAt).toLocaleDateString('en-IN',{day:'2-digit',month:'short'}):'Now';
+  if(!list)return;
+  if(!accessRegistry.foremen.length){
+    list.innerHTML='<div class="admin-empty">No paid Foreman accounts have been approved yet.<br>Add an email address to grant paid access.</div>';
+    return;
+  }
+  list.innerHTML=accessRegistry.foremen.slice().sort((a,b)=>String(b.grantedAt).localeCompare(String(a.grantedAt))).map(item=>`
+    <div class="admin-list-item">
+      <div class="admin-list-ico">${(item.name||item.email||'F').trim().charAt(0).toUpperCase()}</div>
+      <div class="admin-list-main">
+        <div class="admin-list-name">${item.name||'Approved Foreman'}</div>
+        <div class="admin-list-email">${item.email}</div>
+        <div class="admin-list-meta">
+          <span class="admin-pill paid">${ADMIN_PORTAL_CONFIG.foremanPlanLabel}</span>
+          <span class="admin-pill time">Granted ${formatWhen(item.grantedAt)}</span>
+        </div>
+      </div>
+      <button class="btn btn-danger btn-sm" type="button" onclick="revokeForemanAccess('${item.email}')">Remove</button>
+    </div>`).join('');
+}
+function grantForemanAccess(){
+  if(!adminSessionActive){toast('Unlock the administrator portal first.',true);return;}
+  const email=normalizeEmail(document.getElementById('adminForemanEmail').value);
+  const name=(document.getElementById('adminForemanName').value||'').trim();
+  if(!isValidEmail(email)){toast('Enter a valid email address for the Foreman.',true);return;}
+  const existing=getForemanGrant(email);
+  const grantedAt=existing&&existing.grantedAt?existing.grantedAt:new Date().toISOString();
+  if(existing){
+    accessRegistry.foremen=accessRegistry.foremen.map(item=>item.email===email?{...item,email,name:name||item.name||'',plan:'paid',grantedAt}:item);
+    toast('Foreman access updated.');
+  }else{
+    accessRegistry.foremen.unshift({email,name,plan:'paid',grantedAt});
+    toast('Foreman access granted.');
+  }
+  document.getElementById('adminForemanEmail').value='';
+  document.getElementById('adminForemanName').value='';
+  saveAccessRegistry();
+}
+function revokeForemanAccess(email){
+  if(!adminSessionActive){toast('Unlock the administrator portal first.',true);return;}
+  const key=normalizeEmail(email);
+  accessRegistry.foremen=accessRegistry.foremen.filter(item=>item.email!==key);
+  saveAccessRegistry();
+  if(currentUser&&normalizeEmail(currentUser.email)===key&&S.role==='foreman'){
+    setRole('member',false);
+    toast('Current user was moved to the free member workspace.',true);
+  }else{
+    toast('Foreman access removed.');
+  }
+}
 
 /* ── THEME ── */
 function toggleTheme(){S.theme=S.theme==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',S.theme);localStorage.setItem('cv_t',S.theme);queueCloudSave();}
@@ -1229,6 +1500,10 @@ function renderMN(){
 
 /* ── ROLE ── */
 function setRole(r,sync=true){
+  if(r==='foreman'&&currentUser&&!userHasForemanAccess(currentUser)){
+    toast('Foreman access requires administrator approval. Member access is still free.',true);
+    r='member';
+  }
   S.role=r;
   document.getElementById('roleForeman').className='role-btn'+(r==='foreman'?' active':'');
   document.getElementById('roleMember').className='role-btn'+(r==='member'?' active':'');
@@ -1245,6 +1520,7 @@ function setRole(r,sync=true){
   nav(r==='foreman'?'dashboard':'m_dashboard',null);
   if(r==='member') renderMyChits();
   popDrops();
+  updateAccessUI();
   if(sync) queueCloudSave();
 }
 
@@ -1870,7 +2146,9 @@ function renderMyChits(){
   const today=new Date();
   const ym=`${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}`;
   document.getElementById('cm_start').value=ym;
+  loadAccessRegistry();
   updateAuthUI(null);
+  syncAdminPortalUI();
   popDrops();
   renderMembers();
   renderPayTable();
