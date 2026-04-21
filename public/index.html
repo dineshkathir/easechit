@@ -1,0 +1,1887 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>ChitVault — Smart Chit Fund Manager</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+/* ── DARK THEME ── */
+[data-theme="dark"]{
+  --bg:#0b0f14;--bg2:#141b24;--bg3:#1c2733;--bg4:#243040;
+  --ln:#263345;--ln2:#2e3f55;
+  --t1:#dce8f5;--t2:#7a9ab8;--t3:#3e5870;--t4:#1e3048;
+  --shd:0 8px 32px rgba(0,0,0,.55);--ovl:rgba(0,0,0,.8);
+  --cline:rgba(46,63,85,.8);--scr:var(--ln2);
+}
+/* ── LIGHT THEME ── */
+[data-theme="light"]{
+  --bg:#eef2f7;--bg2:#ffffff;--bg3:#e4ecf4;--bg4:#d4e0ec;
+  --ln:#c4d4e4;--ln2:#a8c0d8;
+  --t1:#0d1f33;--t2:#3a5a7a;--t3:#6a8aaa;--t4:#9ab0c8;
+  --shd:0 4px 20px rgba(0,0,0,.1);--ovl:rgba(0,0,0,.5);
+  --cline:rgba(180,210,235,.9);--scr:var(--ln);
+}
+/* ── BRAND ── */
+:root{
+  --gold:#d4a843;--gold2:#f0c96a;--gold3:#7a5510;
+  --teal:#17c4a2;--teal2:#0d8a72;
+  --red:#e85555;--green:#3dcc8a;--blue:#4f9cf9;--purple:#9b79f5;
+}
+html{height:100%;height:-webkit-fill-available;}
+body{min-height:100vh;min-height:-webkit-fill-available;background:var(--bg);color:var(--t1);font-family:'IBM Plex Sans',sans-serif;font-size:14px;overflow:hidden;transition:background .28s,color .28s;position:relative;}
+
+/* ══════════ LAYOUT ══════════ */
+.shell{display:flex;height:100vh;height:100dvh;overflow:hidden;}
+.sidebar{width:240px;background:var(--bg2);border-right:1px solid var(--ln);display:flex;flex-direction:column;flex-shrink:0;z-index:10;transition:background .28s,border-color .28s;}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0;}
+.topbar{height:56px;background:var(--bg2);border-bottom:1px solid var(--ln);display:flex;align-items:center;padding:0 18px;gap:10px;flex-shrink:0;transition:background .28s,border-color .28s;}
+.content{flex:1;overflow-y:auto;overflow-x:hidden;padding:18px;-webkit-overflow-scrolling:touch;}
+.content::-webkit-scrollbar{width:3px;}
+.content::-webkit-scrollbar-thumb{background:var(--scr);border-radius:2px;}
+
+/* ══════════ SIDEBAR ══════════ */
+.logo-wrap{padding:18px 16px 14px;border-bottom:1px solid var(--ln);}
+.logo-mark{display:flex;align-items:center;gap:10px;}
+.logo-icon{width:36px;height:36px;background:linear-gradient(135deg,var(--gold),var(--gold3));border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;font-family:'Playfair Display',serif;font-weight:700;color:#0b0800;flex-shrink:0;}
+.logo-name{font-family:'Playfair Display',serif;font-size:18px;color:var(--t1);}
+.logo-name em{color:var(--gold);font-style:normal;}
+.logo-tagline{font-size:10px;color:var(--t3);letter-spacing:1px;text-transform:uppercase;margin-top:2px;}
+.role-switch{margin:12px 10px;background:var(--bg3);border:1px solid var(--ln);border-radius:10px;padding:3px;display:flex;gap:2px;}
+.role-btn{flex:1;padding:7px 4px;border:none;background:transparent;color:var(--t3);font-family:'IBM Plex Sans',sans-serif;font-size:11px;font-weight:600;cursor:pointer;border-radius:7px;transition:all .2s;letter-spacing:.3px;}
+.role-btn.active{background:var(--bg4);color:var(--gold2);border:1px solid var(--ln2);}
+.nav-sec{padding:8px 12px 4px;font-size:9px;font-weight:600;color:var(--t4);letter-spacing:2px;text-transform:uppercase;margin-top:4px;}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 14px;margin:1px 8px;border-radius:8px;cursor:pointer;color:var(--t3);font-size:13px;font-weight:500;transition:all .18s;border:1px solid transparent;user-select:none;}
+.nav-item svg{width:15px;height:15px;flex-shrink:0;opacity:.7;}
+.nav-item:hover{background:var(--bg3);color:var(--t2);}
+.nav-item.active{background:rgba(212,168,67,.1);color:var(--gold2);border-color:rgba(212,168,67,.2);}
+.nav-item.active svg{opacity:1;}
+.nbadge{margin-left:auto;background:var(--red);color:#fff;font-size:9px;font-weight:700;padding:2px 6px;border-radius:10px;}
+.sidebar-footer{margin-top:auto;padding:12px 10px;border-top:1px solid var(--ln);}
+.theme-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;padding:0 2px;}
+.theme-lbl{font-size:10px;color:var(--t3);font-weight:600;letter-spacing:.5px;text-transform:uppercase;}
+.tgl{width:54px;height:28px;background:var(--bg3);border:1px solid var(--ln);border-radius:14px;cursor:pointer;position:relative;transition:all .3s;flex-shrink:0;display:flex;align-items:center;}
+.tgl-knob{width:22px;height:22px;border-radius:50%;background:var(--gold);position:absolute;left:3px;transition:left .3s,background .3s;display:flex;align-items:center;justify-content:center;font-size:11px;box-shadow:0 2px 6px rgba(0,0,0,.25);}
+[data-theme="light"] .tgl-knob{left:27px;background:var(--blue);}
+.tgl-track{position:absolute;width:100%;display:flex;justify-content:space-between;padding:0 7px;font-size:10px;pointer-events:none;}
+.user-pill{display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--bg3);border-radius:9px;border:1px solid var(--ln);}
+.user-av{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--teal),var(--teal2));display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:#041a14;flex-shrink:0;}
+.user-info{flex:1;min-width:0;}
+.user-name{font-size:12px;font-weight:600;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.user-role{font-size:10px;color:var(--t3);}
+
+/* ══════════ TOPBAR ══════════ */
+.topbar-title{font-family:'Playfair Display',serif;font-size:17px;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.topbar-title span{color:var(--gold);}
+.topbar-r{margin-left:auto;display:flex;align-items:center;gap:8px;}
+.ico-btn{width:34px;height:34px;background:var(--bg3);border:1px solid var(--ln);border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;color:var(--t2);transition:background .18s;}
+.ico-btn:hover{background:var(--bg4);}
+.ndot{position:absolute;top:6px;right:6px;width:6px;height:6px;background:var(--red);border-radius:50%;border:1px solid var(--bg2);}
+.mob-menu{display:none;width:36px;height:36px;background:var(--bg3);border:1px solid var(--ln);border-radius:8px;align-items:center;justify-content:center;cursor:pointer;color:var(--t2);}
+
+/* ══════════ AD BANNERS ══════════ */
+.ad-strip{background:var(--bg3);border:1px dashed var(--ln2);border-radius:8px;height:50px;display:flex;align-items:center;justify-content:center;margin-bottom:16px;position:relative;overflow:hidden;flex-shrink:0;}
+.ad-strip::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(-45deg,transparent,transparent 6px,rgba(128,128,128,.05) 6px,rgba(128,128,128,.05) 12px);}
+.ad-tag{font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--t3);letter-spacing:2px;text-transform:uppercase;background:var(--bg3);padding:3px 10px;border:1px solid var(--ln);border-radius:4px;position:relative;}
+.footer-ad{height:48px;background:var(--bg2);border-top:1px dashed var(--ln2);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+
+/* ══════════ CARDS ══════════ */
+.card{background:var(--bg2);border:1px solid var(--ln);border-radius:14px;padding:18px;position:relative;overflow:hidden;transition:background .28s,border-color .28s;}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--cline),transparent);}
+.card-hd{font-size:10px;font-weight:600;color:var(--t3);letter-spacing:2px;text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:7px;}
+.pip{width:5px;height:5px;border-radius:50%;background:var(--gold);}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:11px;}
+.gcol{display:flex;flex-direction:column;gap:14px;}
+
+/* ══════════ STAT CARDS ══════════ */
+.stat{background:var(--bg2);border:1px solid var(--ln);border-radius:12px;padding:14px;position:relative;overflow:hidden;transition:background .28s,border-color .28s;}
+.stat::after{content:'';position:absolute;bottom:-14px;right:-14px;width:55px;height:55px;border-radius:50%;}
+.stat.g::after{background:rgba(212,168,67,.1);}
+.stat.t::after{background:rgba(23,196,162,.1);}
+.stat.r::after{background:rgba(232,85,85,.1);}
+.stat.b::after{background:rgba(79,156,249,.1);}
+.stat.p::after{background:rgba(155,121,245,.1);}
+.stat-lbl{font-size:9px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--t3);margin-bottom:5px;}
+.stat-val{font-family:'Playfair Display',serif;font-size:22px;line-height:1;margin-bottom:3px;}
+.stat-val.g{color:var(--gold2);}
+.stat-val.t{color:var(--teal);}
+.stat-val.r{color:var(--red);}
+.stat-val.b{color:var(--blue);}
+.stat-val.p{color:var(--purple);}
+.stat-sub{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--t3);}
+
+/* ══════════ FORMS ══════════ */
+.fg{margin-bottom:13px;}
+label{display:block;font-size:10px;font-weight:600;color:var(--t2);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;}
+input,select,textarea{width:100%;background:var(--bg);border:1px solid var(--ln);border-radius:8px;padding:10px 13px;color:var(--t1);font-family:'IBM Plex Mono',monospace;font-size:14px;outline:none;transition:border-color .2s,box-shadow .2s,background .28s;-webkit-appearance:none;appearance:none;}
+input:focus,select:focus,textarea:focus{border-color:var(--gold3);box-shadow:0 0 0 3px rgba(212,168,67,.08);}
+input::placeholder{color:var(--t4);}
+textarea{resize:vertical;min-height:70px;}
+select option{background:var(--bg2);color:var(--t1);}
+[data-theme="light"] input,[data-theme="light"] select,[data-theme="light"] textarea{background:var(--bg3);}
+
+/* ══════════ BUTTONS ══════════ */
+.btn{padding:10px 18px;border:none;border-radius:9px;font-family:'IBM Plex Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;transition:all .18s;display:inline-flex;align-items:center;gap:7px;letter-spacing:.3px;touch-action:manipulation;}
+.btn-gold{background:linear-gradient(135deg,var(--gold),var(--gold3));color:#0a0700;box-shadow:0 3px 10px rgba(212,168,67,.25);}
+.btn-gold:active{transform:scale(.97);}
+.btn-teal{background:linear-gradient(135deg,var(--teal),var(--teal2));color:#030e0b;box-shadow:0 3px 10px rgba(23,196,162,.2);}
+.btn-teal:active{transform:scale(.97);}
+.btn-ghost{background:var(--bg3);color:var(--t2);border:1px solid var(--ln);}
+.btn-ghost:hover{color:var(--t1);border-color:var(--ln2);}
+.btn-danger{background:rgba(232,85,85,.1);color:var(--red);border:1px solid rgba(232,85,85,.2);}
+.btn-sm{padding:7px 13px;font-size:11px;}
+.btn-full{width:100%;justify-content:center;}
+.btn-icon{width:34px;height:34px;padding:0;justify-content:center;background:var(--bg3);color:var(--t2);border:1px solid var(--ln);border-radius:8px;}
+
+/* ══════════ TABLES ══════════ */
+.tbl-wrap{border-radius:10px;border:1px solid var(--ln);overflow:hidden;}
+.tbl-scroll{overflow-x:auto;max-height:300px;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+.tbl-scroll::-webkit-scrollbar{height:3px;width:3px;}
+.tbl-scroll::-webkit-scrollbar-thumb{background:var(--scr);border-radius:2px;}
+table{width:100%;border-collapse:collapse;font-size:12px;}
+thead th{background:var(--bg3);padding:10px 13px;text-align:left;font-size:9px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--t3);border-bottom:1px solid var(--ln);white-space:nowrap;}
+tbody tr{border-bottom:1px solid var(--ln);transition:background .12s;}
+tbody tr:last-child{border-bottom:none;}
+tbody tr:hover{background:rgba(128,128,128,.04);}
+tbody td{padding:10px 13px;color:var(--t2);font-family:'IBM Plex Mono',monospace;font-size:12px;white-space:nowrap;}
+tbody td:first-child{color:var(--t1);font-family:'IBM Plex Sans',sans-serif;font-weight:500;}
+
+/* ══════════ BADGES ══════════ */
+.badge{display:inline-flex;align-items:center;padding:2px 9px;border-radius:20px;font-size:9px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;}
+.bg{background:rgba(61,204,138,.12);color:var(--green);border:1px solid rgba(61,204,138,.2);}
+.bgold{background:rgba(212,168,67,.12);color:var(--gold2);border:1px solid rgba(212,168,67,.2);}
+.br{background:rgba(232,85,85,.12);color:var(--red);border:1px solid rgba(232,85,85,.2);}
+.bb{background:rgba(79,156,249,.12);color:var(--blue);border:1px solid rgba(79,156,249,.2);}
+.bp{background:rgba(155,121,245,.12);color:var(--purple);border:1px solid rgba(155,121,245,.2);}
+
+/* ══════════ RESULT ROWS ══════════ */
+.rr{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--ln);}
+.rr:last-child{border-bottom:none;}
+.rr-k{font-size:11px;color:var(--t3);font-weight:500;}
+.rr-v{font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--t1);}
+.rr-v.gold{color:var(--gold2);}
+.rr-v.gr{color:var(--green);}
+.rr-v.rd{color:var(--red);}
+.rr-v.lg{font-size:15px;font-weight:500;color:var(--gold2);}
+
+/* ══════════ PROGRESS ══════════ */
+.pb-track{height:5px;background:var(--bg4);border-radius:3px;overflow:hidden;margin:5px 0;}
+.pb-fill{height:100%;border-radius:3px;transition:width .5s ease;}
+.pb-teal{background:linear-gradient(90deg,var(--teal2),var(--teal));}
+.pb-gold{background:linear-gradient(90deg,var(--gold3),var(--gold2));}
+
+/* ══════════ MEMBER CHIT FUND CARDS ══════════ */
+.mcf-card{background:var(--bg);border:1px solid var(--ln);border-radius:12px;padding:14px;margin-bottom:10px;transition:border-color .15s,background .28s;}
+[data-theme="light"] .mcf-card{background:var(--bg3);}
+.mcf-card:hover{border-color:var(--ln2);}
+.mcf-top{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;}
+.mcf-icon{width:38px;height:38px;border-radius:10px;background:rgba(212,168,67,.12);border:1px solid rgba(212,168,67,.2);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.mcf-info{flex:1;min-width:0;}
+.mcf-name{font-size:14px;font-weight:600;color:var(--t1);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.mcf-meta{font-size:10px;color:var(--t3);letter-spacing:.4px;}
+.mcf-actions{display:flex;gap:5px;flex-shrink:0;}
+.mcf-row{display:flex;justify-content:space-between;gap:8px;margin-bottom:8px;}
+.mcf-stat{flex:1;background:var(--bg3);border-radius:8px;padding:8px 10px;text-align:center;}
+[data-theme="light"] .mcf-stat{background:var(--bg4);}
+.mcf-stat-val{font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:600;color:var(--gold2);margin-bottom:2px;}
+.mcf-stat-lbl{font-size:9px;color:var(--t3);letter-spacing:.5px;text-transform:uppercase;}
+.mcf-prog-row{display:flex;align-items:center;gap:8px;}
+.mcf-pct{font-size:11px;font-weight:600;color:var(--teal);font-family:'IBM Plex Mono',monospace;min-width:32px;text-align:right;}
+.mcf-note{font-size:11px;color:var(--t3);margin-top:7px;border-top:1px solid var(--ln);padding-top:7px;line-height:1.5;}
+
+/* ══════════ BID ROWS ══════════ */
+.bid-row{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:9px;border:1px solid var(--ln);margin-bottom:7px;background:var(--bg);transition:border-color .15s;}
+[data-theme="light"] .bid-row{background:var(--bg3);}
+.bid-row.lowest{border-color:var(--gold2);background:rgba(212,168,67,.06);}
+.bid-rank{width:24px;height:24px;border-radius:50%;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--t3);flex-shrink:0;}
+.bid-row.lowest .bid-rank{background:var(--gold2);color:#0a0700;}
+.bid-name{flex:1;font-size:13px;font-weight:600;color:var(--t1);}
+.bid-grp{font-size:10px;color:var(--t3);}
+.bid-amt{font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:600;color:var(--t1);}
+.bid-row.lowest .bid-amt{color:var(--gold2);}
+.bid-winner-tag{font-size:9px;background:rgba(212,168,67,.15);color:var(--gold2);border:1px solid rgba(212,168,67,.3);border-radius:4px;padding:2px 6px;letter-spacing:.5px;text-transform:uppercase;white-space:nowrap;}
+
+/* ══════════ MEMBER ROW ══════════ */
+.member-row{display:flex;align-items:center;gap:11px;padding:11px;background:var(--bg);border:1px solid var(--ln);border-radius:9px;margin-bottom:8px;transition:border-color .15s,background .28s;}
+.member-row:hover{border-color:var(--ln2);}
+[data-theme="light"] .member-row{background:var(--bg3);}
+.av{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;flex-shrink:0;}
+.m-info{flex:1;min-width:0;}
+.m-name{font-size:13px;font-weight:600;color:var(--t1);}
+.m-meta{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--t3);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.row-actions{display:flex;gap:5px;align-items:center;flex-shrink:0;}
+
+/* ══════════ AUCTION ══════════ */
+.auc-card{background:linear-gradient(135deg,rgba(212,168,67,.07),rgba(23,196,162,.04));border:1px solid rgba(212,168,67,.22);border-radius:14px;padding:20px;margin-bottom:14px;}
+.auc-timer{font-family:'Playfair Display',serif;font-size:38px;color:var(--gold2);text-align:center;letter-spacing:3px;}
+.auc-timer-lbl{font-size:10px;color:var(--t3);letter-spacing:2px;text-transform:uppercase;text-align:center;margin-bottom:10px;}
+
+/* ══════════ NOTIFICATIONS ══════════ */
+.notif-item{display:flex;gap:10px;padding:11px 14px;border-bottom:1px solid var(--ln);}
+.notif-item:last-child{border-bottom:none;}
+.ndot-sm{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:4px;}
+.notif-text{font-size:12px;color:var(--t2);line-height:1.5;}
+.notif-time{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--t4);margin-top:2px;}
+
+/* ══════════ TOAST ══════════ */
+.toast{position:fixed;bottom:68px;right:16px;background:var(--bg2);border:1px solid var(--green);border-radius:10px;padding:11px 16px;font-size:12px;color:var(--green);z-index:9999;box-shadow:var(--shd);transform:translateY(60px);opacity:0;transition:all .3s;font-weight:600;display:flex;align-items:center;gap:8px;max-width:260px;}
+.toast.show{transform:translateY(0);opacity:1;}
+.toast.err{border-color:var(--red);color:var(--red);}
+
+/* â•â•â•â•â•â•â•â•â•â• AUTH & SYNC â•â•â•â•â•â•â•â•â•â• */
+.auth-btn{min-width:118px;justify-content:center;}
+.auth-chip{padding:7px 10px;border-radius:999px;border:1px solid var(--ln);background:var(--bg3);font-size:10px;font-weight:600;letter-spacing:.6px;text-transform:uppercase;color:var(--t2);white-space:nowrap;}
+.auth-chip.ready{color:var(--green);border-color:rgba(61,204,138,.28);}
+.auth-chip.offline{color:var(--red);border-color:rgba(232,85,85,.26);}
+.sync-note{margin-top:8px;font-size:10px;color:var(--t3);line-height:1.5;}
+.sync-note strong{color:var(--t1);font-weight:600;}
+.user-auth-actions{display:flex;gap:8px;margin-top:10px;}
+.user-auth-actions .btn{flex:1;justify-content:center;}
+.auth-overlay{position:fixed;inset:0;z-index:9800;background:linear-gradient(180deg,rgba(8,12,18,.92),rgba(8,12,18,.96));backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);display:none;align-items:center;justify-content:center;padding:20px;}
+.auth-overlay.show{display:flex;}
+.auth-gate{width:min(100%,420px);background:var(--bg2);border:1px solid var(--ln2);border-radius:22px;padding:28px;box-shadow:var(--shd);position:relative;overflow:hidden;}
+.auth-gate::before{content:'';position:absolute;inset:auto -40px -70px auto;width:180px;height:180px;border-radius:50%;background:radial-gradient(circle,rgba(212,168,67,.2),transparent 70%);}
+.auth-kicker{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--gold2);font-weight:700;margin-bottom:10px;}
+.auth-title{font-family:'Playfair Display',serif;font-size:28px;line-height:1.1;color:var(--t1);margin-bottom:10px;}
+.auth-copy{font-size:13px;line-height:1.7;color:var(--t2);margin-bottom:18px;}
+.auth-meta{display:grid;gap:10px;margin-bottom:18px;}
+.auth-meta .rr{padding:10px 0;}
+.auth-error{margin-top:12px;font-size:12px;color:var(--red);line-height:1.5;display:none;}
+.auth-error.show{display:block;}
+
+/* ══════════ MODAL ══════════ */
+.modal-bg{display:none;position:fixed;inset:0;background:var(--ovl);z-index:9100;align-items:flex-end;justify-content:center;}
+.modal-bg.open{display:flex;}
+.modal-bg.center{align-items:center;}
+.modal{background:var(--bg2);border:1px solid var(--ln2);border-radius:20px 20px 0 0;width:100%;max-width:480px;max-height:90vh;max-height:90dvh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 -8px 40px rgba(0,0,0,.4);animation:slideUp .25s ease;transition:background .28s;}
+.modal-bg.center .modal{border-radius:18px;margin:0 16px;max-width:360px;}
+@keyframes slideUp{from{transform:translateY(60px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+.modal-handle{width:40px;height:4px;background:var(--ln2);border-radius:2px;margin:10px auto 0;display:block;flex-shrink:0;}
+.modal-bg.center .modal-handle{display:none;}
+.modal-hd{padding:16px 20px;border-bottom:1px solid var(--ln);display:flex;align-items:center;justify-content:space-between;background:var(--bg2);flex-shrink:0;}
+.modal-title{font-family:'Playfair Display',serif;font-size:16px;color:var(--t1);}
+.modal-close{width:28px;height:28px;background:var(--bg3);border:1px solid var(--ln);border-radius:6px;color:var(--t3);cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;}
+.modal-body{padding:18px;overflow-y:auto;flex:1;-webkit-overflow-scrolling:touch;}
+.modal-foot{padding:14px 18px;border-top:1px solid var(--ln);display:flex;gap:8px;justify-content:flex-end;background:var(--bg2);flex-shrink:0;}
+.intst-inner{background:repeating-linear-gradient(-45deg,transparent,transparent 8px,rgba(128,128,128,.06) 8px,rgba(128,128,128,.06) 16px);border:1px dashed var(--ln2);border-radius:10px;height:220px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;}
+
+/* ══════════ SECTIONS ══════════ */
+.section{display:none;}
+.section.active{display:block;animation:fadeUp .22s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+
+/* ══════════ MISC ══════════ */
+.div{height:1px;background:linear-gradient(90deg,transparent,var(--ln2),transparent);margin:16px 0;}
+.insight{background:rgba(212,168,67,.06);border:1px solid rgba(212,168,67,.14);border-radius:9px;padding:11px 13px;font-size:11px;color:var(--t2);line-height:1.6;display:flex;gap:8px;margin-top:13px;}
+.insight-icon{color:var(--gold);font-size:14px;flex-shrink:0;margin-top:1px;}
+.emi-bd{background:var(--bg3);border-radius:10px;padding:14px;margin-top:13px;}
+.chart-bars{display:flex;align-items:flex-end;gap:6px;height:90px;margin-top:10px;}
+.chart-bw{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;}
+.chart-b{width:100%;border-radius:4px 4px 0 0;min-height:4px;transition:height .4s ease;}
+.chart-bl{font-size:9px;color:var(--t3);font-family:'IBM Plex Mono',monospace;}
+.kpi{background:var(--bg3);border-radius:10px;padding:13px;text-align:center;}
+.kpi-val{font-family:'Playfair Display',serif;font-size:20px;margin-bottom:2px;}
+.kpi-lbl{font-size:9px;color:var(--t3);letter-spacing:1px;text-transform:uppercase;}
+.empty{text-align:center;padding:32px 16px;color:var(--t3);}
+.empty-icon{font-size:30px;margin-bottom:10px;opacity:.35;}
+.empty p{font-size:12px;line-height:1.6;}
+.page-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;gap:10px;flex-wrap:wrap;}
+.page-title{font-family:'Playfair Display',serif;font-size:20px;color:var(--t1);}
+.page-title span{color:var(--gold);}
+
+/* ══════════ MOBILE BOTTOM NAV ══════════ */
+.mobile-nav{display:none;left:0;right:0;height:calc(64px + env(safe-area-inset-bottom,0px));background:var(--bg2);border-top:1px solid var(--ln);z-index:9000;padding:0;flex-shrink:0;transition:background .28s,border-color .28s;}
+.mn-inner{display:flex;height:64px;align-items:stretch;width:100%;}
+.mn-item{flex:1;height:64px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:6px 4px 4px;cursor:pointer;color:var(--t3);border:none;background:transparent;transition:color .2s;position:relative;touch-action:manipulation;-webkit-tap-highlight-color:transparent;min-width:0;outline:none;-webkit-user-select:none;user-select:none;}
+.mn-item:active{opacity:.7;}
+.mn-icon-wrap{width:36px;height:26px;display:flex;align-items:center;justify-content:center;border-radius:12px;transition:background .2s;pointer-events:none;flex-shrink:0;}
+.mn-item.active .mn-icon-wrap{background:rgba(212,168,67,.18);}
+.mn-item span{font-size:9px;font-weight:600;letter-spacing:.2px;text-transform:uppercase;pointer-events:none;white-space:nowrap;line-height:1;color:inherit;}
+.mn-item svg{width:20px;height:20px;flex-shrink:0;pointer-events:none;display:block;}
+.mn-item.active{color:var(--gold2);}
+.mn-badge{position:absolute;top:5px;right:calc(50% - 20px);min-width:15px;height:15px;background:var(--red);color:#fff;font-size:8px;font-weight:700;border-radius:8px;display:flex;align-items:center;justify-content:center;border:2px solid var(--bg2);pointer-events:none;padding:0 3px;}
+
+/* ══════════ SIDEBAR OVERLAY (mobile) ══════════ */
+.sb-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:8999;backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);}
+.sb-overlay.open{display:block;}
+
+/* ══════════ RESPONSIVE — TABLET ══════════ */
+@media(max-width:900px){
+  .sidebar{position:fixed;top:0;left:-270px;height:100dvh;z-index:9500;width:260px;transition:left .3s cubic-bezier(.4,0,.2,1);box-shadow:6px 0 30px rgba(0,0,0,.4);}
+  .sidebar.open{left:0;}
+  .mob-menu{display:flex;}
+  .footer-ad{display:none;}
+  .mobile-nav{display:flex;}
+  .shell{height:100dvh;}
+  .content{padding:14px 14px 14px;}
+  .g4{grid-template-columns:1fr 1fr;}
+  .g3{grid-template-columns:1fr 1fr;}
+  .ad-strip{height:44px;margin-bottom:12px;}
+  .topbar{padding:0 12px;height:52px;}
+  .topbar-title{font-size:16px;}
+  .btn.btn-sm{padding:8px 14px;}
+}
+
+/* ══════════ RESPONSIVE — MOBILE ══════════ */
+@media(max-width:600px){
+  .g2,.g3,.g4{grid-template-columns:1fr;}
+  .topbar{height:52px;padding:0 12px;}
+  .topbar-title{font-size:15px;}
+  .topbar-r{gap:6px;}
+  .auc-timer{font-size:32px;letter-spacing:2px;}
+  .stat-val{font-size:20px;}
+  .stat{padding:12px;}
+  .card{padding:14px;}
+  .card-hd{margin-bottom:12px;}
+  .content{padding:12px 12px 12px;}
+  .content>*+*{margin-top:12px;}
+  .toast{bottom:calc(72px + env(safe-area-inset-bottom,0px));right:12px;left:12px;max-width:none;border-radius:14px;font-size:13px;}
+  .modal-bg.center .modal{margin:0 12px;max-width:100%;}
+  .modal{max-height:calc(88vh - 64px);max-height:calc(88dvh - 64px);}
+  .modal-body{padding:14px;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+  .modal-foot{padding:12px 14px;gap:8px;padding-bottom:max(12px,env(safe-area-inset-bottom,12px));flex-shrink:0;}
+  .modal-foot .btn{flex:1;justify-content:center;}
+  .page-hd{margin-bottom:12px;}
+  .page-title{font-size:18px;}
+  .rr-k{font-size:12px;}
+  .rr-v{font-size:13px;}
+  .btn{padding:11px 16px;font-size:13px;border-radius:10px;}
+  .btn-sm{padding:9px 14px;font-size:12px;}
+  input,select,textarea{padding:12px 13px;font-size:15px;border-radius:10px;}
+  label{font-size:11px;margin-bottom:5px;}
+  .fg{margin-bottom:14px;}
+  .tbl-scroll{max-height:260px;}
+  tbody td{padding:9px 10px;font-size:11px;}
+  thead th{padding:9px 10px;font-size:9px;}
+  .member-row{padding:12px;}
+  .m-name{font-size:14px;}
+  .auc-card{padding:16px;}
+  .kpi{padding:12px 8px;}
+  .kpi-val{font-size:18px;}
+  .kpi-lbl{font-size:8px;}
+  .notif-item{padding:12px;}
+  .notif-text{font-size:13px;}
+  /* Mobile role switcher inline */
+  .role-switch{margin:10px 12px;}
+  /* Wider touch targets */
+  .ico-btn{width:38px;height:38px;}
+  .mob-menu{width:38px;height:38px;}
+  /* Stat grid 2-col on small screens */
+  .g4{grid-template-columns:1fr 1fr;}
+  .stat-lbl{font-size:9px;}
+  /* Hide top ad strip on mobile to save space */
+  .ad-strip-wrap{display:none;}
+  /* Create btn: icon only on tiny screens */
+  #topCreateBtn .btn-txt{display:none;}
+  #topCreateBtn{padding:0;width:38px;height:38px;border-radius:10px;font-size:20px;gap:0;justify-content:center;line-height:1;}
+  .auth-gate{padding:22px 18px;border-radius:18px;}
+  .auth-title{font-size:24px;}
+  .user-auth-actions{flex-direction:column;}
+  .auth-chip{display:none;}
+}
+
+
+/* ══════════ EMI CALCULATOR REDESIGN ══════════ */
+.emi-hero{background:linear-gradient(135deg,rgba(212,168,67,.12),rgba(79,156,249,.08));border:1px solid rgba(212,168,67,.2);border-radius:18px;padding:20px;margin-bottom:16px;}
+.emi-input-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
+.emi-input-card{background:var(--bg);border:1px solid var(--ln);border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:4px;}
+.emi-input-lbl{font-size:9px;font-weight:600;color:var(--t3);letter-spacing:1.5px;text-transform:uppercase;}
+.emi-input-card input,.emi-input-card select{background:transparent;border:none;padding:0;font-size:18px;font-family:'IBM Plex Mono',monospace;font-weight:500;color:var(--t1);border-radius:0;width:100%;outline:none;}
+.emi-input-card.wide{grid-column:1/-1;}
+.emi-result-strip{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:16px;}
+.emi-pill{background:var(--bg2);border:1px solid var(--ln);border-radius:14px;padding:14px 12px;text-align:center;}
+.emi-pill-val{font-family:'Playfair Display',serif;font-size:20px;font-weight:600;line-height:1;margin-bottom:4px;}
+.emi-pill-lbl{font-size:9px;font-weight:600;color:var(--t3);letter-spacing:1px;text-transform:uppercase;}
+.emi-pill.g .emi-pill-val{color:var(--gold2);}
+.emi-pill.t .emi-pill-val{color:var(--teal);}
+.emi-pill.b .emi-pill-val{color:var(--blue);}
+.emi-pill.p .emi-pill-val{color:var(--purple);}
+.emi-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--ln);gap:8px;}
+.emi-row:last-child{border-bottom:none;}
+.emi-row-k{font-size:12px;color:var(--t3);flex:1;}
+.emi-row-v{font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--t1);font-weight:500;white-space:nowrap;}
+.emi-row-v.g{color:var(--green);}
+.emi-row-v.r{color:var(--red);}
+.emi-row-v.gold{color:var(--gold2);font-size:15px;font-weight:600;}
+.emi-vs-card{background:linear-gradient(135deg,rgba(61,204,138,.06),rgba(79,156,249,.04));border:1px solid rgba(61,204,138,.15);border-radius:14px;padding:16px;margin-top:12px;}
+
+/* ══════════ PAYMENT TRACKER REDESIGN ══════════ */
+.pay-filter-bar{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+.pay-progress-card{background:var(--bg2);border:1px solid var(--ln);border-radius:16px;padding:18px;margin-bottom:14px;}
+.pay-progress-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
+.pay-progress-title{font-size:14px;font-weight:600;color:var(--t1);}
+.pay-progress-pct{font-family:'Playfair Display',serif;font-size:26px;color:var(--teal);}
+.pay-track-wrap{height:8px;background:var(--bg4);border-radius:4px;overflow:hidden;margin-bottom:14px;}
+.pay-track-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--teal2),var(--teal));transition:width .6s ease;}
+.pay-stats-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
+.pay-stat-mini{background:var(--bg3);border-radius:10px;padding:10px 8px;text-align:center;}
+.pay-stat-mini-val{font-family:'Playfair Display',serif;font-size:18px;font-weight:600;line-height:1;margin-bottom:3px;}
+.pay-stat-mini-lbl{font-size:9px;font-weight:600;color:var(--t3);letter-spacing:1px;text-transform:uppercase;}
+.pay-member-item{background:var(--bg2);border:1px solid var(--ln);border-radius:14px;padding:14px 16px;display:flex;align-items:center;gap:12px;margin-bottom:8px;transition:border-color .2s;}
+.pay-member-item.is-paid{border-left:3px solid var(--green);}
+.pay-member-item.is-due{border-left:3px solid var(--red);}
+.pay-av{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;flex-shrink:0;}
+.pay-member-name{font-size:14px;font-weight:600;color:var(--t1);}
+.pay-member-meta{font-size:11px;color:var(--t3);margin-top:2px;font-family:'IBM Plex Mono',monospace;}
+.pay-amt{font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--t2);margin-right:8px;white-space:nowrap;}
+.pay-toggle{width:44px;height:26px;border-radius:13px;border:none;cursor:pointer;transition:background .25s,border-color .25s;flex-shrink:0;position:relative;touch-action:manipulation;outline:none;}
+.pay-toggle.is-paid{background:var(--green);}
+.pay-toggle.is-due{background:var(--bg4);border:1.5px solid var(--ln2);}
+.pay-toggle::after{content:'';position:absolute;top:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:left .25s;box-shadow:0 1px 4px rgba(0,0,0,.3);}
+.pay-toggle.is-paid::after{left:21px;}
+.pay-toggle.is-due::after{left:3px;}
+
+/* ══════════ AUCTION REDESIGN ══════════ */
+.auc-hero{background:linear-gradient(160deg,rgba(212,168,67,.13) 0%,rgba(23,196,162,.07) 100%);border:1px solid rgba(212,168,67,.28);border-radius:20px;padding:24px 20px 20px;margin-bottom:16px;text-align:center;position:relative;overflow:hidden;}
+.auc-hero::after{content:'🏆';position:absolute;right:-8px;bottom:-12px;font-size:80px;opacity:.06;pointer-events:none;}
+.auc-live-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(61,204,138,.1);border:1px solid rgba(61,204,138,.25);border-radius:20px;padding:4px 12px;font-size:10px;font-weight:600;color:var(--green);letter-spacing:1px;text-transform:uppercase;margin-bottom:12px;}
+.auc-live-dot{width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(61,204,138,.4);}50%{opacity:.7;box-shadow:0 0 0 4px rgba(61,204,138,0);}}
+.auc-hero-time{font-family:'Playfair Display',serif;font-size:54px;color:var(--gold2);letter-spacing:5px;line-height:1;text-shadow:0 2px 20px rgba(212,168,67,.25);}
+.auc-timer-btns{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:16px;}
+.auc-timer-btns .btn{justify-content:center;padding:11px 8px;font-size:13px;}
+.auc-fields-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+.auc-field{background:var(--bg3);border:1px solid var(--ln);border-radius:12px;padding:12px 14px;}
+.auc-field label{font-size:9px;font-weight:600;color:var(--t3);letter-spacing:1.5px;text-transform:uppercase;display:block;margin-bottom:6px;}
+.auc-field input,.auc-field select{background:transparent;border:none;padding:0;font-size:16px;font-family:'IBM Plex Mono',monospace;font-weight:500;color:var(--t1);width:100%;outline:none;border-radius:0;}
+.auc-field.wide{grid-column:1/-1;}
+.auc-prize-banner{text-align:center;padding:18px 0 14px;border-bottom:1px solid var(--ln);margin-bottom:14px;}
+.auc-prize-lbl{font-size:10px;font-weight:600;color:var(--t3);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;}
+.auc-prize-val{font-family:'Playfair Display',serif;font-size:40px;color:var(--gold2);line-height:1;text-shadow:0 2px 16px rgba(212,168,67,.2);}
+.auc-calc-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.auc-calc-chip{background:var(--bg);border:1px solid var(--ln);border-radius:10px;padding:10px 12px;}
+.auc-calc-chip-lbl{font-size:9px;font-weight:600;color:var(--t3);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;}
+.auc-calc-chip-val{font-family:'IBM Plex Mono',monospace;font-size:14px;color:var(--t1);font-weight:500;}
+.auc-calc-chip-val.g{color:var(--green);}
+.auc-calc-chip-val.r{color:var(--red);}
+.auc-calc-chip-val.gold{color:var(--gold2);font-size:16px;}
+.auc-hist-row{display:flex;align-items:center;gap:12px;padding:12px;background:var(--bg3);border-radius:12px;margin-bottom:8px;border:1px solid var(--ln);}
+.auc-hist-mo-chip{width:42px;height:42px;border-radius:10px;background:rgba(212,168,67,.1);border:1px solid rgba(212,168,67,.2);display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;}
+.auc-hist-mo-chip span:first-child{font-size:8px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:1px;}
+.auc-hist-mo-chip span:last-child{font-size:15px;font-weight:700;color:var(--gold2);font-family:'IBM Plex Mono',monospace;line-height:1;}
+.auc-hist-info{flex:1;min-width:0;}
+.auc-hist-winner{font-size:13px;font-weight:600;color:var(--t1);}
+.auc-hist-sub{font-size:11px;color:var(--t3);font-family:'IBM Plex Mono',monospace;margin-top:2px;}
+.auc-hist-prize{font-family:'Playfair Display',serif;font-size:16px;color:var(--gold2);white-space:nowrap;}
+
+/* Member Live Auction */
+.mem-auc-hero{background:linear-gradient(160deg,rgba(232,85,85,.08),rgba(212,168,67,.1));border:2px solid rgba(212,168,67,.3);border-radius:20px;padding:24px 20px;text-align:center;margin-bottom:16px;}
+.mem-bid-wrap{background:var(--bg3);border:2px solid var(--ln);border-radius:16px;padding:16px 18px;display:flex;align-items:center;gap:10px;margin:16px 0;transition:border-color .2s;}
+.mem-bid-wrap:focus-within{border-color:var(--gold3);background:var(--bg);}
+.mem-bid-prefix{font-size:24px;color:var(--t3);font-family:'Playfair Display',serif;line-height:1;}
+.mem-bid-wrap input{background:transparent;border:none;padding:0;font-size:28px;font-family:'Playfair Display',serif;font-weight:600;color:var(--t1);width:100%;outline:none;}
+.mem-rule-item{display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--bg3);border-radius:12px;margin-bottom:8px;border:1px solid var(--ln);}
+.mem-rule-icon{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;}
+.mem-rule-title{font-size:13px;font-weight:600;color:var(--t1);}
+.mem-rule-sub{font-size:11px;color:var(--t3);margin-top:1px;}
+
+/* Member My Payments */
+.mpay-group-card{background:var(--bg2);border:1px solid var(--ln);border-radius:16px;padding:18px;margin-bottom:14px;}
+.mpay-select-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+.mpay-select-grid select,.mpay-select-grid input{border-radius:12px;font-size:15px;padding:12px 13px;}
+.mpay-amount-display{background:linear-gradient(135deg,rgba(23,196,162,.1),rgba(79,156,249,.06));border:1px solid rgba(23,196,162,.2);border-radius:14px;padding:16px;margin-bottom:14px;text-align:center;}
+.mpay-amount-lbl{font-size:10px;font-weight:600;color:var(--t3);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;}
+.mpay-amount-val{font-family:'Playfair Display',serif;font-size:34px;color:var(--teal);line-height:1;}
+.mpay-hist-item{display:flex;align-items:center;gap:12px;padding:14px;background:var(--bg2);border:1px solid var(--ln);border-radius:14px;margin-bottom:8px;}
+.mpay-hist-mo{width:42px;height:42px;border-radius:10px;background:rgba(61,204,138,.1);border:1px solid rgba(61,204,138,.18);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--green);font-family:'IBM Plex Mono',monospace;font-size:13px;flex-shrink:0;}
+.mpay-hist-group{font-size:13px;font-weight:600;color:var(--t1);}
+.mpay-hist-date{font-size:11px;color:var(--t3);font-family:'IBM Plex Mono',monospace;margin-top:2px;}
+.mpay-hist-amt{font-family:'Playfair Display',serif;font-size:16px;color:var(--teal);white-space:nowrap;}
+
+/* ══════════ MOBILE TOPBAR ROLE STRIP ══════════ */
+@media(max-width:900px){
+  .mob-role-strip{display:flex;padding:8px 12px 4px;background:var(--bg2);border-bottom:1px solid var(--ln);gap:6px;flex-shrink:0;}
+  .mob-role-btn{flex:1;padding:7px 8px;border:1px solid var(--ln);background:var(--bg3);color:var(--t3);font-family:'IBM Plex Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;border-radius:8px;transition:all .2s;text-align:center;touch-action:manipulation;}
+  .mob-role-btn.active{background:rgba(212,168,67,.12);color:var(--gold2);border-color:rgba(212,168,67,.3);}
+}
+@media(min-width:901px){.mob-role-strip{display:none;}}
+</style>
+</head>
+<body>
+
+<div class="toast" id="toast"><span id="t-icon">✓</span><span id="t-msg">Done</span></div>
+<div class="sb-overlay" id="sbOverlay" onclick="closeSB()"></div>
+
+<!-- ADD MEMBER MODAL -->
+<div class="modal-bg" id="memberModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-hd"><div class="modal-title">Add New Member</div><button class="modal-close" onclick="closeModal('memberModal')">✕</button></div>
+    <div class="modal-body">
+      <div class="fg"><label>Full Name</label><input id="mm_name" placeholder="e.g. Ravi Kumar"></div>
+      <div class="fg"><label>Phone</label><input id="mm_phone" type="tel" placeholder="9876543210"></div>
+      <div class="fg"><label>Email (optional)</label><input id="mm_email" type="email" placeholder="ravi@email.com"></div>
+      <div class="g2">
+        <div class="fg"><label>Chit Group</label><select id="mm_group"><option value="">— Select —</option></select></div>
+        <div class="fg"><label>Ticket No.</label><input id="mm_ticket" type="number" placeholder="1"></div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost btn-sm" onclick="closeModal('memberModal')">Cancel</button>
+      <button class="btn btn-gold btn-sm" onclick="saveMember()">Save Member</button>
+    </div>
+  </div>
+</div>
+
+<!-- CREATE CHIT MODAL -->
+<div class="modal-bg" id="chitModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-hd"><div class="modal-title">Create Chit Fund</div><button class="modal-close" onclick="closeModal('chitModal')">✕</button></div>
+    <div class="modal-body">
+      <div class="fg"><label>Chit Name</label><input id="cm_name" placeholder="e.g. Gold Chit 2025"></div>
+      <div class="g2">
+        <div class="fg"><label>Total Value (₹)</label><input id="cm_value" type="number" placeholder="100000"></div>
+        <div class="fg"><label>Members</label><input id="cm_members" type="number" placeholder="20"></div>
+      </div>
+      <div class="g2">
+        <div class="fg"><label>Duration (Months)</label><input id="cm_duration" type="number" placeholder="20"></div>
+        <div class="fg"><label>Commission (%)</label><input id="cm_comm" type="number" value="5" step=".1"></div>
+      </div>
+      <div class="fg"><label>Start Date</label><input id="cm_start" type="month"></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost btn-sm" onclick="closeModal('chitModal')">Cancel</button>
+      <button class="btn btn-gold btn-sm" onclick="saveChit()">Create Fund</button>
+    </div>
+  </div>
+</div>
+
+<!-- INTERSTITIAL AD -->
+<div class="modal-bg center" id="adModal">
+  <div class="modal">
+    <div class="modal-hd"><div style="font-size:9px;letter-spacing:2px;color:var(--t3);text-transform:uppercase;font-family:'IBM Plex Mono',monospace;">Advertisement</div><button class="modal-close" onclick="closeModal('adModal')">✕</button></div>
+    <div class="modal-body">
+      <div class="intst-inner">
+        <div class="ad-tag">AdMob Interstitial</div>
+        <div style="font-size:10px;color:var(--t3);margin-top:4px;">320 × 480 — Full-screen Ad Unit</div>
+      </div>
+    </div>
+    <div class="modal-foot"><button class="btn btn-ghost btn-sm btn-full" onclick="closeModal('adModal')">Continue to App →</button></div>
+  </div>
+</div>
+
+<!-- MY CHIT FUND MODAL -->
+<div class="modal-bg" id="mcfModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-hd">
+      <div class="modal-title" id="mcfModalTitle">Add Chit Fund</div>
+      <button class="modal-close" onclick="closeModal('mcfModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="mcf_edit_id">
+      <div class="fg"><label>Fund Name / Group</label><input id="mcf_name" placeholder="e.g. Mahalakshmi Chit, Office Chit…"></div>
+      <div class="g2">
+        <div class="fg"><label>Chit Value (₹)</label><input id="mcf_value" type="number" placeholder="100000" inputmode="numeric"></div>
+        <div class="fg"><label>No. of Members</label><input id="mcf_members" type="number" placeholder="20" inputmode="numeric"></div>
+      </div>
+      <div class="g2">
+        <div class="fg"><label>Duration (Months)</label><input id="mcf_duration" type="number" placeholder="20" inputmode="numeric"></div>
+        <div class="fg"><label>Commission (%)</label><input id="mcf_comm" type="number" value="5" step=".1" inputmode="decimal"></div>
+      </div>
+      <div class="g2">
+        <div class="fg"><label>Start Month</label><input id="mcf_start" type="month"></div>
+        <div class="fg"><label>Month Paid Upto</label><input id="mcf_paid" type="number" placeholder="0" min="0" inputmode="numeric"></div>
+      </div>
+      <div class="fg"><label>Foreman / Organiser Name</label><input id="mcf_foreman" placeholder="Optional"></div>
+      <div class="fg"><label>Notes (optional)</label><textarea id="mcf_notes" placeholder="Any notes…" style="min-height:52px;"></textarea></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost btn-sm" onclick="closeModal('mcfModal')">Cancel</button>
+      <button class="btn btn-gold btn-sm" onclick="saveMCF()">Save Fund</button>
+    </div>
+  </div>
+</div>
+
+<!-- MY CHIT FUND DELETE CONFIRM -->
+<div class="modal-bg center" id="mcfDeleteModal">
+  <div class="modal">
+    <div class="modal-hd"><div class="modal-title" style="color:var(--red);">Remove Fund?</div><button class="modal-close" onclick="closeModal('mcfDeleteModal')">✕</button></div>
+    <div class="modal-body" style="text-align:center;padding:24px 20px;">
+      <div style="font-size:36px;margin-bottom:12px;">🗑</div>
+      <div style="font-size:14px;color:var(--t2);margin-bottom:6px;">Remove this fund from your tracker?</div>
+      <div style="font-weight:600;color:var(--t1);font-size:15px;" id="mcf_del_name">this fund</div>
+      <div style="font-size:12px;color:var(--t3);margin-top:6px;">This action cannot be undone.</div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost btn-sm" onclick="closeModal('mcfDeleteModal')">Cancel</button>
+      <button class="btn btn-danger btn-sm" onclick="confirmDeleteMCF()">Remove</button>
+    </div>
+  </div>
+</div>
+
+<div class="auth-overlay show" id="authOverlay">
+  <div class="auth-gate">
+    <div class="auth-kicker">Secure Access</div>
+    <div class="auth-title">Sign in with Google to unlock your chit data.</div>
+    <div class="auth-copy">This app now stores each signed-in user's members, funds, payments, and auctions in Firebase so the same data can be loaded again on another device.</div>
+    <div class="auth-meta">
+      <div class="rr"><span class="rr-k">Authentication</span><span class="rr-v">Google via Firebase</span></div>
+      <div class="rr"><span class="rr-k">Database</span><span class="rr-v gold">Cloud Firestore</span></div>
+      <div class="rr"><span class="rr-k">Scope</span><span class="rr-v">Private per user</span></div>
+    </div>
+    <button class="btn btn-gold btn-full auth-btn" type="button" onclick="signInWithGoogle()">Continue With Google</button>
+    <div class="auth-error" id="authError"></div>
+  </div>
+</div>
+
+<div class="shell">
+  <!-- SIDEBAR -->
+  <div class="sidebar" id="sidebar">
+    <div class="logo-wrap">
+      <div class="logo-mark">
+        <div class="logo-icon">₹</div>
+        <div><div class="logo-name">Chit<em>Vault</em></div><div class="logo-tagline">Fund Manager</div></div>
+      </div>
+    </div>
+    <div class="role-switch">
+      <button class="role-btn active" id="roleForeman" onclick="setRole('foreman')">Foreman</button>
+      <button class="role-btn" id="roleMember" onclick="setRole('member')">Member</button>
+    </div>
+    <div id="foremanNav">
+      <div class="nav-sec">Overview</div>
+      <div class="nav-item active" onclick="nav('dashboard',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span>Dashboard</span></div>
+      <div class="nav-sec">Management</div>
+      <div class="nav-item" onclick="nav('members',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="7" r="4"/><path d="M2 21v-2a4 4 0 0 1 4-4h6a4 4 0 0 1 4 4v2"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg><span>Members</span><span class="nbadge" id="memberBadge">0</span></div>
+      <div class="nav-item" onclick="nav('payments',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg><span>Payments</span></div>
+      <div class="nav-item" onclick="nav('auction',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>Auction</span></div>
+      <div class="nav-sec">Finance</div>
+      <div class="nav-item" onclick="nav('emi',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 1 0 0 7h5a3.5 3.5 0 1 1 0 7H6"/></svg><span>EMI Calc</span></div>
+      <div class="nav-item" onclick="nav('reports',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg><span>Reports</span></div>
+      <div class="nav-item" onclick="nav('notifications',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><span>Alerts</span><span class="nbadge">3</span></div>
+    </div>
+    <div id="memberNav" style="display:none;">
+      <div class="nav-sec">My Account</div>
+      <div class="nav-item" onclick="nav('m_dashboard',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span>My Dashboard</span></div>
+      <div class="nav-item" onclick="nav('m_payments',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg><span>My Payments</span></div>
+      <div class="nav-item" onclick="nav('m_auction',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><span>Live Auction</span></div>
+      <div class="nav-item" onclick="nav('m_emi',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 1 0 0 7h5a3.5 3.5 0 1 1 0 7H6"/></svg><span>EMI Calc</span></div>
+      <div class="nav-item" onclick="nav('notifications',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/></svg><span>Notifications</span><span class="nbadge">3</span></div>
+    </div>
+    <div class="sidebar-footer">
+      <div class="theme-row">
+        <span class="theme-lbl">Theme</span>
+        <div class="tgl" onclick="toggleTheme()" title="Toggle dark/light mode">
+          <div class="tgl-track"><span>☀</span><span>🌙</span></div>
+          <div class="tgl-knob" id="tglKnob"></div>
+        </div>
+      </div>
+      <div class="user-pill">
+        <div class="user-av" id="sbAvatar">F</div>
+        <div class="user-info">
+          <div class="user-name" id="sbName">Foreman Admin</div>
+          <div class="user-role" id="sbRole">Fund Manager</div>
+          <div class="sync-note" id="syncNote">Firebase is not connected yet.</div>
+        </div>
+      </div>
+      <div class="user-auth-actions">
+        <button class="btn btn-gold btn-sm auth-btn" id="googleLoginBtn" onclick="signInWithGoogle()" type="button">Google Login</button>
+        <button class="btn btn-ghost btn-sm" id="logoutBtn" onclick="signOutUser()" type="button" style="display:none;">Logout</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="topbar">
+      <button class="mob-menu" onclick="openSB()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+      <div class="topbar-title" id="topTitle">Fund <span>Dashboard</span></div>
+      <div class="topbar-r">
+        <div class="auth-chip offline" id="authChip">Not connected</div>
+        <div class="ico-btn" onclick="nav('notifications',null)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><span class="ndot"></span></div>
+        <button class="btn btn-gold btn-sm" onclick="openModal('chitModal')" id="topCreateBtn">+<span class="btn-txt"> New Chit</span></button>
+      </div>
+    </div>
+
+    <!-- MOBILE ROLE STRIP -->
+    <div class="mob-role-strip" id="mobRoleStrip">
+      <button class="mob-role-btn active" id="mobRoleForeman" onclick="setRole('foreman')" type="button">⚙ Foreman</button>
+      <button class="mob-role-btn" id="mobRoleMember" onclick="setRole('member')" type="button">👤 Member</button>
+    </div>
+
+    <div class="ad-strip-wrap" style="padding:0 18px;flex-shrink:0;margin-top:12px;">
+      <div class="ad-strip"><div class="ad-tag">AdMob Banner — 728×90 Leaderboard</div></div>
+    </div>
+
+    <div class="content" id="mainContent">
+
+      <!-- ══ FOREMAN DASHBOARD ══ -->
+      <div class="section active" id="sec-dashboard">
+        <div class="g4" style="margin-bottom:14px;">
+          <div class="stat g"><div class="stat-lbl">Total Chit Value</div><div class="stat-val g" id="d_tv">₹0</div><div class="stat-sub" id="d_cc">0 funds</div></div>
+          <div class="stat t"><div class="stat-lbl">Total Members</div><div class="stat-val t" id="d_mem">0</div><div class="stat-sub">all groups</div></div>
+          <div class="stat b"><div class="stat-lbl">Monthly Collection</div><div class="stat-val b" id="d_mo">₹0</div><div class="stat-sub">per cycle</div></div>
+          <div class="stat p"><div class="stat-lbl">Foreman Earnings</div><div class="stat-val p" id="d_earn">₹0</div><div class="stat-sub">commission</div></div>
+        </div>
+        <div class="g2">
+          <div class="gcol">
+            <div class="card">
+              <div class="card-hd"><span class="pip"></span>Active Chit Funds</div>
+              <div id="d_chitList"><div class="empty"><div class="empty-icon">💼</div><p>No chit funds yet.<br>Tap "+ New Chit" to create one.</p></div></div>
+              <button class="btn btn-ghost btn-sm btn-full" style="margin-top:10px;" onclick="openModal('chitModal')">+ Create Chit Fund</button>
+            </div>
+            <div class="card">
+              <div class="card-hd"><span class="pip"></span>Collection Progress</div>
+              <div id="d_prog"><div class="empty"><div class="empty-icon">📊</div><p>Create a chit fund to track.</p></div></div>
+            </div>
+          </div>
+          <div class="gcol">
+            <div class="card">
+              <div class="card-hd"><span class="pip"></span>Recent Activity</div>
+              <div id="d_act">
+                <div class="notif-item"><div class="ndot-sm" style="background:var(--teal)"></div><div><div class="notif-text">App initialized. Create your first chit fund.</div><div class="notif-time">Just now</div></div></div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-hd"><span class="pip"></span>Quick Stats</div>
+              <div class="g2">
+                <div class="kpi"><div class="kpi-val" style="color:var(--green)" id="qs_paid">0</div><div class="kpi-lbl">Paid</div></div>
+                <div class="kpi"><div class="kpi-val" style="color:var(--red)" id="qs_due">0</div><div class="kpi-lbl">Due</div></div>
+                <div class="kpi"><div class="kpi-val" style="color:var(--blue)" id="qs_auc">0</div><div class="kpi-lbl">Auctions</div></div>
+                <div class="kpi"><div class="kpi-val" style="color:var(--purple)" id="qs_prz">0</div><div class="kpi-lbl">Prized</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ MEMBERS ══ -->
+      <div class="section" id="sec-members">
+        <div class="page-hd"><div class="page-title">Member <span>Registry</span></div><button class="btn btn-gold btn-sm" onclick="openAddMember()">+ Add Member</button></div>
+        <div class="card" style="margin-bottom:14px;">
+          <div class="card-hd"><span class="pip"></span>Filter</div>
+          <div class="g2">
+            <div class="fg" style="margin:0;"><label>Search</label><input id="m_search" placeholder="Name or phone…" oninput="renderMembers()"></div>
+            <div class="fg" style="margin:0;"><label>Group</label><select id="m_filter" onchange="renderMembers()"><option value="">All Groups</option></select></div>
+          </div>
+        </div>
+        <div class="card"><div class="card-hd"><span class="pip"></span>All Members</div><div id="memberList"><div class="empty"><div class="empty-icon">👥</div><p>No members yet.</p></div></div></div>
+      </div>
+
+      <!-- ══ PAYMENTS ══ -->
+      <div class="section" id="sec-payments">
+        <div class="page-hd"><div class="page-title">Payment <span>Tracker</span></div></div>
+        <div class="pay-filter-bar">
+          <select id="pt_group" onchange="renderPayTable()"><option value="">— Select Group —</option></select>
+          <input id="pt_month" type="number" placeholder="Month #" min="1" oninput="renderPayTable()">
+        </div>
+        <div class="pay-progress-card" id="pay_progress_card" style="display:none;">
+          <div class="pay-progress-hd">
+            <div class="pay-progress-title" id="pay_group_title">Select a group</div>
+            <div class="pay-progress-pct" id="pt_pct">0%</div>
+          </div>
+          <div class="pay-track-wrap"><div class="pay-track-fill" id="pay_track_fill" style="width:0%"></div></div>
+          <div class="pay-stats-row">
+            <div class="pay-stat-mini"><div class="pay-stat-mini-val" style="color:var(--green)" id="pt_col">₹0</div><div class="pay-stat-mini-lbl">Collected</div></div>
+            <div class="pay-stat-mini"><div class="pay-stat-mini-val" style="color:var(--red)" id="pt_out">₹0</div><div class="pay-stat-mini-lbl">Due</div></div>
+            <div class="pay-stat-mini"><div class="pay-stat-mini-val" style="color:var(--blue)" id="pt_cc">0</div><div class="pay-stat-mini-lbl">Paid</div></div>
+          </div>
+        </div>
+        <div id="payMemberList"><div style="text-align:center;padding:48px 20px;color:var(--t3);"><div style="font-size:36px;margin-bottom:12px;opacity:.3;">💳</div><p style="font-size:13px;">Select a group and month<br>to track payments</p></div></div>
+      </div>
+
+      <!-- ══ AUCTION ══ -->
+      <div class="section" id="sec-auction">
+        <div class="page-hd"><div class="page-title">Auction <span>Management</span></div></div>
+        <!-- Timer Hero -->
+        <div class="auc-hero">
+          <div class="auc-live-badge"><span class="auc-live-dot"></span><span id="auc_status_lbl">Ready</span></div>
+          <div class="auc-hero-time" id="auctionTimer">00:00:00</div>
+          <div class="auc-timer-btns">
+            <button class="btn btn-gold btn-sm" onclick="startTimer()" type="button">▶ Start</button>
+            <button class="btn btn-ghost btn-sm" onclick="pauseTimer()" type="button">⏸ Pause</button>
+            <button class="btn btn-danger btn-sm" onclick="resetTimer()" type="button">↺ Reset</button>
+          </div>
+        </div>
+        <!-- Foreman: Add Bid on Behalf -->
+        <div class="card" style="margin-bottom:14px;">
+          <div class="card-hd"><span class="pip"></span>Add Bid on Behalf of Member</div>
+          <div class="g2" style="margin-bottom:10px;">
+            <div class="fg" style="margin:0;"><label>Chit Group</label><select id="fm_bid_grp"><option value="">— Select —</option></select></div>
+            <div class="fg" style="margin:0;"><label>Member Name</label>
+              <select id="fm_bid_member"><option value="">— Select Member —</option></select>
+            </div>
+          </div>
+          <div class="fg"><label>Bid / Discount Amount (₹)</label><input id="fm_bid_amt" type="number" placeholder="e.g. 5000" inputmode="numeric"></div>
+          <button class="btn btn-gold btn-sm btn-full" onclick="foremanAddBid()" type="button">+ Add Bid</button>
+        </div>
+        <!-- Live Bids from Members -->
+        <div class="card" style="margin-bottom:14px;">
+          <div class="card-hd" style="justify-content:space-between;display:flex;align-items:center;">
+            <span style="display:flex;align-items:center;gap:7px;"><span class="pip"></span>Live Member Bids</span>
+            <span id="auc_bid_count" style="font-size:10px;color:var(--t3);font-family:'IBM Plex Mono',monospace;">0 bids</span>
+          </div>
+          <div id="foreman_bids_list"><div class="empty"><div class="empty-icon">🔨</div><p>No bids yet. Members can place bids from the Auction tab.</p></div></div>
+        </div>
+        <!-- Finalize -->
+        <div class="card" style="margin-bottom:14px;">
+          <div class="card-hd"><span class="pip"></span>Finalize Auction</div>
+          <div class="auc-fields-grid">
+            <div class="auc-field wide"><label>Chit Group</label><select id="auc_group" onchange="calcAuction()"><option value="">— Select Group —</option></select></div>
+            <div class="auc-field"><label>Month #</label><input id="auc_month" type="number" placeholder="3" min="1" oninput="calcAuction()"></div>
+            <div class="auc-field"><label>Winning Bid (Discount ₹)</label><input id="auc_bid" type="number" placeholder="5000" oninput="calcAuction()"></div>
+            <div class="auc-field wide"><label>Winner Name</label><input id="auc_winner" placeholder="Member name"></div>
+          </div>
+          <button class="btn btn-teal btn-full" onclick="finalizeAuction()" type="button" style="margin-top:4px;">✓ Close Auction &amp; Declare Winner</button>
+        </div>
+        <!-- Live Calc -->
+        <div class="card" style="margin-bottom:14px;" id="auc_live_card">
+          <div class="card-hd"><span class="pip"></span>Live Calculation</div>
+          <div class="auc-prize-banner">
+            <div class="auc-prize-lbl">Prize Amount</div>
+            <div class="auc-prize-val" id="ar_pr">—</div>
+          </div>
+          <div class="auc-calc-grid">
+            <div class="auc-calc-chip"><div class="auc-calc-chip-lbl">Chit Value</div><div class="auc-calc-chip-val" id="ar_cv">—</div></div>
+            <div class="auc-calc-chip"><div class="auc-calc-chip-lbl">Monthly EMI</div><div class="auc-calc-chip-val" id="ar_mo">—</div></div>
+            <div class="auc-calc-chip"><div class="auc-calc-chip-lbl">Commission</div><div class="auc-calc-chip-val r" id="ar_cm">—</div></div>
+            <div class="auc-calc-chip"><div class="auc-calc-chip-lbl">Total Pool</div><div class="auc-calc-chip-val" id="ar_pl">—</div></div>
+            <div class="auc-calc-chip"><div class="auc-calc-chip-lbl">Discount</div><div class="auc-calc-chip-val" id="ar_dc">—</div></div>
+            <div class="auc-calc-chip"><div class="auc-calc-chip-lbl">Dividend/Member</div><div class="auc-calc-chip-val g" id="ar_dv">—</div></div>
+            <div class="auc-calc-chip" style="grid-column:1/-1"><div class="auc-calc-chip-lbl">Net Instalment (after dividend)</div><div class="auc-calc-chip-val g" id="ar_ni">—</div></div>
+          </div>
+        </div>
+        <!-- History -->
+        <div class="card">
+          <div class="card-hd"><span class="pip"></span>Auction History</div>
+          <div id="auc_hist"><div class="empty"><div class="empty-icon">🔨</div><p>No auctions yet.</p></div></div>
+        </div>
+      </div>
+
+      <!-- ══ EMI ══ -->
+      <div class="section" id="sec-emi">
+        <div class="page-hd"><div class="page-title">EMI <span>Calculator</span></div></div>
+        <!-- Inputs -->
+        <div class="card" style="margin-bottom:14px;">
+          <div class="card-hd"><span class="pip"></span>Parameters</div>
+          <div class="emi-input-grid">
+            <div class="emi-input-card"><div class="emi-input-lbl">Chit Value ₹</div><input id="e_val" type="number" placeholder="100000" oninput="calcEMI()" inputmode="numeric"></div>
+            <div class="emi-input-card"><div class="emi-input-lbl">Members</div><input id="e_mem" type="number" placeholder="20" oninput="calcEMI()" inputmode="numeric"></div>
+            <div class="emi-input-card"><div class="emi-input-lbl">Duration (Months)</div><input id="e_dur" type="number" placeholder="20" oninput="calcEMI()" inputmode="numeric"></div>
+            <div class="emi-input-card"><div class="emi-input-lbl">Commission %</div><input id="e_comm" type="number" value="5" step=".1" oninput="calcEMI()" inputmode="decimal"></div>
+            <div class="emi-input-card"><div class="emi-input-lbl">Auction Discount ₹</div><input id="e_disc" type="number" placeholder="3000" oninput="calcEMI()" inputmode="numeric"></div>
+            <div class="emi-input-card"><div class="emi-input-lbl">Dividend Split</div><select id="e_divm" onchange="calcEMI()"><option value="all">All Members</option><option value="nonprized">Non-Prized</option></select></div>
+          </div>
+        </div>
+        <!-- Results Pills -->
+        <div class="emi-result-strip" id="emi_results" style="display:none;">
+          <div class="emi-pill g"><div class="emi-pill-val" id="er_mo">₹0</div><div class="emi-pill-lbl">Monthly EMI</div></div>
+          <div class="emi-pill t"><div class="emi-pill-val" id="er_net">₹0</div><div class="emi-pill-lbl">Net (after div)</div></div>
+          <div class="emi-pill b"><div class="emi-pill-val" id="er_dv">₹0</div><div class="emi-pill-lbl">Dividend</div></div>
+          <div class="emi-pill p"><div class="emi-pill-val" id="er_pr">₹0</div><div class="emi-pill-lbl">Prize</div></div>
+        </div>
+        <!-- Breakdown -->
+        <div class="card" style="margin-bottom:14px;" id="emi_breakdown" style="display:none;">
+          <div class="card-hd"><span class="pip"></span>Breakdown</div>
+          <div class="emi-row"><span class="emi-row-k">Chit Value</span><span class="emi-row-v" id="ed_cv">—</span></div>
+          <div class="emi-row"><span class="emi-row-k">Foreman Commission</span><span class="emi-row-v r" id="ed_cm">—</span></div>
+          <div class="emi-row"><span class="emi-row-k">Auction Discount</span><span class="emi-row-v" id="ed_dc">—</span></div>
+          <div class="emi-row"><span class="emi-row-k">Dividend / Member</span><span class="emi-row-v g" id="ed_dv">—</span></div>
+          <div class="emi-row"><span class="emi-row-k">Total Paid (all months)</span><span class="emi-row-v" id="ed_tot">—</span></div>
+          <div class="emi-row"><span class="emi-row-k">Foreman Total Earn</span><span class="emi-row-v" id="ed_fe">—</span></div>
+          <div class="emi-row"><span class="emi-row-k">Early Winner Cost</span><span class="emi-row-v" id="ed_ew">—</span></div>
+          <div class="emi-row"><span class="emi-row-k">Mid Winner Cost</span><span class="emi-row-v" id="ed_mw">—</span></div>
+          <div class="emi-row"><span class="emi-row-k">Last Winner Cost</span><span class="emi-row-v g">0% (Free!)</span></div>
+        </div>
+        <!-- FD Comparison -->
+        <div class="card" id="emi_fd_card" style="display:none;">
+          <div class="card-hd"><span class="pip"></span>Chit vs Fixed Deposit</div>
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;background:var(--bg3);border-radius:10px;padding:10px 14px;">
+            <span style="font-size:12px;color:var(--t3);font-weight:600;letter-spacing:.5px;text-transform:uppercase;white-space:nowrap;">FD Rate % p.a.</span>
+            <input id="e_fd" type="number" value="7" step=".1" oninput="calcEMI()" inputmode="decimal" style="background:transparent;border:none;font-size:18px;font-family:'IBM Plex Mono',monospace;font-weight:500;color:var(--t1);outline:none;width:80px;">
+          </div>
+          <div class="emi-row"><span class="emi-row-k">Total Investment</span><span class="emi-row-v" id="ec_inv">—</span></div>
+          <div class="emi-row"><span class="emi-row-k">FD Maturity</span><span class="emi-row-v g" id="ec_fd">—</span></div>
+          <div class="emi-row"><span class="emi-row-k">FD Interest</span><span class="emi-row-v g" id="ec_fi">—</span></div>
+          <div class="emi-row"><span class="emi-row-k">Chit Commission Cost</span><span class="emi-row-v r" id="ec_cc">—</span></div>
+          <div class="emi-vs-card"><span style="font-size:16px;margin-right:8px;">💡</span><span id="ec_v" style="font-size:12px;color:var(--t2);line-height:1.6;">Enter parameters above.</span></div>
+        </div>
+      </div>
+
+      <!-- ══ REPORTS ══ -->
+      <div class="section" id="sec-reports">
+        <div class="page-hd"><div class="page-title">Reports <span>&amp; History</span></div></div>
+        <div class="g4" style="margin-bottom:14px;">
+          <div class="stat g"><div class="stat-lbl">Total Funds</div><div class="stat-val g" id="rp_f">₹0</div><div class="stat-sub" id="rp_fc">0 chits</div></div>
+          <div class="stat t"><div class="stat-lbl">Members</div><div class="stat-val t" id="rp_m">0</div></div>
+          <div class="stat b"><div class="stat-lbl">Auctions</div><div class="stat-val b" id="rp_a">0</div></div>
+          <div class="stat p"><div class="stat-lbl">Commission</div><div class="stat-val p" id="rp_c">₹0</div></div>
+        </div>
+        <div class="g2" style="margin-bottom:14px;">
+          <div class="card">
+            <div class="card-hd"><span class="pip"></span>Chit Fund Summary</div>
+            <div class="tbl-wrap"><div class="tbl-scroll"><table><thead><tr><th>Name</th><th>Value</th><th>Members</th><th>Duration</th><th>Monthly</th><th>Status</th></tr></thead><tbody id="rp_ct"><tr><td colspan="6" style="text-align:center;color:var(--t3);padding:20px;">No funds yet</td></tr></tbody></table></div></div>
+          </div>
+          <div class="card"><div class="card-hd"><span class="pip"></span>Collection Chart</div><div id="colChart"><div class="empty"><div class="empty-icon">📈</div><p>Create chits to see chart.</p></div></div></div>
+        </div>
+        <div class="card">
+          <div class="card-hd"><span class="pip"></span>Auction History</div>
+          <div class="tbl-wrap"><div class="tbl-scroll"><table><thead><tr><th>Month</th><th>Group</th><th>Winner</th><th>Discount</th><th>Dividend</th><th>Prize</th></tr></thead><tbody id="rp_at"><tr><td colspan="6" style="text-align:center;color:var(--t3);padding:20px;">No auctions yet</td></tr></tbody></table></div></div>
+        </div>
+      </div>
+
+      <!-- ══ NOTIFICATIONS ══ -->
+      <div class="section" id="sec-notifications">
+        <div class="page-hd"><div class="page-title">Alerts <span>&amp; Reminders</span></div></div>
+        <div class="g2">
+          <div class="card">
+            <div class="card-hd"><span class="pip"></span>Send Reminder</div>
+            <div class="fg"><label>Chit Group</label><select id="notif_group"><option value="">— Select —</option></select></div>
+            <div class="fg"><label>Message Type</label><select id="notif_type"><option>Payment Reminder</option><option>Auction Date Announcement</option><option>Dividend Credit Notice</option><option>Custom Message</option></select></div>
+            <div class="fg"><label>Custom Message</label><textarea id="notif_msg" placeholder="Optional custom message…"></textarea></div>
+            <button class="btn btn-gold btn-sm btn-full" onclick="sendNotif()">📣 Send to Group</button>
+          </div>
+          <div class="card">
+            <div class="card-hd"><span class="pip"></span>Notification Log</div>
+            <div id="notifLog">
+              <div class="notif-item"><div class="ndot-sm" style="background:var(--gold)"></div><div><div class="notif-text">Auction for Gold Chit 2025 scheduled for 15th Jan</div><div class="notif-time">2 days ago</div></div></div>
+              <div class="notif-item"><div class="ndot-sm" style="background:var(--red)"></div><div><div class="notif-text">3 members have pending payments this month</div><div class="notif-time">5 days ago</div></div></div>
+              <div class="notif-item"><div class="ndot-sm" style="background:var(--green)"></div><div><div class="notif-text">Dividend of ₹150 credited to all members</div><div class="notif-time">1 week ago</div></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ MEMBER: MY DASHBOARD ══ -->
+      <div class="section" id="sec-m_dashboard">
+        <div class="page-hd"><div class="page-title">My <span>Dashboard</span></div><button class="btn btn-gold btn-sm" onclick="openMCFModal()">+ Add Fund</button></div>
+        <div class="g3" style="margin-bottom:14px;">
+          <div class="stat g"><div class="stat-lbl">Total Chit Value</div><div class="stat-val g" id="mcf_total">₹0</div><div class="stat-sub" id="mcf_count_lbl">0 funds</div></div>
+          <div class="stat t"><div class="stat-lbl">Monthly Outgo</div><div class="stat-val t" id="mcf_monthly">₹0</div><div class="stat-sub">total instalments</div></div>
+          <div class="stat p"><div class="stat-lbl">Dividend Earned</div><div class="stat-val p" id="md_d">₹0</div><div class="stat-sub">total so far</div></div>
+        </div>
+        <div class="card">
+          <div class="card-hd"><span class="pip"></span>My Chit Funds</div>
+          <div id="mcf_list"><div class="empty"><div class="empty-icon">🏦</div><p>No chit funds yet.<br>Tap "+ Add Fund" to add one.</p></div></div>
+        </div>
+      </div>
+
+      <!-- ══ MEMBER: MY PAYMENTS ══ -->
+      <div class="section" id="sec-m_payments">
+        <div class="page-hd"><div class="page-title">My <span>Payments</span></div></div>
+        <div class="card" style="margin-bottom:14px;">
+          <div class="card-hd"><span class="pip"></span>Pay This Month</div>
+          <div class="mpay-select-grid">
+            <select id="mp_grp" onchange="updateMpayDetail()"><option value="">— Select Group —</option></select>
+            <input id="mp_mo" type="number" placeholder="Month #" min="1" oninput="updateMpayDetail()" inputmode="numeric">
+          </div>
+          <div id="mp_det"></div>
+          <button class="btn btn-teal btn-full" onclick="makePayment()" type="button" style="margin-top:4px;">✓ Mark as Paid</button>
+        </div>
+        <div class="card">
+          <div class="card-hd"><span class="pip"></span>Payment History</div>
+          <div id="mp_rec"><div class="empty"><div class="empty-icon">💳</div><p>No records yet.</p></div></div>
+        </div>
+      </div>
+
+      <!-- ══ MEMBER: LIVE AUCTION ══ -->
+      <div class="section" id="sec-m_auction">
+        <div class="page-hd"><div class="page-title">Live <span>Auction</span></div></div>
+        <div class="mem-auc-hero">
+          <div class="auc-live-badge"><span class="auc-live-dot"></span>Auction Live</div>
+          <div style="font-size:11px;color:var(--t3);letter-spacing:2px;text-transform:uppercase;margin:10px 0 6px;">Time Remaining</div>
+          <div class="auc-hero-time" id="mem_timer">00:00:00</div>
+        </div>
+        <!-- Highest bid banner -->
+        <div id="mem_lowest_banner" style="display:none;background:linear-gradient(135deg,rgba(212,168,67,.1),rgba(240,201,106,.07));border:1px solid rgba(212,168,67,.25);border-radius:12px;padding:14px 18px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;">
+          <div>
+            <div style="font-size:10px;color:var(--gold2);letter-spacing:1.5px;text-transform:uppercase;font-weight:600;margin-bottom:3px;">Current Highest Bid</div>
+            <div style="font-family:'Playfair Display',serif;font-size:22px;color:var(--gold2);" id="mem_lowest_val">—</div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-size:10px;color:var(--t3);margin-bottom:2px;">by</div>
+            <div style="font-size:13px;font-weight:600;color:var(--t1);" id="mem_lowest_name">—</div>
+          </div>
+        </div>
+        <div class="card" style="margin-bottom:14px;">
+          <div class="card-hd"><span class="pip"></span>Place Your Bid</div>
+          <div class="g2" style="margin-bottom:10px;">
+            <div class="fg" style="margin:0;"><label>Chit Group</label><select id="mem_bid_grp"><option value="">— Select —</option></select></div>
+            <div class="fg" style="margin:0;"><label>Your Name</label><input id="mem_bid_name" placeholder="Your name"></div>
+          </div>
+          <div style="font-size:12px;color:var(--t3);margin-bottom:8px;line-height:1.5;">Enter discount amount. Highest bid wins the prize.</div>
+          <div class="mem-bid-wrap">
+            <span class="mem-bid-prefix">₹</span>
+            <input id="mem_bid" type="number" placeholder="0" inputmode="numeric">
+          </div>
+          <button class="btn btn-gold btn-full" onclick="placeBid()" type="button">🔨 Place My Bid</button>
+        </div>
+        <!-- My current bid status -->
+        <div class="card" style="margin-bottom:14px;">
+          <div class="card-hd"><span class="pip"></span>All Active Bids</div>
+          <div id="mem_bids_list"><div class="empty"><div class="empty-icon">🔨</div><p>No bids placed yet.</p></div></div>
+        </div>
+        <div class="card">
+          <div class="card-hd"><span class="pip"></span>How It Works</div>
+          <div class="mem-rule-item"><div class="mem-rule-icon" style="background:rgba(212,168,67,.12);">🏆</div><div><div class="mem-rule-title">Highest Discount Wins</div><div class="mem-rule-sub">The member offering the largest discount wins the prize pot</div></div></div>
+          <div class="mem-rule-item"><div class="mem-rule-icon" style="background:rgba(232,85,85,.1);">⚙️</div><div><div class="mem-rule-title">Commission Deducted</div><div class="mem-rule-sub">Foreman's commission is taken from the prize amount</div></div></div>
+          <div class="mem-rule-item"><div class="mem-rule-icon" style="background:rgba(61,204,138,.1);">💰</div><div><div class="mem-rule-title">Dividend for Everyone</div><div class="mem-rule-sub">Remaining discount is split equally among all members</div></div></div>
+          <div class="mem-rule-item"><div class="mem-rule-icon" style="background:rgba(79,156,249,.1);">📊</div><div><div class="mem-rule-title">Net Prize = Value − Deductions</div><div class="mem-rule-sub">Your payout after commission and bid discount</div></div></div>
+        </div>
+      </div>
+
+      <!-- ══ MEMBER: EMI ══ -->
+      <div class="section" id="sec-m_emi">
+        <div class="page-hd"><div class="page-title">My EMI <span>Calculator</span></div></div>
+        <div class="card" style="margin-bottom:14px;">
+          <div class="card-hd"><span class="pip"></span>My Instalment</div>
+          <div class="emi-input-grid">
+            <div class="emi-input-card"><div class="emi-input-lbl">Chit Value ₹</div><input id="me_val" type="number" placeholder="100000" oninput="calcMemberEMI()" inputmode="numeric"></div>
+            <div class="emi-input-card"><div class="emi-input-lbl">Members</div><input id="me_mem" type="number" placeholder="20" oninput="calcMemberEMI()" inputmode="numeric"></div>
+            <div class="emi-input-card"><div class="emi-input-lbl">Commission %</div><input id="me_comm" type="number" value="5" oninput="calcMemberEMI()" inputmode="decimal"></div>
+            <div class="emi-input-card"><div class="emi-input-lbl">Discount ₹</div><input id="me_disc" type="number" placeholder="3000" oninput="calcMemberEMI()" inputmode="numeric"></div>
+          </div>
+        </div>
+        <div id="me_res"></div>
+      </div>
+
+    </div><!-- /content -->
+    <div class="footer-ad"><div class="ad-tag">AdMob Banner — 320×50 Mobile Footer</div></div>
+    <!-- MOBILE BOTTOM NAV -->
+    <nav class="mobile-nav"><div class="mn-inner" id="mnInner"></div></nav>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script>
+// Replace these placeholders with your Firebase project's web app config.
+const FIREBASE_CONFIG=window.CHITVAULT_FIREBASE_CONFIG||{
+  apiKey:'AIzaSyABFcHyZXi0kLY7MNVGZByiyMtkgqNhHkU',
+  authDomain:'easechit.firebaseapp.com',
+  projectId:'easechit',
+  storageBucket:'easechit.firebasestorage.app',
+  messagingSenderId:'1094688786658',
+  appId:'1:1094688786658:web:e24a829c4cf85af26176bb'
+};
+const DEFAULT_AVATAR={foreman:'F',member:'M'};
+let auth=null,db=null,googleProvider=null,currentUser=null,authReady=false,isApplyingRemoteState=false;
+let remoteUnsubscribe=null,saveTimer=null,lastSavedHash='',seededDemo=false;
+const S={role:'foreman',theme:'dark',chits:[],members:[],payments:{},auctions:[],memberPayments:[],myChitFunds:[],liveBids:[],timerInterval:null,timerSecs:0,timerRunning:false,adCount:0,cur:'dashboard'};
+const fmt=v=>'₹'+Number(v).toLocaleString('en-IN',{maximumFractionDigits:2});
+const fmtN=v=>Number(v).toLocaleString('en-IN',{maximumFractionDigits:2});
+const pct=v=>v.toFixed(2)+'%';
+function firebaseConfigured(){
+  return FIREBASE_CONFIG&&FIREBASE_CONFIG.apiKey&&FIREBASE_CONFIG.apiKey!=='YOUR_API_KEY'&&FIREBASE_CONFIG.projectId&&FIREBASE_CONFIG.projectId!=='YOUR_PROJECT_ID'&&FIREBASE_CONFIG.appId&&FIREBASE_CONFIG.appId!=='YOUR_APP_ID';
+}
+function createDemoState(){
+  const today=new Date();
+  const ym=`${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}`;
+  const chits=[{id:1001,name:'Gold Chit 2025',value:100000,members:20,duration:20,comm:5,start:ym,created:today.toLocaleDateString('en-IN')}];
+  const members=[
+    {name:'Ravi Kumar',phone:'9876543210',email:''},
+    {name:'Priya Lakshmi',phone:'9845123456',email:''},
+    {name:'Suresh Babu',phone:'9812345678',email:''},
+    {name:'Anitha Devi',phone:'9798765432',email:''},
+    {name:'Murugan A.',phone:'9789012345',email:''}
+  ].map((m,i)=>({id:2000+i,...m,groupId:1001,groupName:'Gold Chit 2025',ticket:i+1,color:CLR[i%CLR.length],prized:false}));
+  return {role:S.role,theme:S.theme,chits,members,payments:{'2000_1001_1':true,'2001_1001_1':true,'2002_1001_1':true},auctions:[{id:3001,month:1,groupName:'Gold Chit 2025',winner:'Ravi Kumar',discount:4500,dividend:225,prize:90500,comm:5000}],memberPayments:[],myChitFunds:[],liveBids:[],adCount:0,cur:'dashboard'};
+}
+function serializableState(){
+  return {role:S.role,theme:S.theme,chits:S.chits,members:S.members,payments:S.payments,auctions:S.auctions,memberPayments:S.memberPayments,myChitFunds:S.myChitFunds,liveBids:S.liveBids,adCount:S.adCount,cur:S.cur};
+}
+function stateHash(obj){return JSON.stringify(obj);}
+function updateSyncStatus(text,isReady){
+  const chip=document.getElementById('authChip');
+  const note=document.getElementById('syncNote');
+  if(chip){chip.textContent=text;chip.className='auth-chip '+(isReady?'ready':'offline');}
+  if(note) note.innerHTML=isReady?`<strong>Synced:</strong> ${text}`:`<strong>Status:</strong> ${text}`;
+}
+function setAuthError(message){
+  const el=document.getElementById('authError');if(!el)return;
+  el.textContent=message||'';el.className='auth-error'+(message?' show':'');
+}
+function updateAuthUI(user){
+  const loginBtn=document.getElementById('googleLoginBtn');
+  const logoutBtn=document.getElementById('logoutBtn');
+  const overlay=document.getElementById('authOverlay');
+  if(loginBtn) loginBtn.style.display=user?'none':'';
+  if(logoutBtn) logoutBtn.style.display=user?'':'none';
+  if(overlay) overlay.classList.toggle('show',!user);
+  if(user){
+    const name=user.displayName||user.email||'Firebase User';
+    document.getElementById('sbName').textContent=name;
+    document.getElementById('sbRole').textContent=user.email||'Google account';
+    document.getElementById('sbAvatar').textContent=(name.trim()[0]||DEFAULT_AVATAR[S.role]||'U').toUpperCase();
+    updateSyncStatus('Connected to Firebase',true);
+  }else{
+    document.getElementById('sbName').textContent=S.role==='foreman'?'Foreman Admin':'Member View';
+    document.getElementById('sbRole').textContent=firebaseConfigured()?'Sign in required':'Add your Firebase config';
+    document.getElementById('sbAvatar').textContent=DEFAULT_AVATAR[S.role]||'F';
+    updateSyncStatus(firebaseConfigured()?'Waiting for Google login':'Firebase config is still a placeholder',false);
+  }
+}
+function getUserDocRef(uid){return db.collection('users').doc(uid).collection('private').doc('appState');}
+function applyState(data){
+  const next=data||{};
+  isApplyingRemoteState=true;
+  S.role=next.role||'foreman';
+  S.theme=next.theme||S.theme||'dark';
+  S.chits=Array.isArray(next.chits)?next.chits:[];
+  S.members=Array.isArray(next.members)?next.members:[];
+  S.payments=next.payments&&typeof next.payments==='object'?next.payments:{};
+  S.auctions=Array.isArray(next.auctions)?next.auctions:[];
+  S.memberPayments=Array.isArray(next.memberPayments)?next.memberPayments:[];
+  S.myChitFunds=Array.isArray(next.myChitFunds)?next.myChitFunds:[];
+  S.liveBids=Array.isArray(next.liveBids)?next.liveBids:[];
+  S.adCount=Number.isFinite(next.adCount)?next.adCount:0;
+  S.cur=next.cur||'dashboard';
+  document.documentElement.setAttribute('data-theme',S.theme);
+  localStorage.setItem('cv_t',S.theme);
+  popDrops();renderMembers();renderPayTable();renderAucHist();renderMPay();renderBids();renderMyChits();renderReports();updateDB();
+  document.getElementById('memberBadge').textContent=S.members.length;
+  setRole(S.role,false);
+  nav(S.cur,null);
+  isApplyingRemoteState=false;
+}
+async function saveStateNow(){
+  if(!currentUser||!db||isApplyingRemoteState)return;
+  const snapshot=serializableState();
+  const hash=stateHash(snapshot);
+  if(hash===lastSavedHash)return;
+  lastSavedHash=hash;
+  await getUserDocRef(currentUser.uid).set({state:snapshot,updatedAt:firebase.firestore.FieldValue.serverTimestamp(),updatedBy:{uid:currentUser.uid,name:currentUser.displayName||currentUser.email||'Google User'}},{merge:true});
+  updateSyncStatus('Saved to Firestore',true);
+}
+function queueCloudSave(immediate=false){
+  if(isApplyingRemoteState)return;
+  clearTimeout(saveTimer);
+  if(!currentUser||!db){updateSyncStatus(firebaseConfigured()?'Sign in to sync changes':'Firebase config is still a placeholder',false);return;}
+  const run=()=>saveStateNow().catch(err=>{console.error(err);updateSyncStatus('Sync failed',false);toast('Firebase sync failed. Check console.',true);});
+  if(immediate){run();return;}
+  saveTimer=setTimeout(run,350);
+}
+function initializeFirebase(){
+  if(!firebaseConfigured()){updateAuthUI(null);setAuthError('Replace the FIREBASE_CONFIG placeholders in this file with your Firebase web app config, then reload the page.');return;}
+  if(!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
+  auth=firebase.auth();db=firebase.firestore();googleProvider=new firebase.auth.GoogleAuthProvider();authReady=true;setAuthError('');
+  auth.onAuthStateChanged(async user=>{
+    currentUser=user||null;updateAuthUI(currentUser);
+    if(remoteUnsubscribe){remoteUnsubscribe();remoteUnsubscribe=null;}
+    clearTimeout(saveTimer);
+    if(!user)return;
+    updateSyncStatus('Loading cloud data...',true);
+    remoteUnsubscribe=getUserDocRef(user.uid).onSnapshot(async snap=>{
+      const payload=snap.data();
+      if(payload&&payload.state){lastSavedHash=stateHash(payload.state);applyState(payload.state);updateSyncStatus('Live sync active',true);}
+      else if(!seededDemo){seededDemo=true;const demo=createDemoState();applyState(demo);await saveStateNow();addAct('Your Firebase workspace is ready. Demo data was seeded once.','teal');}
+    },err=>{console.error(err);updateSyncStatus('Unable to read Firestore',false);toast('Could not load Firebase data.',true);});
+  });
+}
+async function signInWithGoogle(){
+  if(!authReady){initializeFirebase();if(!authReady)return;}
+  try{setAuthError('');await auth.signInWithPopup(googleProvider);}
+  catch(err){
+    console.error(err);
+    const message=err&&err.code==='auth/popup-blocked'?'Your browser blocked the Google sign-in popup. Allow popups for this page and try again.':err&&err.code==='auth/unauthorized-domain'?'This domain is not in Firebase Auth authorized domains yet. Add your local/dev host in the Firebase console.':'Google sign-in failed. Check your Firebase Auth setup and try again.';
+    setAuthError(message);toast('Google sign-in failed.',true);
+  }
+}
+async function signOutUser(){if(auth) await auth.signOut();}
+
+/* ── THEME ── */
+function toggleTheme(){S.theme=S.theme==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',S.theme);localStorage.setItem('cv_t',S.theme);queueCloudSave();}
+(()=>{const t=localStorage.getItem('cv_t');if(t){S.theme=t;document.documentElement.setAttribute('data-theme',t);}})();
+
+/* ── TOAST ── */
+function toast(msg,err=false){const el=document.getElementById('toast');document.getElementById('t-msg').textContent=msg;document.getElementById('t-icon').textContent=err?'✗':'✓';el.className='toast show'+(err?' err':'');clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('show'),2800);}
+
+/* ── MODAL ── */
+function openModal(id){document.getElementById(id).classList.add('open');}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+function maybeAd(){S.adCount++;if(S.adCount%4===0)openModal('adModal');}
+
+/* ── SIDEBAR ── */
+function openSB(){document.getElementById('sidebar').classList.add('open');document.getElementById('sbOverlay').classList.add('open');}
+function closeSB(){document.getElementById('sidebar').classList.remove('open');document.getElementById('sbOverlay').classList.remove('open');}
+
+/* ── MOBILE NAV ITEMS ── */
+const FN=[{id:'dashboard',svg:'<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>',lbl:'Home'},
+{id:'members',svg:'<circle cx="9" cy="7" r="4"/><path d="M2 21v-2a4 4 0 0 1 4-4h6a4 4 0 0 1 4 4v2"/>',lbl:'Members',bid:true},
+{id:'payments',svg:'<rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/>',lbl:'Payments'},
+{id:'auction',svg:'<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>',lbl:'Auction'},
+{id:'reports',svg:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>',lbl:'Reports'}];
+const MN=[{id:'m_dashboard',svg:'<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>',lbl:'Home'},
+{id:'m_payments',svg:'<rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/>',lbl:'Payments'},
+{id:'m_auction',svg:'<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>',lbl:'Auction'},
+{id:'m_emi',svg:'<line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 1 0 0 7h5a3.5 3.5 0 1 1 0 7H6"/>',lbl:'EMI'},
+{id:'notifications',svg:'<path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>',lbl:'Alerts'}];
+
+function renderMN(){
+  const items=S.role==='foreman'?FN:MN;
+  const mc=S.members.length;
+  document.getElementById('mnInner').innerHTML=items.map(it=>`
+    <button class="mn-item${S.cur===it.id?' active':''}" onclick="nav('${it.id}',null)" type="button">
+      <div class="mn-icon-wrap">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7">${it.svg}</svg>
+      </div>
+      <span>${it.lbl}</span>
+      ${it.bid&&mc?`<span class="mn-badge">${mc}</span>`:''}
+    </button>`).join('');
+}
+
+/* ── ROLE ── */
+function setRole(r,sync=true){
+  S.role=r;
+  document.getElementById('roleForeman').className='role-btn'+(r==='foreman'?' active':'');
+  document.getElementById('roleMember').className='role-btn'+(r==='member'?' active':'');
+  document.getElementById('mobRoleForeman').className='mob-role-btn'+(r==='foreman'?' active':'');
+  document.getElementById('mobRoleMember').className='mob-role-btn'+(r==='member'?' active':'');
+  document.getElementById('foremanNav').style.display=r==='foreman'?'':'none';
+  document.getElementById('memberNav').style.display=r==='member'?'':'none';
+  document.getElementById('topCreateBtn').style.display=r==='foreman'?'':'none';
+  if(!currentUser){
+    document.getElementById('sbName').textContent=r==='foreman'?'Foreman Admin':'Member View';
+    document.getElementById('sbRole').textContent=r==='foreman'?'Fund Manager':'Subscriber';
+    document.getElementById('sbAvatar').textContent=DEFAULT_AVATAR[r]||'F';
+  }
+  nav(r==='foreman'?'dashboard':'m_dashboard',null);
+  if(r==='member') renderMyChits();
+  popDrops();
+  if(sync) queueCloudSave();
+}
+
+/* ── NAV ── */
+const TITLES={dashboard:'Fund Dashboard',members:'Member Registry',payments:'Payment Tracker',auction:'Auction Management',emi:'EMI Calculator',reports:'Reports & History',notifications:'Alerts & Reminders',m_dashboard:'My Dashboard',m_payments:'My Payments',m_auction:'Live Auction',m_emi:'My EMI Calc'};
+function nav(sec,el){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  const se=document.getElementById('sec-'+sec);
+  if(se) se.classList.add('active');
+  if(el){
+    el.classList.add('active');
+  } else {
+    // Activate matching sidebar nav item when navigating from mobile nav
+    document.querySelectorAll('.nav-item').forEach(n=>{
+      if(n.getAttribute('onclick')&&n.getAttribute('onclick').includes("'"+sec+"'")) n.classList.add('active');
+    });
+  }
+  document.getElementById('topTitle').innerHTML=(TITLES[sec]||sec).replace(/(\S+)$/,'<span>$1</span>');
+  S.cur=sec;closeSB();
+  if(sec==='reports') renderReports();
+  if(sec==='m_dashboard') renderMyChits();
+  if(sec==='auction'||sec==='m_auction') renderBids();
+  renderMN();
+}
+
+/* ── CHIT ── */
+function saveChit(){
+  const name=document.getElementById('cm_name').value.trim();
+  const value=parseFloat(document.getElementById('cm_value').value);
+  const members=parseInt(document.getElementById('cm_members').value);
+  const duration=parseInt(document.getElementById('cm_duration').value);
+  const comm=parseFloat(document.getElementById('cm_comm').value)||5;
+  const start=document.getElementById('cm_start').value;
+  if(!name||!value||!members||!duration){toast('Fill all chit details!',true);return;}
+  S.chits.push({id:Date.now(),name,value,members,duration,comm,start,created:new Date().toLocaleDateString('en-IN')});
+  closeModal('chitModal');toast(`"${name}" created!`);maybeAd();
+  ['cm_name','cm_value','cm_members','cm_duration','cm_start'].forEach(i=>document.getElementById(i).value='');
+  document.getElementById('cm_comm').value='5';
+  queueCloudSave();
+  popDrops();updateDB();addAct(`Chit "${name}" created — ${fmt(value)} / ${members} members`,'gold');
+}
+
+function popDrops(){
+  const ids=['mm_group','pt_group','auc_group','notif_group','m_filter','mem_bid_grp','fm_bid_grp'];
+  ids.forEach(id=>{
+    const el=document.getElementById(id);if(!el)return;
+    const cur=el.value;
+    el.innerHTML=(id==='m_filter'?'<option value="">All Groups</option>':'<option value="">— Select —</option>')+S.chits.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
+    if(cur) el.value=cur;
+  });
+  // Populate fm_bid_member when fm_bid_grp changes
+  const fmGrp=document.getElementById('fm_bid_grp');
+  const fmMem=document.getElementById('fm_bid_member');
+  if(fmGrp&&fmMem){
+    fmGrp.onchange=function(){
+      const gid=this.value;
+      const mems=S.members.filter(m=>m.groupId==gid);
+      fmMem.innerHTML='<option value="">— Select Member —</option>'+mems.map(m=>`<option value="${m.name}">${m.name}</option>`).join('');
+    };
+    // Trigger if already selected
+    if(fmGrp.value) fmGrp.onchange.call(fmGrp);
+  }
+  // My Payments dropdown: foreman chits + member's own funds
+  const mpGrp=document.getElementById('mp_grp');
+  if(mpGrp){
+    const cur=mpGrp.value;
+    mpGrp.innerHTML='<option value="">— Select Group —</option>'+
+      S.chits.map(c=>`<option value="c_${c.id}">${c.name}</option>`).join('')+
+      S.myChitFunds.map(f=>`<option value="m_${f.id}">${f.name} (My Fund)</option>`).join('');
+    if(cur) mpGrp.value=cur;
+  }
+}
+
+function foremanAddBid(){
+  const gid=document.getElementById('fm_bid_grp').value;
+  const name=(document.getElementById('fm_bid_member').value||'').trim();
+  const bid=parseFloat(document.getElementById('fm_bid_amt').value)||0;
+  if(!gid){toast('Select a chit group!',true);return;}
+  if(!name){toast('Select a member!',true);return;}
+  if(!bid||bid<=0){toast('Enter a valid bid amount!',true);return;}
+  const c=S.chits.find(c=>c.id==gid);if(!c){toast('Group not found',true);return;}
+  const existIdx=S.liveBids.findIndex(b=>b.name.toLowerCase()===name.toLowerCase()&&b.gid==gid);
+  const bidObj={id:Date.now(),name,gid,groupName:c.name,amount:bid,time:new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}),byForeman:true};
+  if(existIdx>-1){S.liveBids[existIdx]=bidObj;toast(`Bid updated for ${name}!`);}
+  else{S.liveBids.push(bidObj);toast(`Bid of ${fmt(bid)} added for ${name}!`);}
+  document.getElementById('fm_bid_amt').value='';
+  renderBids();
+  addAct(`Foreman added bid ${fmt(bid)} for ${name}`,'blue');
+  queueCloudSave();
+}
+
+/* ── MEMBERS ── */
+function openAddMember(){popDrops();openModal('memberModal');}
+const CLR=['#d4a843','#17c4a2','#4f9cf9','#e85555','#3dcc8a','#9b79f5','#f09c4a'];
+
+function saveMember(){
+  const name=document.getElementById('mm_name').value.trim();
+  const phone=document.getElementById('mm_phone').value.trim();
+  const email=document.getElementById('mm_email').value.trim();
+  const gid=document.getElementById('mm_group').value;
+  const ticket=parseInt(document.getElementById('mm_ticket').value)||S.members.length+1;
+  if(!name||!phone||!gid){toast('Fill name, phone & group!',true);return;}
+  const grp=S.chits.find(c=>c.id==gid);
+  S.members.push({id:Date.now(),name,phone,email,groupId:gid,groupName:grp?grp.name:'',ticket,color:CLR[S.members.length%CLR.length],prized:false});
+  closeModal('memberModal');toast(`${name} added!`);
+  ['mm_name','mm_phone','mm_email','mm_ticket'].forEach(i=>document.getElementById(i).value='');
+  document.getElementById('mm_group').value='';
+  renderMembers();updateDB();
+  document.getElementById('memberBadge').textContent=S.members.length;
+  addAct(`${name} added to ${grp?grp.name:'group'}`,'teal');
+  queueCloudSave();
+}
+
+function renderMembers(){
+  const search=(document.getElementById('m_search').value||'').toLowerCase();
+  const gf=document.getElementById('m_filter').value;
+  const list=S.members.filter(m=>(m.name.toLowerCase().includes(search)||m.phone.includes(search))&&(!gf||m.groupId==gf));
+  const el=document.getElementById('memberList');
+  if(!list.length){el.innerHTML='<div class="empty"><div class="empty-icon">👥</div><p>No members found.</p></div>';return;}
+  el.innerHTML=list.map(m=>`
+    <div class="member-row">
+      <div class="av" style="background:${m.color}22;color:${m.color};border:1px solid ${m.color}33">${m.name[0].toUpperCase()}</div>
+      <div class="m-info"><div class="m-name">${m.name}</div><div class="m-meta">📱 ${m.phone} · #${m.ticket} · ${m.groupName}</div></div>
+      <div class="row-actions">
+        ${m.prized?'<span class="badge bgold">Prized</span>':'<span class="badge bg">Active</span>'}
+        <button class="btn btn-icon btn-sm" onclick="togglePrize(${m.id})">🏆</button>
+        <button class="btn btn-icon btn-sm btn-danger" onclick="removeMember(${m.id})">✕</button>
+      </div>
+    </div>`).join('');
+}
+function togglePrize(id){const m=S.members.find(m=>m.id===id);if(m){m.prized=!m.prized;renderMembers();toast(m.name+(m.prized?' prized':' active'));queueCloudSave();}}
+function removeMember(id){const m=S.members.find(m=>m.id===id);S.members=S.members.filter(m=>m.id!==id);renderMembers();updateDB();document.getElementById('memberBadge').textContent=S.members.length;if(m)toast(`${m.name} removed.`);queueCloudSave();}
+
+/* ── PAYMENTS ── */
+function renderPayTable(){
+  const gid=document.getElementById('pt_group').value;
+  const mo=parseInt(document.getElementById('pt_month').value)||0;
+  const list=document.getElementById('payMemberList');
+  const progCard=document.getElementById('pay_progress_card');
+  if(!gid||!mo){
+    progCard.style.display='none';
+    list.innerHTML='<div style="text-align:center;padding:48px 20px;color:var(--t3);"><div style="font-size:36px;margin-bottom:12px;opacity:.3;">💳</div><p style="font-size:13px;">Select a group and month<br>to track payments</p></div>';
+    return;
+  }
+  const chit=S.chits.find(c=>c.id==gid);if(!chit)return;
+  const mems=S.members.filter(m=>m.groupId==gid);
+  if(!mems.length){
+    progCard.style.display='none';
+    list.innerHTML='<div style="text-align:center;padding:40px 20px;color:var(--t3);"><div style="font-size:30px;margin-bottom:10px;opacity:.3;">👥</div><p style="font-size:13px;">No members in this group</p></div>';
+    return;
+  }
+  const mly=chit.value/chit.members;
+  let paid=0,due=0;
+  const items=mems.map(m=>{
+    const k=`${m.id}_${gid}_${mo}`;const ip=!!S.payments[k];ip?paid++:due++;
+    return {m,k,ip,mly};
+  });
+  const pp=mems.length?paid/mems.length*100:0;
+  progCard.style.display='';
+  document.getElementById('pay_group_title').textContent=chit.name+' — Month '+mo;
+  document.getElementById('pt_pct').textContent=pp.toFixed(0)+'%';
+  document.getElementById('pay_track_fill').style.width=pp+'%';
+  document.getElementById('pt_col').textContent=fmt(paid*mly);
+  document.getElementById('pt_out').textContent=fmt(due*mly);
+  document.getElementById('pt_cc').textContent=paid;
+  list.innerHTML=items.map(({m,k,ip})=>`
+    <div class="pay-member-item ${ip?'is-paid':'is-due'}">
+      <div class="pay-av" style="background:${m.color}22;color:${m.color};border:1px solid ${m.color}33">${m.name[0].toUpperCase()}</div>
+      <div style="flex:1;min-width:0;">
+        <div class="pay-member-name">${m.name}</div>
+        <div class="pay-member-meta">#${m.ticket} · ${fmtN(mly)}</div>
+      </div>
+      <span style="font-size:11px;font-weight:600;color:${ip?'var(--green)':'var(--red)'};margin-right:10px;">${ip?'Paid':'Due'}</span>
+      <button class="pay-toggle ${ip?'is-paid':'is-due'}" onclick="togPay('${k}',${mly})" type="button" title="${ip?'Mark as due':'Mark as paid'}"></button>
+    </div>`).join('');
+}
+function togPay(k,amt){S.payments[k]=!S.payments[k];renderPayTable();updateDB();toast(S.payments[k]?'Marked as paid':'Marked as due');queueCloudSave();}
+
+/* ── AUCTION TIMER ── */
+function startTimer(){
+  if(S.timerRunning)return;S.timerRunning=true;
+  const sl=document.getElementById('auc_status_lbl');if(sl)sl.textContent='Live';
+  S.timerInterval=setInterval(()=>{
+    S.timerSecs++;
+    const h=String(Math.floor(S.timerSecs/3600)).padStart(2,'0');
+    const m=String(Math.floor((S.timerSecs%3600)/60)).padStart(2,'0');
+    const s=String(S.timerSecs%60).padStart(2,'0');
+    const t=`${h}:${m}:${s}`;
+    ['auctionTimer','mem_timer'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=t;});
+  },1000);
+}
+function pauseTimer(){S.timerRunning=false;clearInterval(S.timerInterval);const sl=document.getElementById('auc_status_lbl');if(sl)sl.textContent='Paused';}
+function resetTimer(){pauseTimer();S.timerSecs=0;['auctionTimer','mem_timer'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent='00:00:00';});const sl=document.getElementById('auc_status_lbl');if(sl)sl.textContent='Ready';}
+
+function calcAuction(){
+  const gid=document.getElementById('auc_group').value;
+  const bid=parseFloat(document.getElementById('auc_bid').value)||0;
+  if(!gid)return;
+  const c=S.chits.find(c=>c.id==gid);if(!c)return;
+  const mo=c.value/c.members,comm=(c.comm/100)*c.value,disc=Math.min(bid,c.value-comm);
+  const div=disc/c.members,ni=mo-div,prize=c.value-comm-disc;
+  document.getElementById('ar_cv').textContent=fmt(c.value);
+  document.getElementById('ar_mo').textContent=fmt(mo);
+  document.getElementById('ar_pl').textContent=fmt(mo*c.members);
+  document.getElementById('ar_cm').textContent=fmt(comm);
+  document.getElementById('ar_dc').textContent=fmt(disc);
+  document.getElementById('ar_dv').textContent=fmt(div);
+  document.getElementById('ar_ni').textContent=fmt(ni);
+  document.getElementById('ar_pr').textContent=fmt(prize);
+}
+function closeAuctionWithWinner(bidId){
+  const bid=S.liveBids.find(b=>b.id===bidId);if(!bid)return;
+  const c=S.chits.find(c=>c.id==bid.gid);if(!c){toast('Chit group not found',true);return;}
+  // Auto-fill finalize form
+  document.getElementById('auc_group').value=bid.gid;
+  document.getElementById('auc_winner').value=bid.name;
+  document.getElementById('auc_bid').value=bid.amount;
+  // Get next month number
+  const prevAuctions=S.auctions.filter(a=>a.groupName===c.name);
+  document.getElementById('auc_month').value=prevAuctions.length+1;
+  calcAuction();
+  // Scroll to finalize section
+  document.getElementById('auc_group').closest('.card').scrollIntoView({behavior:'smooth',block:'start'});
+  toast('Highest bid loaded — review and confirm!');
+}
+function finalizeAuction(){
+  const gid=document.getElementById('auc_group').value,mo=document.getElementById('auc_month').value;
+  const bid=parseFloat(document.getElementById('auc_bid').value)||0,winner=document.getElementById('auc_winner').value.trim();
+  if(!gid||!mo||!winner){toast('Fill all auction fields!',true);return;}
+  const c=S.chits.find(c=>c.id==gid);
+  const comm=(c.comm/100)*c.value,disc=Math.min(bid,c.value-comm),div=disc/c.members,prize=c.value-comm-disc;
+  S.auctions.push({id:Date.now(),month:mo,groupName:c.name,winner,discount:disc,dividend:div,prize,comm});
+  // Clear live bids for this group
+  S.liveBids=S.liveBids.filter(b=>b.gid!=gid);
+  renderAucHist();renderBids();toast(`${winner} wins ${fmt(prize)}!`);maybeAd();updateDB();
+  addAct(`Month ${mo} auction: ${winner} wins ${fmt(prize)}`,'gold');
+  ['auc_month','auc_bid','auc_winner'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('auc_group').value='';
+  calcAuction();
+  queueCloudSave();
+}
+function renderAucHist(){
+  const el=document.getElementById('auc_hist');
+  if(!S.auctions.length){el.innerHTML='<div class="empty"><div class="empty-icon">🔨</div><p>No auctions yet.</p></div>';return;}
+  el.innerHTML=S.auctions.slice().reverse().map(a=>`
+    <div class="auc-hist-row">
+      <div class="auc-hist-mo-chip"><span>Mo</span><span>${a.month}</span></div>
+      <div class="auc-hist-info">
+        <div class="auc-hist-winner">${a.winner}</div>
+        <div class="auc-hist-sub">${a.groupName} · Div: ${fmt(a.dividend)}/mbr</div>
+      </div>
+      <div class="auc-hist-prize">${fmt(a.prize)}</div>
+    </div>`).join('');
+}
+
+/* ── EMI ── */
+function calcEMI(){
+  const val=parseFloat(document.getElementById('e_val').value)||0;
+  const mem=parseInt(document.getElementById('e_mem').value)||0;
+  const dur=parseInt(document.getElementById('e_dur').value)||0;
+  const comm=parseFloat(document.getElementById('e_comm').value)||5;
+  const disc=parseFloat(document.getElementById('e_disc').value)||0;
+  const fd=parseFloat(document.getElementById('e_fd').value)||7;
+  if(!val||!mem)return;
+  const mo=val/mem,fc=(comm/100)*val,ad=Math.min(disc,val-fc),div=ad/mem,ni=mo-div,pr=val-fc-ad;
+  const mos=dur||mem,tot=mo*mos,fte=fc*mos;
+  const ec=(fc/pr)*(12/mos)*100,mc=(fc/val)*(12/Math.ceil(mos/2))*100;
+  const fdr=fd/100/12;let fdm=0;
+  for(let i=0;i<mos;i++) fdm+=mo*Math.pow(1+fdr,mos-i);
+  const fdi=fdm-tot;
+  document.getElementById('er_mo').textContent=fmt(mo);
+  document.getElementById('er_net').textContent=fmt(ni);
+  document.getElementById('er_dv').textContent=fmt(div);
+  document.getElementById('er_pr').textContent=fmt(pr);
+  const er=document.getElementById('emi_results');if(er)er.style.display='';
+  const eb=document.getElementById('emi_breakdown');if(eb)eb.style.display='';
+  const ef=document.getElementById('emi_fd_card');if(ef)ef.style.display='';
+  document.getElementById('ed_cv').textContent=fmt(val);
+  document.getElementById('ed_cm').textContent=fmt(fc);
+  document.getElementById('ed_dc').textContent=fmt(ad);
+  document.getElementById('ed_dv').textContent=fmt(div);
+  document.getElementById('ed_tot').textContent=fmt(tot);
+  document.getElementById('ed_fe').textContent=fmt(fte);
+  document.getElementById('ed_ew').textContent=pct(ec);
+  document.getElementById('ed_mw').textContent=pct(mc);
+  document.getElementById('ec_inv').textContent=fmt(tot);
+  document.getElementById('ec_fd').textContent=fmt(fdm.toFixed(0));
+  document.getElementById('ec_fi').textContent=fmt(fdi.toFixed(0));
+  document.getElementById('ec_cc').textContent=fmt(fc);
+  document.getElementById('ec_v').textContent=fdi>fc?`FD earns ₹${fmtN((fdi-fc).toFixed(0))} more than chit cost. But chit gives auction liquidity!`:`Chit commission (${fmt(fc)}) compared to FD interest earned (${fmt(fdi.toFixed(0))}). Chit offers early fund access.`;
+}
+function resolveFund(val){
+  if(!val) return null;
+  if(val.startsWith('c_')){const id=val.slice(2);return S.chits.find(c=>c.id==id)||null;}
+  if(val.startsWith('m_')){const id=val.slice(2);return S.myChitFunds.find(f=>f.id==id)||null;}
+  // legacy fallback
+  return S.chits.find(c=>c.id==val)||S.myChitFunds.find(f=>f.id==val)||null;
+}
+function updateMpayDetail(){
+  const gid=document.getElementById('mp_grp').value;
+  const mo=parseInt(document.getElementById('mp_mo').value)||0;
+  const el=document.getElementById('mp_det');
+  if(!gid||!mo){el.innerHTML='';return;}
+  const c=resolveFund(gid);if(!c){el.innerHTML='';return;}
+  const mly=c.value/c.members;
+  el.innerHTML=`<div class="mpay-amount-display"><div class="mpay-amount-lbl">Amount Due — Month ${mo}</div><div class="mpay-amount-val">${fmt(mly)}</div></div>`;
+}
+function calcMemberEMI(){
+  const val=parseFloat(document.getElementById('me_val').value)||0;
+  const mem=parseInt(document.getElementById('me_mem').value)||0;
+  const comm=parseFloat(document.getElementById('me_comm').value)||5;
+  const disc=parseFloat(document.getElementById('me_disc').value)||0;
+  if(!val||!mem)return;
+  const mo=val/mem,fc=(comm/100)*val,div=Math.min(disc,val-fc)/mem,ni=mo-div;
+  document.getElementById('me_res').innerHTML=`
+    <div class="card">
+      <div class="card-hd"><span class="pip"></span>Your Breakdown</div>
+      <div class="emi-result-strip" style="margin-bottom:0;">
+        <div class="emi-pill g"><div class="emi-pill-val">${fmt(mo)}</div><div class="emi-pill-lbl">Gross EMI</div></div>
+        <div class="emi-pill b"><div class="emi-pill-val">${fmt(div)}</div><div class="emi-pill-lbl">Dividend</div></div>
+        <div class="emi-pill t"><div class="emi-pill-val">${fmt(ni)}</div><div class="emi-pill-lbl">Net Payment</div></div>
+        <div class="emi-pill p"><div class="emi-pill-val">${fmt(val-fc-Math.min(disc,val-fc))}</div><div class="emi-pill-lbl">Prize Pool</div></div>
+      </div>
+    </div>`;
+}
+
+/* ── REPORTS ── */
+function renderReports(){
+  const tv=S.chits.reduce((a,c)=>a+c.value,0);
+  const tc=S.chits.reduce((a,c)=>a+(c.comm/100)*c.value*c.duration,0);
+  document.getElementById('rp_f').textContent=fmt(tv);
+  document.getElementById('rp_fc').textContent=S.chits.length+' chit(s)';
+  document.getElementById('rp_m').textContent=S.members.length;
+  document.getElementById('rp_a').textContent=S.auctions.length;
+  document.getElementById('rp_c').textContent=fmt(tc);
+  document.getElementById('rp_ct').innerHTML=S.chits.length?S.chits.map(c=>`<tr><td>${c.name}</td><td>${fmtN(c.value)}</td><td>${c.members}</td><td>${c.duration} mo.</td><td>${fmtN(c.value/c.members)}</td><td><span class="badge bg">Active</span></td></tr>`).join(''):`<tr><td colspan="6" style="text-align:center;color:var(--t3);padding:20px;">No funds yet</td></tr>`;
+  document.getElementById('rp_at').innerHTML=S.auctions.length?S.auctions.map(a=>`<tr><td>Mo.${a.month}</td><td>${a.groupName}</td><td>${a.winner}</td><td>${fmt(a.discount)}</td><td>${fmt(a.dividend)}</td><td style="color:var(--gold2);font-weight:500;">${fmt(a.prize)}</td></tr>`).join(''):`<tr><td colspan="6" style="text-align:center;color:var(--t3);padding:20px;">No auctions yet</td></tr>`;
+  if(S.chits.length){
+    const cols=['var(--gold2)','var(--teal)','var(--blue)','var(--purple)','var(--green)'];
+    const mx=Math.max(...S.chits.map(c=>c.value));
+    document.getElementById('colChart').innerHTML=`<div class="chart-bars">${S.chits.map((c,i)=>`<div class="chart-bw"><div class="chart-b" style="height:${Math.max(8,Math.round(c.value/mx*80))}px;background:${cols[i%cols.length]};opacity:.85;"></div><div class="chart-bl">${c.name.substring(0,5)}</div></div>`).join('')}</div><div style="font-size:10px;color:var(--t3);margin-top:6px;font-family:'IBM Plex Mono',monospace;">Monthly collection by group</div>`;
+  }
+}
+
+/* ── NOTIFICATIONS ── */
+function sendNotif(){
+  const gid=document.getElementById('notif_group').value;
+  const type=document.getElementById('notif_type').value;
+  const msg=document.getElementById('notif_msg').value.trim();
+  const grp=S.chits.find(c=>c.id==gid);
+  const text=msg||(type+(grp?` for ${grp.name}`:''));
+  document.getElementById('notifLog').insertAdjacentHTML('afterbegin',`<div class="notif-item"><div class="ndot-sm" style="background:var(--teal)"></div><div><div class="notif-text">${text}</div><div class="notif-time">Just now</div></div></div>`);
+  document.getElementById('notif_msg').value='';toast('Notification sent!');
+}
+
+/* ── MEMBER VIEW ── */
+function loadMemberView(){
+  const gid=document.getElementById('mem_mygrp').value;if(!gid)return;
+  const c=S.chits.find(c=>c.id==gid);if(!c)return;
+  const mo=c.value/c.members;
+  document.getElementById('md_v').textContent=fmt(c.value);
+  document.getElementById('md_g').textContent=c.name;
+  document.getElementById('md_p').textContent=Object.keys(S.payments).filter(k=>k.includes(`_${gid}_`)&&S.payments[k]).length;
+  document.getElementById('md_d').textContent=fmt(0);
+  document.getElementById('mem_stat').innerHTML=`<div class="rr"><span class="rr-k">Chit Value</span><span class="rr-v">${fmt(c.value)}</span></div><div class="rr"><span class="rr-k">Monthly Instalment</span><span class="rr-v gold">${fmt(mo)}</span></div><div class="rr"><span class="rr-k">Duration</span><span class="rr-v">${c.duration} months</span></div><div class="rr"><span class="rr-k">Commission</span><span class="rr-v rd">${c.comm}%</span></div><div class="rr"><span class="rr-k">Status</span><span class="rr-v"><span class="badge bg">Active Member</span></span></div>`;
+}
+function makePayment(){
+  const gid=document.getElementById('mp_grp').value;
+  const mo=parseInt(document.getElementById('mp_mo').value);
+  if(!gid||!mo){toast('Select group and month!',true);return;}
+  const c=resolveFund(gid);if(!c){toast('Fund not found',true);return;}
+  // Check for duplicate
+  const already=S.memberPayments.find(p=>p.gid===gid&&p.month===mo);
+  if(already){toast('Month '+mo+' already paid!',true);return;}
+  S.memberPayments.push({gid,month:mo,groupName:c.name,amount:c.value/c.members,date:new Date().toLocaleDateString('en-IN'),status:'Paid'});
+  // If it's a member-added fund, update the paid count
+  if(gid.startsWith('m_')){
+    const fid=gid.slice(2);
+    const idx=S.myChitFunds.findIndex(f=>f.id==fid);
+    if(idx>-1){
+      const maxPaid=Math.max(...S.memberPayments.filter(p=>p.gid===gid).map(p=>p.month));
+      S.myChitFunds[idx].paid=maxPaid;
+    }
+    renderMyChits();
+  }
+  renderMPay();toast(`Month ${mo} payment recorded!`);
+  queueCloudSave();
+}
+function renderMPay(){
+  const el=document.getElementById('mp_rec');
+  if(!S.memberPayments.length){el.innerHTML='<div class="empty"><div class="empty-icon">💳</div><p>No records yet.</p></div>';return;}
+  el.innerHTML=S.memberPayments.slice().reverse().map(p=>`
+    <div class="mpay-hist-item">
+      <div class="mpay-hist-mo">M${p.month}</div>
+      <div style="flex:1;min-width:0;">
+        <div class="mpay-hist-group">${p.groupName}</div>
+        <div class="mpay-hist-date">${p.date} · <span style="color:var(--green);font-weight:600;">${p.status}</span></div>
+      </div>
+      <div class="mpay-hist-amt">${fmt(p.amount)}</div>
+    </div>`).join('');
+}
+function placeBid(){
+  const bid=parseFloat(document.getElementById('mem_bid').value)||0;
+  const name=(document.getElementById('mem_bid_name').value||'').trim();
+  const gid=document.getElementById('mem_bid_grp').value;
+  if(!gid){toast('Select a chit group!',true);return;}
+  if(!name){toast('Enter your name!',true);return;}
+  if(!bid||bid<=0){toast('Enter a valid bid amount!',true);return;}
+  const c=S.chits.find(c=>c.id==gid);if(!c){toast('Group not found',true);return;}
+  // Update existing bid from same member in same group, or push new
+  const existIdx=S.liveBids.findIndex(b=>b.name.toLowerCase()===name.toLowerCase()&&b.gid==gid);
+  const bidObj={id:Date.now(),name,gid,groupName:c.name,amount:bid,time:new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})};
+  if(existIdx>-1){S.liveBids[existIdx]=bidObj;toast(`Bid updated to ${fmt(bid)}!`);}
+  else{S.liveBids.push(bidObj);toast(`Bid of ${fmt(bid)} placed!`);}
+  document.getElementById('mem_bid').value='';
+  renderBids();
+  queueCloudSave();
+}
+
+function renderBids(){
+  const bids=[...S.liveBids].sort((a,b)=>b.amount-a.amount);
+  const highest=bids[0]||null;
+
+  // ── Member view ──
+  const memEl=document.getElementById('mem_bids_list');
+  const memBanner=document.getElementById('mem_lowest_banner');
+  if(memEl){
+    if(!bids.length){
+      memEl.innerHTML='<div class="empty"><div class="empty-icon">🔨</div><p>No bids placed yet.</p></div>';
+      if(memBanner) memBanner.style.display='none';
+    } else {
+      if(memBanner){
+        memBanner.style.display='flex';
+        document.getElementById('mem_lowest_val').textContent=fmt(highest.amount);
+        document.getElementById('mem_lowest_name').textContent=highest.name;
+      }
+      memEl.innerHTML=bids.map((b,i)=>`
+        <div class="bid-row${i===0?' lowest':''}">
+          <div class="bid-rank">${i+1}</div>
+          <div style="flex:1;min-width:0;">
+            <div class="bid-name">${b.name}${i===0?' <span class="bid-winner-tag">Highest</span>':''}${b.byForeman?' <span style="font-size:9px;color:var(--blue);background:rgba(79,156,249,.1);border:1px solid rgba(79,156,249,.2);border-radius:4px;padding:2px 5px;">Foreman</span>':''}</div>
+            <div class="bid-grp">${b.groupName} · ${b.time}</div>
+          </div>
+          <div class="bid-amt">${fmt(b.amount)}</div>
+        </div>`).join('');
+    }
+  }
+
+  // ── Foreman view ──
+  const fmEl=document.getElementById('foreman_bids_list');
+  const cntEl=document.getElementById('auc_bid_count');
+  if(cntEl) cntEl.textContent=bids.length+' bid'+(bids.length===1?'':'s');
+  if(fmEl){
+    if(!bids.length){
+      fmEl.innerHTML='<div class="empty"><div class="empty-icon">🔨</div><p>No bids yet. Members can place bids from the Auction tab.</p></div>';
+    } else {
+      fmEl.innerHTML=bids.map((b,i)=>`
+        <div class="bid-row${i===0?' lowest':''}">
+          <div class="bid-rank">${i+1}</div>
+          <div style="flex:1;min-width:0;">
+            <div class="bid-name">${b.name}${i===0?' <span class="bid-winner-tag">Highest — Winner</span>':''}${b.byForeman?' <span style="font-size:9px;background:rgba(79,156,249,.12);color:var(--blue);border:1px solid rgba(79,156,249,.25);border-radius:4px;padding:2px 5px;letter-spacing:.3px;">Foreman</span>':''}</div>
+            <div class="bid-grp">${b.groupName} · ${b.time}</div>
+          </div>
+          <div class="bid-amt">${fmt(b.amount)}</div>
+          ${i===0?`<button class="btn btn-gold btn-sm" onclick="closeAuctionWithWinner(${b.id})" style="white-space:nowrap;">✓ Declare</button>`:''}
+        </div>`).join('');
+    }
+  }
+}
+
+/* ── DASHBOARD ── */
+function updateDB(){
+  const tv=S.chits.reduce((a,c)=>a+c.value,0);
+  const tm=S.chits.reduce((a,c)=>a+c.value/c.members,0);
+  const te=S.chits.reduce((a,c)=>a+(c.comm/100)*c.value,0);
+  document.getElementById('d_tv').textContent=fmt(tv);
+  document.getElementById('d_cc').textContent=S.chits.length+' active fund(s)';
+  document.getElementById('d_mem').textContent=S.members.length;
+  document.getElementById('d_mo').textContent=fmt(tm);
+  document.getElementById('d_earn').textContent=fmt(te);
+  document.getElementById('d_chitList').innerHTML=S.chits.length?S.chits.map(c=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--ln);"><div><div style="font-weight:600;font-size:13px;color:var(--t1);">${c.name}</div><div style="font-size:11px;color:var(--t3);font-family:'IBM Plex Mono',monospace;">${fmt(c.value)} · ${c.members} members</div></div><span class="badge bg">Active</span></div>`).join(''):'<div class="empty"><div class="empty-icon">💼</div><p>No chit funds yet.</p></div>';
+  document.getElementById('d_prog').innerHTML=S.chits.length?S.chits.map(c=>{const pk=Object.keys(S.payments).filter(k=>k.includes(`_${c.id}_`)&&S.payments[k]);const p=Math.min(100,c.members?pk.length/c.members*100:0);return `<div style="margin-bottom:12px;"><div style="display:flex;justify-content:space-between;font-size:11px;color:var(--t3);margin-bottom:4px;"><span>${c.name}</span><span>${p.toFixed(0)}%</span></div><div class="pb-track"><div class="pb-fill pb-teal" style="width:${p}%"></div></div></div>`;}).join(''):'<div class="empty"><div class="empty-icon">📊</div><p>No funds to track.</p></div>';
+  const ap=Object.values(S.payments).filter(Boolean).length;
+  document.getElementById('qs_paid').textContent=ap;
+  document.getElementById('qs_due').textContent=Math.max(0,S.members.length-ap);
+  document.getElementById('qs_auc').textContent=S.auctions.length;
+  document.getElementById('qs_prz').textContent=S.members.filter(m=>m.prized).length;
+}
+function addAct(text,color){
+  const el=document.getElementById('d_act');
+  const d=document.createElement('div');d.className='notif-item';
+  d.innerHTML=`<div class="ndot-sm" style="background:var(--${color})"></div><div><div class="notif-text">${text}</div><div class="notif-time">Just now</div></div>`;
+  el.insertBefore(d,el.firstChild);if(el.children.length>6)el.removeChild(el.lastChild);
+}
+
+/* ── MY CHIT FUNDS ── */
+let mcf_del_pending=null;
+
+function openMCFModal(id){
+  document.getElementById('mcf_edit_id').value='';
+  document.getElementById('mcf_name').value='';
+  document.getElementById('mcf_value').value='';
+  document.getElementById('mcf_members').value='';
+  document.getElementById('mcf_duration').value='';
+  document.getElementById('mcf_comm').value='5';
+  document.getElementById('mcf_start').value='';
+  document.getElementById('mcf_paid').value='0';
+  document.getElementById('mcf_foreman').value='';
+  document.getElementById('mcf_notes').value='';
+  document.getElementById('mcfModalTitle').textContent='Add Chit Fund';
+  if(id){
+    const f=S.myChitFunds.find(x=>x.id===id);if(!f)return;
+    document.getElementById('mcf_edit_id').value=id;
+    document.getElementById('mcf_name').value=f.name;
+    document.getElementById('mcf_value').value=f.value;
+    document.getElementById('mcf_members').value=f.members;
+    document.getElementById('mcf_duration').value=f.duration;
+    document.getElementById('mcf_comm').value=f.comm;
+    document.getElementById('mcf_start').value=f.start||'';
+    document.getElementById('mcf_paid').value=f.paid||0;
+    document.getElementById('mcf_foreman').value=f.foreman||'';
+    document.getElementById('mcf_notes').value=f.notes||'';
+    document.getElementById('mcfModalTitle').textContent='Edit Chit Fund';
+  }
+  openModal('mcfModal');
+}
+
+function saveMCF(){
+  const name=document.getElementById('mcf_name').value.trim();
+  const value=parseFloat(document.getElementById('mcf_value').value)||0;
+  const members=parseInt(document.getElementById('mcf_members').value)||0;
+  const duration=parseInt(document.getElementById('mcf_duration').value)||0;
+  const comm=parseFloat(document.getElementById('mcf_comm').value)||5;
+  const start=document.getElementById('mcf_start').value;
+  const paid=parseInt(document.getElementById('mcf_paid').value)||0;
+  const foreman=document.getElementById('mcf_foreman').value.trim();
+  const notes=document.getElementById('mcf_notes').value.trim();
+  if(!name||!value||!members||!duration){toast('Fund name, value, members and duration are required!',true);return;}
+  const editId=document.getElementById('mcf_edit_id').value;
+  if(editId){
+    const idx=S.myChitFunds.findIndex(x=>x.id==editId);
+    if(idx>-1) S.myChitFunds[idx]={...S.myChitFunds[idx],name,value,members,duration,comm,start,paid,foreman,notes};
+    toast(`"${name}" updated!`);
+  } else {
+    S.myChitFunds.push({id:Date.now(),name,value,members,duration,comm,start,paid,foreman,notes,created:new Date().toLocaleDateString('en-IN')});
+    toast(`"${name}" added!`);
+  }
+  closeModal('mcfModal');popDrops();renderMyChits();
+  queueCloudSave();
+}
+
+function deleteMCF(id){
+  const f=S.myChitFunds.find(x=>x.id===id);if(!f)return;
+  mcf_del_pending=id;
+  document.getElementById('mcf_del_name').textContent=`"${f.name}"`;
+  openModal('mcfDeleteModal');
+}
+
+function confirmDeleteMCF(){
+  if(!mcf_del_pending)return;
+  const gid='m_'+mcf_del_pending;
+  S.myChitFunds=S.myChitFunds.filter(x=>x.id!==mcf_del_pending);
+  S.memberPayments=S.memberPayments.filter(p=>p.gid!==gid);
+  mcf_del_pending=null;
+  closeModal('mcfDeleteModal');
+  popDrops();renderMyChits();renderMPay();
+  toast('Fund removed.');
+  queueCloudSave();
+}
+
+function renderMyChits(){
+  const funds=S.myChitFunds;
+  const totalVal=funds.reduce((a,f)=>a+f.value,0);
+  const totalMo=funds.reduce((a,f)=>a+(f.value/f.members),0);
+  document.getElementById('mcf_total').textContent=fmt(totalVal);
+  document.getElementById('mcf_count_lbl').textContent=funds.length+' fund'+(funds.length===1?'':'s');
+  document.getElementById('mcf_monthly').textContent=fmt(totalMo);
+  const el=document.getElementById('mcf_list');
+  if(!funds.length){el.innerHTML='<div class="empty"><div class="empty-icon">🏦</div><p>No chit funds yet.<br>Tap "+ Add Fund" to add one.</p></div>';return;}
+  el.innerHTML=funds.map(f=>{
+    const monthly=f.value/f.members;
+    const paidRecords=S.memberPayments.filter(p=>p.gid==='m_'+f.id);
+    const paidCount=Math.min(paidRecords.length,f.duration);
+    const pct=f.duration?Math.round(paidCount/f.duration*100):0;
+    const remaining=f.duration-paidCount;
+    const totalPaid=paidRecords.reduce((a,p)=>a+p.amount,0);
+    const barColor=pct>=75?'var(--green)':pct>=40?'var(--teal)':'var(--gold2)';
+    return `<div class="mcf-card">
+      <div class="mcf-top">
+        <div class="mcf-icon">🏛</div>
+        <div class="mcf-info">
+          <div class="mcf-name">${f.name}</div>
+          <div class="mcf-meta">${f.members} members · ${f.duration} months · ${f.comm}% comm${f.foreman?' · '+f.foreman:''}</div>
+        </div>
+        <div class="mcf-actions">
+          <button class="btn btn-icon btn-sm" title="Edit" onclick="openMCFModal(${f.id})">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </button>
+          <button class="btn btn-icon btn-sm" title="Remove" onclick="deleteMCF(${f.id})" style="color:var(--red);border-color:rgba(232,85,85,.2);">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="mcf-row">
+        <div class="mcf-stat"><div class="mcf-stat-val">${fmt(f.value)}</div><div class="mcf-stat-lbl">Chit Value</div></div>
+        <div class="mcf-stat"><div class="mcf-stat-val">${fmt(monthly)}</div><div class="mcf-stat-lbl">Monthly</div></div>
+        <div class="mcf-stat"><div class="mcf-stat-val" style="color:var(--teal);">${fmt(totalPaid)}</div><div class="mcf-stat-lbl">Paid So Far</div></div>
+      </div>
+      <div class="mcf-prog-row">
+        <div style="font-size:10px;color:var(--t3);white-space:nowrap;">Month ${paidCount}/${f.duration}</div>
+        <div class="pb-track" style="flex:1;"><div class="pb-fill" style="width:${pct}%;background:${barColor};"></div></div>
+        <div class="mcf-pct">${pct}%</div>
+      </div>
+      <div style="font-size:10px;color:var(--t4);font-family:'IBM Plex Mono',monospace;margin-top:4px;">${remaining>0?remaining+' month(s) remaining':'✅ Chit completed!'}${f.start?' · Started '+f.start:''}</div>
+      ${f.notes?`<div class="mcf-note">${f.notes}</div>`:''}
+    </div>`;
+  }).join('');
+}
+
+/* ── INIT ── */
+(function(){
+  const today=new Date();
+  const ym=`${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}`;
+  document.getElementById('cm_start').value=ym;
+  updateAuthUI(null);
+  popDrops();
+  renderMembers();
+  renderPayTable();
+  renderAucHist();
+  renderMPay();
+  renderBids();
+  renderMyChits();
+  renderMN();
+  updateDB();
+  initializeFirebase();
+})();
+</script>
+</body>
+</html>
