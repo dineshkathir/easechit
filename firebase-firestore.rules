@@ -18,5 +18,21 @@ service cloud.firestore {
       allow read: if request.auth != null;
       allow create, update, delete: if request.auth != null;
     }
+
+    match /paymentRecords/{paymentId} {
+      allow read: if request.auth != null && (
+        (resource.data.memberEmail is string
+          && request.auth.token.email is string
+          && resource.data.memberEmail == request.auth.token.email.lower()) ||
+        (resource.data.foremanUid is string
+          && resource.data.foremanUid == request.auth.uid)
+      );
+      allow create, update, delete: if request.auth != null;
+    }
+
+    match /liveBids/{bidId} {
+      allow read: if request.auth != null;
+      allow create, update, delete: if request.auth != null;
+    }
   }
 }

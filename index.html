@@ -1190,6 +1190,11 @@ let memberAssignments=[];
 let memberAssignmentsUnsubscribe=null;
 let accessRegistryUnsubscribe=null;
 let memberAssignmentBackfillDone=false;
+let sharedPayments=[];
+let sharedPaymentsUnsubscribe=null;
+let sharedPaymentKeys=new Set();
+let sharedLiveBids=[];
+let sharedLiveBidsUnsubscribe=null;
 const S={role:'foreman',theme:'dark',chits:[],members:[],payments:{},auctions:[],memberPayments:[],myChitFunds:[],liveBids:[],timerInterval:null,timerSecs:0,timerRunning:false,adCount:0,cur:'dashboard'};
 const ACCESS_STORAGE_KEY='cv_admin_access_registry_v1';
 const ADMIN_SESSION_KEY='cv_admin_portal_session_v1';
@@ -1317,6 +1322,12 @@ function getMemberAssignmentRef(memberId,groupId){
 function getCurrentUserEmail(){
   return normalizeEmail(currentUser&&currentUser.email?currentUser.email:'');
 }
+function getPaymentRecordRef(memberId,groupId,month){
+  return db.collection('paymentRecords').doc(`${groupId}_${memberId}_${month}`);
+}
+function getLiveBidRef(groupId,bidderKey){
+  return db.collection('liveBids').doc(`${groupId}_${bidderKey}`);
+}
 function getMatchedMembers(email=getCurrentUserEmail()){
   if(!email)return [];
   return S.members.filter(member=>normalizeEmail(member.email)===email);
@@ -1358,6 +1369,121 @@ function getVisibleMemberFunds(){
       notes:f.notes||''
     }))
   ];
+}
+function getVisibleAuctionGroupIds(){
+  const memberGroups=getAssignedMemberFunds().map(item=>String(item.id));
+  const foremanGroups=S.chits.map(item=>String(item.id));
+  return Array.from(new Set([...memberGroups,...foremanGroups]));
+}
+function applySharedLiveBidsToState(){
+  const visibleIds=new Set(getVisibleAuctionGroupIds());
+  S.liveBids=sharedLiveBids.filter(item=>visibleIds.size===0 || visibleIds.has(String(item.gid)));
+  renderBids();
+}
+function applySharedPaymentsToState(){
+  sharedPaymentKeys.forEach(key=>{
+    delete S.payments[key];
+  });
+  sharedPaymentKeys=new Set();
+  sharedPayments.forEach(item=>{
+    const key=`${item.memberId}_${item.groupId}_${item.month}`;
+    sharedPaymentKeys.add(key);
+    S.payments[key]=!!item.paid;
+  });
+  renderPayTable();
+  renderMyChits();
+  renderMPay();
+  updateDB();
+}
+function subscribeSharedPayments(user){
+  if(sharedPaymentsUnsubscribe){sharedPaymentsUnsubscribe();sharedPaymentsUnsubscribe=null;}
+  sharedPayments=[];
+  applySharedPaymentsToState();
+  if(!db||!user) return;
+  const memberEmail=normalizeEmail(user.email||'');
+  const query=userHasForemanAccess(user)
+    ? db.collection('paymentRecords').where('foremanUid','==',user.uid)
+    : memberEmail
+      ? db.collection('paymentRecords').where('memberEmail','==',memberEmail)
+      : null;
+  if(!query) return;
+  sharedPaymentsUnsubscribe=query.onSnapshot(snap=>{
+    sharedPayments=snap.docs.map(doc=>({id:doc.id,...doc.data()})).filter(item=>item&&item.memberId&&item.groupId&&item.month);
+    applySharedPaymentsToState();
+  },err=>{
+    console.error(err);
+    toast('Could not load shared payment status.',true);
+  });
+}
+function subscribeSharedLiveBids(user){
+  if(sharedLiveBidsUnsubscribe){sharedLiveBidsUnsubscribe();sharedLiveBidsUnsubscribe=null;}
+  sharedLiveBids=[];
+  applySharedLiveBidsToState();
+  if(!db||!user) return;
+  sharedLiveBidsUnsubscribe=db.collection('liveBids').onSnapshot(snap=>{
+    sharedLiveBids=snap.docs.map(doc=>({id:doc.id,...doc.data()})).map(item=>({
+      id:item.id,
+      gid:String(item.gid||''),
+      groupName:item.groupName||'',
+      name:item.name||'',
+      amount:Number(item.amount)||0,
+      time:item.time||'',
+      byForeman:!!item.byForeman,
+      bidderKey:item.bidderKey||''
+    })).filter(item=>item.gid&&item.name);
+    applySharedLiveBidsToState();
+  },err=>{
+    console.error(err);
+    toast('Could not load live auction bids.',true);
+  });
+}
+async function upsertSharedLiveBid(bid){
+  if(!db||!currentUser||!bid||!bid.gid||!bid.bidderKey) return;
+  await getLiveBidRef(bid.gid,bid.bidderKey).set({
+    gid:String(bid.gid),
+    groupName:bid.groupName||'',
+    name:bid.name||'',
+    amount:Number(bid.amount)||0,
+    time:bid.time||'',
+    byForeman:!!bid.byForeman,
+    bidderKey:bid.bidderKey,
+    foremanUid:currentUser.uid||'',
+    updatedAt:firebase.firestore.FieldValue.serverTimestamp()
+  },{merge:true});
+}
+async function clearSharedLiveBidsForGroup(groupId){
+  if(!db||!groupId) return;
+  const snap=await db.collection('liveBids').where('gid','==',String(groupId)).get();
+  if(snap.empty) return;
+  const batch=db.batch();
+  snap.docs.forEach(doc=>batch.delete(doc.ref));
+  await batch.commit();
+}
+function getAssignedRecordByPaymentGroup(gid){
+  const clean=String(gid||'').replace(/^c_/,'');
+  return memberAssignments.find(item=>String(item.groupId)===clean)||null;
+}
+async function setSharedPaymentStatus(opts){
+  if(!db||!currentUser||!opts||!opts.memberId||!opts.groupId||!opts.month) return;
+  const ref=getPaymentRecordRef(opts.memberId,opts.groupId,opts.month);
+  if(opts.paid){
+    await ref.set({
+      memberId:String(opts.memberId),
+      memberEmail:normalizeEmail(opts.memberEmail||''),
+      memberName:opts.memberName||'',
+      memberTicket:Number(opts.memberTicket)||0,
+      groupId:String(opts.groupId),
+      groupName:opts.groupName||'',
+      month:Number(opts.month),
+      amount:Number(opts.amount)||0,
+      paid:true,
+      foremanUid:opts.foremanUid||currentUser.uid||'',
+      updatedAt:firebase.firestore.FieldValue.serverTimestamp(),
+      updatedBy:currentUser.email||currentUser.uid||'user'
+    },{merge:true});
+  }else{
+    await ref.delete();
+  }
 }
 function syncMemberAssignments(user){
   if(memberAssignmentsUnsubscribe){memberAssignmentsUnsubscribe();memberAssignmentsUnsubscribe=null;}
@@ -1523,12 +1649,21 @@ function initializeFirebase(){
     if(remoteUnsubscribe){remoteUnsubscribe();remoteUnsubscribe=null;}
     if(memberAssignmentsUnsubscribe){memberAssignmentsUnsubscribe();memberAssignmentsUnsubscribe=null;}
     if(accessRegistryUnsubscribe){accessRegistryUnsubscribe();accessRegistryUnsubscribe=null;}
+    if(sharedPaymentsUnsubscribe){sharedPaymentsUnsubscribe();sharedPaymentsUnsubscribe=null;}
+    if(sharedLiveBidsUnsubscribe){sharedLiveBidsUnsubscribe();sharedLiveBidsUnsubscribe=null;}
     memberAssignments=[];
     memberAssignmentBackfillDone=false;
+    sharedPayments=[];
+    sharedPaymentKeys.forEach(key=>delete S.payments[key]);
+    sharedPaymentKeys=new Set();
+    sharedLiveBids=[];
+    S.liveBids=[];
     clearTimeout(saveTimer);
     if(!user){popDrops();renderMyChits();renderMPay();renderForemanAccessList();return;}
     subscribeAccessRegistry();
     syncMemberAssignments(user);
+    subscribeSharedPayments(user);
+    subscribeSharedLiveBids(user);
     updateSyncStatus('Loading cloud data...',true);
     remoteUnsubscribe=getUserDocRef(user.uid).onSnapshot(async snap=>{
       const payload=snap.data();
@@ -1827,13 +1962,15 @@ function foremanAddBid(){
   if(!name){toast('Select a member!',true);return;}
   if(!bid||bid<=0){toast('Enter a valid bid amount!',true);return;}
   const c=S.chits.find(c=>c.id==gid);if(!c){toast('Group not found',true);return;}
-  const existIdx=S.liveBids.findIndex(b=>b.name.toLowerCase()===name.toLowerCase()&&b.gid==gid);
-  const bidObj={id:Date.now(),name,gid,groupName:c.name,amount:bid,time:new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}),byForeman:true};
-  if(existIdx>-1){S.liveBids[existIdx]=bidObj;toast(`Bid updated for ${name}!`);}
-  else{S.liveBids.push(bidObj);toast(`Bid of ${fmt(bid)} added for ${name}!`);}
+  const bidObj={id:`${gid}_foreman_${name.toLowerCase().replace(/\s+/g,'_')}`,name,gid:String(gid),groupName:c.name,amount:bid,time:new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}),byForeman:true,bidderKey:`foreman_${name.toLowerCase().replace(/\s+/g,'_')}`};
   document.getElementById('fm_bid_amt').value='';
-  renderBids();
-  addAct(`Foreman added bid ${fmt(bid)} for ${name}`,'blue');
+  upsertSharedLiveBid(bidObj).then(()=>{
+    toast(`Bid of ${fmt(bid)} added for ${name}!`);
+    addAct(`Foreman added bid ${fmt(bid)} for ${name}`,'blue');
+  }).catch(err=>{
+    console.error(err);
+    toast('Could not send live bid online.',true);
+  });
   queueCloudSave();
 }
 
@@ -1921,10 +2058,38 @@ function renderPayTable(){
         <div class="pay-member-meta">#${m.ticket} · ${fmtN(mly)}</div>
       </div>
       <span style="font-size:11px;font-weight:600;color:${ip?'var(--green)':'var(--red)'};margin-right:10px;">${ip?'Paid':'Due'}</span>
-      <button class="pay-toggle ${ip?'is-paid':'is-due'}" onclick="togPay('${k}',${mly})" type="button" title="${ip?'Mark as due':'Mark as paid'}"></button>
+      <button class="pay-toggle ${ip?'is-paid':'is-due'}" onclick="togPay('${m.id}','${gid}','${mo}',${mly},'${(m.email||'').replace(/'/g,\"&#39;\")}','${(m.name||'').replace(/'/g,\"&#39;\")}','${m.ticket||0}','${(chit.name||'').replace(/'/g,\"&#39;\")}')" type="button" title="${ip?'Mark as due':'Mark as paid'}"></button>
     </div>`).join('');
 }
-function togPay(k,amt){S.payments[k]=!S.payments[k];renderPayTable();updateDB();toast(S.payments[k]?'Marked as paid':'Marked as due');queueCloudSave();}
+async function togPay(memberId,gid,mo,amt,memberEmail,memberName,memberTicket,groupName){
+  const key=`${memberId}_${gid}_${mo}`;
+  const next=!S.payments[key];
+  S.payments[key]=next;
+  renderPayTable();
+  updateDB();
+  try{
+    await setSharedPaymentStatus({
+      memberId,
+      groupId:gid,
+      month:mo,
+      amount:amt,
+      paid:next,
+      memberEmail,
+      memberName,
+      memberTicket,
+      groupName,
+      foremanUid:currentUser&&currentUser.uid?currentUser.uid:''
+    });
+    toast(next?'Marked as paid':'Marked as due');
+  }catch(err){
+    console.error(err);
+    S.payments[key]=!next;
+    renderPayTable();
+    updateDB();
+    toast('Could not update payment status online.',true);
+  }
+  queueCloudSave();
+}
 
 /* ── AUCTION TIMER ── */
 function startTimer(){
@@ -1982,6 +2147,7 @@ function finalizeAuction(){
   S.auctions.push({id:Date.now(),month:mo,groupName:c.name,winner,discount:disc,dividend:div,prize,comm});
   // Clear live bids for this group
   S.liveBids=S.liveBids.filter(b=>b.gid!=gid);
+  clearSharedLiveBidsForGroup(gid).catch(err=>console.error(err));
   renderAucHist();renderBids();toast(`${winner} wins ${fmt(prize)}!`);maybeAd();updateDB();
   addAct(`Month ${mo} auction: ${winner} wins ${fmt(prize)}`,'gold');
   ['auc_month','auc_bid','auc_winner'].forEach(id=>document.getElementById(id).value='');
@@ -2114,15 +2280,18 @@ function loadMemberView(){
   document.getElementById('md_d').textContent=fmt(0);
   document.getElementById('mem_stat').innerHTML=`<div class="rr"><span class="rr-k">Chit Value</span><span class="rr-v">${fmt(c.value)}</span></div><div class="rr"><span class="rr-k">Monthly Instalment</span><span class="rr-v gold">${fmt(mo)}</span></div><div class="rr"><span class="rr-k">Duration</span><span class="rr-v">${c.duration} months</span></div><div class="rr"><span class="rr-k">Commission</span><span class="rr-v rd">${c.comm}%</span></div><div class="rr"><span class="rr-k">Status</span><span class="rr-v"><span class="badge bg">Active Member</span></span></div>`;
 }
-function makePayment(){
+async function makePayment(){
   const gid=document.getElementById('mp_grp').value;
   const mo=parseInt(document.getElementById('mp_mo').value);
   if(!gid||!mo){toast('Select group and month!',true);return;}
   const c=resolveFund(gid);if(!c){toast('Fund not found',true);return;}
   // Check for duplicate
-  const already=S.memberPayments.find(p=>p.gid===gid&&p.month===mo);
+  const already=S.memberPayments.find(p=>p.gid===gid&&p.month===mo)
+    || sharedPayments.find(p=>`c_${p.groupId}`===gid&&Number(p.month)===mo&&normalizeEmail(p.memberEmail)===getCurrentUserEmail());
   if(already){toast('Month '+mo+' already paid!',true);return;}
-  S.memberPayments.push({gid,month:mo,groupName:c.name,amount:c.value/c.members,date:new Date().toLocaleDateString('en-IN'),status:'Paid'});
+  const amount=c.value/c.members;
+  const record={gid,month:mo,groupName:c.name,amount,date:new Date().toLocaleDateString('en-IN'),status:'Paid'};
+  S.memberPayments.push(record);
   // If it's a member-added fund, update the paid count
   if(gid.startsWith('m_')){
     const fid=gid.slice(2);
@@ -2132,14 +2301,57 @@ function makePayment(){
       S.myChitFunds[idx].paid=maxPaid;
     }
     renderMyChits();
+    renderMPay();
+    toast(`Month ${mo} payment recorded!`);
+    queueCloudSave();
+    return;
   }
-  renderMPay();toast(`Month ${mo} payment recorded!`);
+  const assignment=getAssignedRecordByPaymentGroup(gid);
+  if(!assignment){
+    S.memberPayments=S.memberPayments.filter(p=>!(p.gid===gid&&p.month===mo));
+    renderMPay();
+    toast('Member assignment not found for this payment.',true);
+    return;
+  }
+  const key=`${assignment.memberId}_${assignment.groupId}_${mo}`;
+  S.payments[key]=true;
+  renderMyChits();
+  renderMPay();
+  updateDB();
+  try{
+    await setSharedPaymentStatus({
+      memberId:assignment.memberId,
+      groupId:assignment.groupId,
+      month:mo,
+      amount,
+      paid:true,
+      memberEmail:assignment.memberEmail,
+      memberName:assignment.memberName,
+      memberTicket:assignment.memberTicket,
+      groupName:assignment.groupName,
+      foremanUid:assignment.foremanUid||''
+    });
+    toast(`Month ${mo} payment recorded!`);
+  }catch(err){
+    console.error(err);
+    delete S.payments[key];
+    S.memberPayments=S.memberPayments.filter(p=>!(p.gid===gid&&p.month===mo));
+    renderMyChits();
+    renderMPay();
+    updateDB();
+    toast('Could not record payment online.',true);
+    return;
+  }
   queueCloudSave();
 }
 function renderMPay(){
   const el=document.getElementById('mp_rec');
-  if(!S.memberPayments.length){el.innerHTML='<div class="empty"><div class="empty-icon">💳</div><p>No records yet.</p></div>';return;}
-  el.innerHTML=S.memberPayments.slice().reverse().map(p=>`
+  const sharedHistory=sharedPayments
+    .filter(p=>normalizeEmail(p.memberEmail)===getCurrentUserEmail())
+    .map(p=>({gid:`c_${p.groupId}`,month:Number(p.month),groupName:p.groupName,amount:Number(p.amount)||0,date:'Online sync',status:p.paid?'Paid':'Due'}));
+  const combined=[...S.memberPayments,...sharedHistory].filter((item,index,arr)=>arr.findIndex(x=>x.gid===item.gid&&x.month===item.month)===index);
+  if(!combined.length){el.innerHTML='<div class="empty"><div class="empty-icon">💳</div><p>No records yet.</p></div>';return;}
+  el.innerHTML=combined.slice().sort((a,b)=>b.month-a.month).map(p=>`
     <div class="mpay-hist-item">
       <div class="mpay-hist-mo">M${p.month}</div>
       <div style="flex:1;min-width:0;">
@@ -2157,13 +2369,15 @@ function placeBid(){
   if(!name){toast('Enter your name!',true);return;}
   if(!bid||bid<=0){toast('Enter a valid bid amount!',true);return;}
   const c=S.chits.find(c=>c.id==gid);if(!c){toast('Group not found',true);return;}
-  // Update existing bid from same member in same group, or push new
-  const existIdx=S.liveBids.findIndex(b=>b.name.toLowerCase()===name.toLowerCase()&&b.gid==gid);
-  const bidObj={id:Date.now(),name,gid,groupName:c.name,amount:bid,time:new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})};
-  if(existIdx>-1){S.liveBids[existIdx]=bidObj;toast(`Bid updated to ${fmt(bid)}!`);}
-  else{S.liveBids.push(bidObj);toast(`Bid of ${fmt(bid)} placed!`);}
+  const bidderKey=normalizeEmail(currentUser&&currentUser.email?currentUser.email:'')||`member_${name.toLowerCase().replace(/\s+/g,'_')}`;
+  const bidObj={id:`${gid}_${bidderKey}`,name,gid:String(gid),groupName:c.name,amount:bid,time:new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}),bidderKey};
   document.getElementById('mem_bid').value='';
-  renderBids();
+  upsertSharedLiveBid(bidObj).then(()=>{
+    toast(`Bid of ${fmt(bid)} placed!`);
+  }).catch(err=>{
+    console.error(err);
+    toast('Could not place live bid online.',true);
+  });
   queueCloudSave();
 }
 
