@@ -5,5 +5,13 @@ service cloud.firestore {
     match /users/{userId}/private/{document=**} {
       allow read, write: if request.auth != null && request.auth.uid == userId;
     }
+
+    match /memberAssignments/{assignmentId} {
+      allow read: if request.auth != null
+        && resource.data.memberEmail is string
+        && request.auth.token.email is string
+        && resource.data.memberEmail == request.auth.token.email.lower();
+      allow create, update, delete: if request.auth != null;
+    }
   }
 }

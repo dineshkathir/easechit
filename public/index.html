@@ -298,6 +298,7 @@ tbody td:first-child{color:var(--t1);font-family:'IBM Plex Sans',sans-serif;font
 
 /* ══════════ MODAL ══════════ */
 .modal-bg{display:none;position:fixed;inset:0;background:var(--ovl);z-index:9100;align-items:flex-end;justify-content:center;}
+.modal-bg.admin-modal{z-index:9905;}
 .modal-bg.open{display:flex;}
 .modal-bg.center{align-items:center;}
 .modal{background:var(--bg2);border:1px solid var(--ln2);border-radius:20px 20px 0 0;width:100%;max-width:480px;max-height:90vh;max-height:90dvh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 -8px 40px rgba(0,0,0,.4);animation:slideUp .25s ease;transition:background .28s;}
@@ -681,7 +682,7 @@ tbody td:first-child{color:var(--t1);font-family:'IBM Plex Sans',sans-serif;font
   </div>
 </div>
 
-<div class="modal-bg center" id="adminPortalModal">
+<div class="modal-bg center admin-modal" id="adminPortalModal">
   <div class="admin-portal">
     <div class="admin-portal-top">
       <div>
@@ -1185,6 +1186,9 @@ let auth=null,db=null,googleProvider=null,currentUser=null,authReady=false,isApp
 let remoteUnsubscribe=null,saveTimer=null,lastSavedHash='',seededDemo=false;
 let adminSessionActive=false;
 let accessRegistry={foremen:[],updatedAt:null};
+let memberAssignments=[];
+let memberAssignmentsUnsubscribe=null;
+let memberAssignmentBackfillDone=false;
 const S={role:'foreman',theme:'dark',chits:[],members:[],payments:{},auctions:[],memberPayments:[],myChitFunds:[],liveBids:[],timerInterval:null,timerSecs:0,timerRunning:false,adCount:0,cur:'dashboard'};
 const ACCESS_STORAGE_KEY='cv_admin_access_registry_v1';
 const ADMIN_SESSION_KEY='cv_admin_portal_session_v1';
@@ -1255,10 +1259,118 @@ function createDemoState(){
   ].map((m,i)=>({id:2000+i,...m,groupId:1001,groupName:'Gold Chit 2025',ticket:i+1,color:CLR[i%CLR.length],prized:false}));
   return {role:S.role,theme:S.theme,chits,members,payments:{'2000_1001_1':true,'2001_1001_1':true,'2002_1001_1':true},auctions:[{id:3001,month:1,groupName:'Gold Chit 2025',winner:'Ravi Kumar',discount:4500,dividend:225,prize:90500,comm:5000}],memberPayments:[],myChitFunds:[],liveBids:[],adCount:0,cur:'dashboard'};
 }
+function createBlankState(){
+  return {role:'member',theme:S.theme||'dark',chits:[],members:[],payments:{},auctions:[],memberPayments:[],myChitFunds:[],liveBids:[],adCount:0,cur:'m_dashboard'};
+}
 function serializableState(){
   return {role:S.role,theme:S.theme,chits:S.chits,members:S.members,payments:S.payments,auctions:S.auctions,memberPayments:S.memberPayments,myChitFunds:S.myChitFunds,liveBids:S.liveBids,adCount:S.adCount,cur:S.cur};
 }
 function stateHash(obj){return JSON.stringify(obj);}
+function getMemberAssignmentRef(memberId,groupId){
+  return db.collection('memberAssignments').doc(`${groupId}_${memberId}`);
+}
+function getCurrentUserEmail(){
+  return normalizeEmail(currentUser&&currentUser.email?currentUser.email:'');
+}
+function getMatchedMembers(email=getCurrentUserEmail()){
+  if(!email)return [];
+  return S.members.filter(member=>normalizeEmail(member.email)===email);
+}
+function getAssignedMemberFunds(){
+  return memberAssignments.map(item=>({
+    key:`c_${item.groupId}`,
+    source:'assigned',
+    id:item.groupId,
+    name:item.groupName,
+    value:Number(item.value)||0,
+    members:Number(item.members)||0,
+    duration:Number(item.duration)||0,
+    comm:Number(item.comm)||0,
+    start:item.start||'',
+    paid:Number(item.paidMonths)||0,
+    memberName:item.memberName||'',
+    memberEmail:item.memberEmail||'',
+    memberTicket:item.memberTicket||'',
+    foremanName:item.foremanName||'',
+    notes:''
+  })).filter(item=>item.id);
+}
+function getVisibleMemberFunds(){
+  return [
+    ...getAssignedMemberFunds(),
+    ...S.myChitFunds.map(f=>({
+      key:`m_${f.id}`,
+      source:'personal',
+      id:f.id,
+      name:f.name,
+      value:Number(f.value)||0,
+      members:Number(f.members)||0,
+      duration:Number(f.duration)||0,
+      comm:Number(f.comm)||0,
+      start:f.start||'',
+      paid:Number(f.paid)||0,
+      foremanName:f.foreman||'',
+      notes:f.notes||''
+    }))
+  ];
+}
+function syncMemberAssignments(user){
+  if(memberAssignmentsUnsubscribe){memberAssignmentsUnsubscribe();memberAssignmentsUnsubscribe=null;}
+  memberAssignments=[];
+  if(!db||!user||!user.email){
+    popDrops();renderMyChits();renderMPay();
+    return;
+  }
+  const email=normalizeEmail(user.email);
+  memberAssignmentsUnsubscribe=db.collection('memberAssignments').where('memberEmail','==',email).onSnapshot(snap=>{
+    memberAssignments=snap.docs.map(doc=>({id:doc.id,...doc.data()}));
+    popDrops();renderMyChits();renderMPay();updateMpayDetail();
+  },err=>{
+    console.error(err);
+    toast('Could not load member assignments.',true);
+  });
+}
+async function syncMemberAssignmentRecord(member,chit){
+  if(!db||!currentUser||!member||!chit)return;
+  const email=normalizeEmail(member.email);
+  if(!email)return;
+  await getMemberAssignmentRef(member.id,chit.id).set({
+    memberId:String(member.id),
+    memberName:member.name||'',
+    memberEmail:email,
+    memberTicket:Number(member.ticket)||0,
+    groupId:String(chit.id),
+    groupName:chit.name||'',
+    value:Number(chit.value)||0,
+    members:Number(chit.members)||0,
+    duration:Number(chit.duration)||0,
+    comm:Number(chit.comm)||0,
+    start:chit.start||'',
+    foremanUid:currentUser.uid||'',
+    foremanEmail:normalizeEmail(currentUser.email||''),
+    foremanName:currentUser.displayName||currentUser.email||'Foreman',
+    updatedAt:firebase.firestore.FieldValue.serverTimestamp()
+  },{merge:true});
+}
+async function deleteMemberAssignmentRecord(member){
+  if(!db||!member||!member.groupId||!member.id||!normalizeEmail(member.email)) return;
+  try{
+    await getMemberAssignmentRef(member.id,member.groupId).delete();
+  }catch(err){
+    console.error(err);
+  }
+}
+async function syncExistingMemberAssignments(){
+  if(memberAssignmentBackfillDone||!db||!currentUser||!userHasForemanAccess(currentUser)) return;
+  memberAssignmentBackfillDone=true;
+  const jobs=S.members
+    .filter(member=>normalizeEmail(member.email))
+    .map(member=>{
+      const chit=S.chits.find(item=>String(item.id)===String(member.groupId));
+      return chit?syncMemberAssignmentRecord(member,chit):Promise.resolve();
+    });
+  await Promise.allSettled(jobs);
+}
 function updateSyncStatus(text,isReady){
   const chip=document.getElementById('authChip');
   const note=document.getElementById('syncNote');
@@ -1269,6 +1381,21 @@ function setAuthError(message){
   const el=document.getElementById('authError');if(!el)return;
   el.textContent=message||'';el.className='auth-error'+(message?' show':'');
 }
+function updateRoleAccessUI(){
+  const hasPaidAccess=userHasForemanAccess(currentUser);
+  const roleForeman=document.getElementById('roleForeman');
+  const mobRoleForeman=document.getElementById('mobRoleForeman');
+  const roleSwitch=document.querySelector('.role-switch');
+  const mobRoleStrip=document.getElementById('mobRoleStrip');
+  const foremanNav=document.getElementById('foremanNav');
+  const topCreateBtn=document.getElementById('topCreateBtn');
+  if(roleForeman) roleForeman.style.display=hasPaidAccess?'':'none';
+  if(mobRoleForeman) mobRoleForeman.style.display=hasPaidAccess?'':'none';
+  if(roleSwitch) roleSwitch.style.display='flex';
+  if(mobRoleStrip) mobRoleStrip.style.display=hasPaidAccess?'':'none';
+  if(foremanNav&&!hasPaidAccess&&S.role!=='foreman') foremanNav.style.display='none';
+  if(topCreateBtn&&!hasPaidAccess) topCreateBtn.style.display='none';
+}
 function updateAccessUI(){
   const authAccess=document.getElementById('authAccessNote');
   const sideAccess=document.getElementById('accessNote');
@@ -1278,6 +1405,7 @@ function updateAccessUI(){
   const foremanText=hasPaidAccess&&currentEmail?`Foreman unlocked for ${currentEmail}.`:`Foreman requires administrator approval and uses the ${ADMIN_PORTAL_CONFIG.foremanPlanLabel.toLowerCase()} plan.`;
   if(authAccess) authAccess.innerHTML=`<strong>Access:</strong> ${memberText} ${foremanText}`;
   if(sideAccess) sideAccess.innerHTML=`<strong>Access:</strong> ${S.role==='foreman'&&hasPaidAccess?'Paid Foreman workspace active.':memberText+' '+foremanText}`;
+  updateRoleAccessUI();
 }
 function updateAuthUI(user){
   const loginBtn=document.getElementById('googleLoginBtn');
@@ -1348,13 +1476,23 @@ function initializeFirebase(){
   auth.onAuthStateChanged(async user=>{
     currentUser=user||null;updateAuthUI(currentUser);
     if(remoteUnsubscribe){remoteUnsubscribe();remoteUnsubscribe=null;}
+    if(memberAssignmentsUnsubscribe){memberAssignmentsUnsubscribe();memberAssignmentsUnsubscribe=null;}
+    memberAssignments=[];
+    memberAssignmentBackfillDone=false;
     clearTimeout(saveTimer);
-    if(!user)return;
+    if(!user){popDrops();renderMyChits();renderMPay();return;}
+    syncMemberAssignments(user);
     updateSyncStatus('Loading cloud data...',true);
     remoteUnsubscribe=getUserDocRef(user.uid).onSnapshot(async snap=>{
       const payload=snap.data();
-      if(payload&&payload.state){lastSavedHash=stateHash(payload.state);applyState(payload.state);if(!userHasForemanAccess(currentUser)&&S.role==='foreman') setRole('member',false);updateSyncStatus('Live sync active',true);}
-      else if(!seededDemo){seededDemo=true;const demo=createDemoState();applyState(demo);await saveStateNow();addAct('Your Firebase workspace is ready. Demo data was seeded once.','teal');}
+      if(payload&&payload.state){lastSavedHash=stateHash(payload.state);applyState(payload.state);if(!userHasForemanAccess(currentUser)&&S.role==='foreman') setRole('member',false);syncExistingMemberAssignments().catch(err=>console.error(err));updateSyncStatus('Live sync active',true);}
+      else if(!seededDemo){
+        seededDemo=true;
+        const starter=userHasForemanAccess(user)?createDemoState():createBlankState();
+        applyState(starter);
+        await saveStateNow();
+        if(userHasForemanAccess(user)) addAct('Your Firebase workspace is ready. Demo data was seeded once.','teal');
+      }
     },err=>{console.error(err);updateSyncStatus('Unable to read Firestore',false);toast('Could not load Firebase data.',true);});
   });
 }
@@ -1566,10 +1704,13 @@ function saveChit(){
 
 function popDrops(){
   const ids=['mm_group','pt_group','auc_group','notif_group','m_filter','mem_bid_grp','fm_bid_grp'];
+  const memberFundOptions=getAssignedMemberFunds().map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
   ids.forEach(id=>{
     const el=document.getElementById(id);if(!el)return;
     const cur=el.value;
-    el.innerHTML=(id==='m_filter'?'<option value="">All Groups</option>':'<option value="">— Select —</option>')+S.chits.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
+    const baseOptions=S.chits.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
+    const options=id==='mem_bid_grp'&&S.role==='member'?memberFundOptions:baseOptions;
+    el.innerHTML=(id==='m_filter'?'<option value="">All Groups</option>':'<option value="">— Select —</option>')+options;
     if(cur) el.value=cur;
   });
   // Populate fm_bid_member when fm_bid_grp changes
@@ -1588,11 +1729,15 @@ function popDrops(){
   const mpGrp=document.getElementById('mp_grp');
   if(mpGrp){
     const cur=mpGrp.value;
+    const assignedOptions=getAssignedMemberFunds().map(c=>`<option value="c_${c.id}">${c.name} (Assigned)</option>`).join('');
     mpGrp.innerHTML='<option value="">— Select Group —</option>'+
-      S.chits.map(c=>`<option value="c_${c.id}">${c.name}</option>`).join('')+
+      assignedOptions+
       S.myChitFunds.map(f=>`<option value="m_${f.id}">${f.name} (My Fund)</option>`).join('');
     if(cur) mpGrp.value=cur;
   }
+  const bidName=document.getElementById('mem_bid_name');
+  const matches=getMatchedMembers();
+  if(bidName&&!bidName.value&&matches.length===1) bidName.value=matches[0].name||'';
 }
 
 function foremanAddBid(){
@@ -1620,12 +1765,13 @@ const CLR=['#d4a843','#17c4a2','#4f9cf9','#e85555','#3dcc8a','#9b79f5','#f09c4a'
 function saveMember(){
   const name=document.getElementById('mm_name').value.trim();
   const phone=document.getElementById('mm_phone').value.trim();
-  const email=document.getElementById('mm_email').value.trim();
+  const email=normalizeEmail(document.getElementById('mm_email').value.trim());
   const gid=document.getElementById('mm_group').value;
   const ticket=parseInt(document.getElementById('mm_ticket').value)||S.members.length+1;
   if(!name||!phone||!gid){toast('Fill name, phone & group!',true);return;}
   const grp=S.chits.find(c=>c.id==gid);
-  S.members.push({id:Date.now(),name,phone,email,groupId:gid,groupName:grp?grp.name:'',ticket,color:CLR[S.members.length%CLR.length],prized:false});
+  const member={id:Date.now(),name,phone,email,groupId:gid,groupName:grp?grp.name:'',ticket,color:CLR[S.members.length%CLR.length],prized:false};
+  S.members.push(member);
   closeModal('memberModal');toast(`${name} added!`);
   ['mm_name','mm_phone','mm_email','mm_ticket'].forEach(i=>document.getElementById(i).value='');
   document.getElementById('mm_group').value='';
@@ -1633,6 +1779,7 @@ function saveMember(){
   document.getElementById('memberBadge').textContent=S.members.length;
   addAct(`${name} added to ${grp?grp.name:'group'}`,'teal');
   queueCloudSave();
+  if(grp&&email) syncMemberAssignmentRecord(member,grp).catch(err=>console.error(err));
 }
 
 function renderMembers(){
@@ -1653,7 +1800,7 @@ function renderMembers(){
     </div>`).join('');
 }
 function togglePrize(id){const m=S.members.find(m=>m.id===id);if(m){m.prized=!m.prized;renderMembers();toast(m.name+(m.prized?' prized':' active'));queueCloudSave();}}
-function removeMember(id){const m=S.members.find(m=>m.id===id);S.members=S.members.filter(m=>m.id!==id);renderMembers();updateDB();document.getElementById('memberBadge').textContent=S.members.length;if(m)toast(`${m.name} removed.`);queueCloudSave();}
+function removeMember(id){const m=S.members.find(m=>m.id===id);S.members=S.members.filter(m=>m.id!==id);renderMembers();updateDB();document.getElementById('memberBadge').textContent=S.members.length;if(m){toast(`${m.name} removed.`);deleteMemberAssignmentRecord(m);}queueCloudSave();}
 
 /* ── PAYMENTS ── */
 function renderPayTable(){
@@ -2093,36 +2240,47 @@ function confirmDeleteMCF(){
 }
 
 function renderMyChits(){
-  const funds=S.myChitFunds;
+  const funds=getVisibleMemberFunds();
   const totalVal=funds.reduce((a,f)=>a+f.value,0);
   const totalMo=funds.reduce((a,f)=>a+(f.value/f.members),0);
   document.getElementById('mcf_total').textContent=fmt(totalVal);
   document.getElementById('mcf_count_lbl').textContent=funds.length+' fund'+(funds.length===1?'':'s');
   document.getElementById('mcf_monthly').textContent=fmt(totalMo);
   const el=document.getElementById('mcf_list');
-  if(!funds.length){el.innerHTML='<div class="empty"><div class="empty-icon">🏦</div><p>No chit funds yet.<br>Tap "+ Add Fund" to add one.</p></div>';return;}
+  if(!funds.length){
+    const email=getCurrentUserEmail();
+    el.innerHTML=`<div class="empty"><div class="empty-icon">🏦</div><p>No chit funds are linked yet.${email?'<br>Add this email to a member record: <strong>'+email+'</strong>':''}</p></div>`;
+    return;
+  }
   el.innerHTML=funds.map(f=>{
     const monthly=f.value/f.members;
-    const paidRecords=S.memberPayments.filter(p=>p.gid==='m_'+f.id);
-    const paidCount=Math.min(paidRecords.length,f.duration);
+    const paidRecords=S.memberPayments.filter(p=>p.gid===f.key);
+    const paidCount=Math.min(Math.max(f.paid||0,paidRecords.length),f.duration);
     const pct=f.duration?Math.round(paidCount/f.duration*100):0;
     const remaining=f.duration-paidCount;
     const totalPaid=paidRecords.reduce((a,p)=>a+p.amount,0);
     const barColor=pct>=75?'var(--green)':pct>=40?'var(--teal)':'var(--gold2)';
+    const sourceMeta=f.source==='assigned'
+      ?`${f.members} members · ${f.duration} months · ${f.comm}% comm${f.memberTicket?' · Ticket #'+f.memberTicket:''}${f.foremanName?' · Foreman '+f.foremanName:''}`
+      :`${f.members} members · ${f.duration} months · ${f.comm}% comm${f.foremanName?' · '+f.foremanName:''}`;
+    const sourceBadge=f.source==='assigned'
+      ?'<span class="badge bb">Assigned</span>'
+      :'<span class="badge bg">My Fund</span>';
     return `<div class="mcf-card">
       <div class="mcf-top">
         <div class="mcf-icon">🏛</div>
         <div class="mcf-info">
           <div class="mcf-name">${f.name}</div>
-          <div class="mcf-meta">${f.members} members · ${f.duration} months · ${f.comm}% comm${f.foreman?' · '+f.foreman:''}</div>
+          <div class="mcf-meta">${sourceMeta}</div>
         </div>
         <div class="mcf-actions">
-          <button class="btn btn-icon btn-sm" title="Edit" onclick="openMCFModal(${f.id})">
+          ${sourceBadge}
+          ${f.source==='personal'?`<button class="btn btn-icon btn-sm" title="Edit" onclick="openMCFModal(${f.id})">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
           </button>
           <button class="btn btn-icon btn-sm" title="Remove" onclick="deleteMCF(${f.id})" style="color:var(--red);border-color:rgba(232,85,85,.2);">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
-          </button>
+          </button>`:'<span class="admin-pill free">Read Only</span>'}
         </div>
       </div>
       <div class="mcf-row">
