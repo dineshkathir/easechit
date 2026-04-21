@@ -1202,6 +1202,7 @@ const fmt=v=>'₹'+Number(v).toLocaleString('en-IN',{maximumFractionDigits:2});
 const fmtN=v=>Number(v).toLocaleString('en-IN',{maximumFractionDigits:2});
 const pct=v=>v.toFixed(2)+'%';
 function normalizeEmail(v){return String(v||'').trim().toLowerCase();}
+function escJsSingle(v){return String(v||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'");}
 function isValidEmail(v){return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);}
 function formatWhen(v){
   if(!v)return 'Not yet';
@@ -2058,7 +2059,7 @@ function renderPayTable(){
         <div class="pay-member-meta">#${m.ticket} · ${fmtN(mly)}</div>
       </div>
       <span style="font-size:11px;font-weight:600;color:${ip?'var(--green)':'var(--red)'};margin-right:10px;">${ip?'Paid':'Due'}</span>
-      <button class="pay-toggle ${ip?'is-paid':'is-due'}" onclick="togPay('${m.id}','${gid}','${mo}',${mly},'${(m.email||'').replace(/'/g,\"&#39;\")}','${(m.name||'').replace(/'/g,\"&#39;\")}','${m.ticket||0}','${(chit.name||'').replace(/'/g,\"&#39;\")}')" type="button" title="${ip?'Mark as due':'Mark as paid'}"></button>
+      <button class="pay-toggle ${ip?'is-paid':'is-due'}" onclick="togPay('${m.id}','${gid}','${mo}',${mly},'${escJsSingle(m.email)}','${escJsSingle(m.name)}','${m.ticket||0}','${escJsSingle(chit.name)}')" type="button" title="${ip?'Mark as due':'Mark as paid'}"></button>
     </div>`).join('');
 }
 async function togPay(memberId,gid,mo,amt,memberEmail,memberName,memberTicket,groupName){
