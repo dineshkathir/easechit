@@ -1227,7 +1227,13 @@ function saveAccessRegistry(){
   accessRegistry.updatedAt=new Date().toISOString();
   localStorage.setItem(ACCESS_STORAGE_KEY,JSON.stringify(accessRegistry));
   renderForemanAccessList();
-  updateAccessUI();
+  updateAuthUI(currentUser);
+  if(currentUser&&userHasForemanAccess(currentUser)){
+    if(S.role!=='foreman') setRole('foreman',false);
+    else updateRoleAccessUI();
+  }else{
+    updateAccessUI();
+  }
 }
 function getForemanGrant(email){
   const key=normalizeEmail(email);
@@ -1581,6 +1587,11 @@ function grantForemanAccess(){
   document.getElementById('adminForemanEmail').value='';
   document.getElementById('adminForemanName').value='';
   saveAccessRegistry();
+  if(currentUser&&normalizeEmail(currentUser.email)===email){
+    updateAuthUI(currentUser);
+    setRole('foreman',false);
+    toast('Foreman access is now active for the current signed-in user.');
+  }
 }
 function revokeForemanAccess(email){
   if(!adminSessionActive){toast('Unlock the administrator portal first.',true);return;}
