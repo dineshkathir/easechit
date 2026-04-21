@@ -230,11 +230,25 @@ function getCurrentAuctionElapsedSecs(session=sharedAuctionSession){
 }
 function updateAuctionStartButton(){
   const btn=document.getElementById('aucStartBtn');
-  const gid=(document.getElementById('auc_group')||{}).value||'';
+  const gid=getSelectedAuctionGroupId();
   if(!btn) return;
   btn.disabled=!gid;
   btn.style.opacity=gid?'1':'.5';
   btn.style.cursor=gid?'pointer':'not-allowed';
+}
+function getSelectedAuctionGroupId(){
+  const aucGroup=(document.getElementById('auc_group')||{}).value||'';
+  const fmBidGroup=(document.getElementById('fm_bid_grp')||{}).value||'';
+  return String(aucGroup||fmBidGroup||'').trim();
+}
+function syncAuctionGroupSelectors(sourceId){
+  const aucGroup=document.getElementById('auc_group');
+  const fmBidGroup=document.getElementById('fm_bid_grp');
+  const selected=sourceId==='fm_bid_grp'
+    ? ((fmBidGroup&&fmBidGroup.value)||'')
+    : ((aucGroup&&aucGroup.value)||'');
+  if(aucGroup&&sourceId!=='auc_group') aucGroup.value=selected;
+  if(fmBidGroup&&sourceId!=='fm_bid_grp') fmBidGroup.value=selected;
 }
 function isMemberInActiveAuction(session=sharedAuctionSession){
   if(!session||!session.groupId) return false;
@@ -1020,12 +1034,13 @@ async function togPay(memberId,gid,mo,amt,memberEmail,memberName,memberTicket,gr
 }
 
 /* â”€â”€ AUCTION TIMER â”€â”€ */
-function handleAuctionGroupChange(){
+function handleAuctionGroupChange(sourceId='auc_group'){
+  syncAuctionGroupSelectors(sourceId);
   calcAuction();
   updateAuctionStartButton();
 }
 async function startTimer(){
-  const gid=(document.getElementById('auc_group').value||'').trim();
+  const gid=getSelectedAuctionGroupId();
   if(!gid){toast('Select a chit group before starting the auction.',true);return;}
   const chit=S.chits.find(c=>String(c.id)===String(gid));
   if(!chit){toast('Selected chit group was not found.',true);return;}
@@ -1072,6 +1087,8 @@ async function resetTimer(){
     });
     const groupSelect=document.getElementById('auc_group');
     if(groupSelect) groupSelect.value='';
+    const fmGroupSelect=document.getElementById('fm_bid_grp');
+    if(fmGroupSelect) fmGroupSelect.value='';
     updateAuctionStartButton();
   }catch(err){
     console.error(err);
@@ -1100,6 +1117,7 @@ function closeAuctionWithWinner(bidId){
   const c=S.chits.find(c=>c.id==bid.gid);if(!c){toast('Chit group not found',true);return;}
   // Auto-fill finalize form
   document.getElementById('auc_group').value=bid.gid;
+  syncAuctionGroupSelectors('auc_group');
   document.getElementById('auc_winner').value=bid.name;
   document.getElementById('auc_bid').value=bid.amount;
   // Get next month number
