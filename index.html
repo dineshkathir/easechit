@@ -1188,6 +1188,7 @@ let adminSessionActive=false;
 let accessRegistry={foremen:[],updatedAt:null};
 let memberAssignments=[];
 let memberAssignmentsUnsubscribe=null;
+let accessRegistryUnsubscribe=null;
 let memberAssignmentBackfillDone=false;
 const S={role:'foreman',theme:'dark',chits:[],members:[],payments:{},auctions:[],memberPayments:[],myChitFunds:[],liveBids:[],timerInterval:null,timerSecs:0,timerRunning:false,adCount:0,cur:'dashboard'};
 const ACCESS_STORAGE_KEY='cv_admin_access_registry_v1';
@@ -1223,9 +1224,47 @@ function loadAccessRegistry(){
   }
   adminSessionActive=localStorage.getItem(ADMIN_SESSION_KEY)==='1';
 }
+function persistAccessRegistryLocal(){
+  localStorage.setItem(ACCESS_STORAGE_KEY,JSON.stringify(accessRegistry));
+}
+function getForemanAccessCollection(){
+  return db.collection('foremanAccess');
+}
+function subscribeAccessRegistry(){
+  if(accessRegistryUnsubscribe){accessRegistryUnsubscribe();accessRegistryUnsubscribe=null;}
+  if(!db||!currentUser){
+    renderForemanAccessList();
+    updateAuthUI(currentUser);
+    return;
+  }
+  accessRegistryUnsubscribe=getForemanAccessCollection().onSnapshot(snap=>{
+    accessRegistry={
+      foremen:snap.docs.map(doc=>{
+        const data=doc.data()||{};
+        return {
+          email:normalizeEmail(data.email||doc.id),
+          name:(data.name||'').trim(),
+          plan:data.plan||'paid',
+          grantedAt:data.grantedAt&&data.grantedAt.toDate?data.grantedAt.toDate().toISOString():(data.grantedAt||new Date().toISOString())
+        };
+      }).filter(item=>item.email),
+      updatedAt:new Date().toISOString()
+    };
+    persistAccessRegistryLocal();
+    renderForemanAccessList();
+    updateAuthUI(currentUser);
+    if(currentUser&&userHasForemanAccess(currentUser)&&S.role!=='foreman'){
+      setRole('foreman',false);
+    }
+  },err=>{
+    console.error(err);
+    renderForemanAccessList();
+    updateAuthUI(currentUser);
+  });
+}
 function saveAccessRegistry(){
   accessRegistry.updatedAt=new Date().toISOString();
-  localStorage.setItem(ACCESS_STORAGE_KEY,JSON.stringify(accessRegistry));
+  persistAccessRegistryLocal();
   renderForemanAccessList();
   updateAuthUI(currentUser);
   if(currentUser&&userHasForemanAccess(currentUser)){
@@ -1483,10 +1522,12 @@ function initializeFirebase(){
     currentUser=user||null;updateAuthUI(currentUser);
     if(remoteUnsubscribe){remoteUnsubscribe();remoteUnsubscribe=null;}
     if(memberAssignmentsUnsubscribe){memberAssignmentsUnsubscribe();memberAssignmentsUnsubscribe=null;}
+    if(accessRegistryUnsubscribe){accessRegistryUnsubscribe();accessRegistryUnsubscribe=null;}
     memberAssignments=[];
     memberAssignmentBackfillDone=false;
     clearTimeout(saveTimer);
-    if(!user){popDrops();renderMyChits();renderMPay();return;}
+    if(!user){popDrops();renderMyChits();renderMPay();renderForemanAccessList();return;}
+    subscribeAccessRegistry();
     syncMemberAssignments(user);
     updateSyncStatus('Loading cloud data...',true);
     remoteUnsubscribe=getUserDocRef(user.uid).onSnapshot(async snap=>{
@@ -1570,34 +1611,61 @@ function renderForemanAccessList(){
       <button class="btn btn-danger btn-sm" type="button" onclick="revokeForemanAccess('${item.email}')">Remove</button>
     </div>`).join('');
 }
-function grantForemanAccess(){
+async function grantForemanAccess(){
   if(!adminSessionActive){toast('Unlock the administrator portal first.',true);return;}
   const email=normalizeEmail(document.getElementById('adminForemanEmail').value);
   const name=(document.getElementById('adminForemanName').value||'').trim();
   if(!isValidEmail(email)){toast('Enter a valid email address for the Foreman.',true);return;}
   const existing=getForemanGrant(email);
   const grantedAt=existing&&existing.grantedAt?existing.grantedAt:new Date().toISOString();
-  if(existing){
-    accessRegistry.foremen=accessRegistry.foremen.map(item=>item.email===email?{...item,email,name:name||item.name||'',plan:'paid',grantedAt}:item);
-    toast('Foreman access updated.');
-  }else{
-    accessRegistry.foremen.unshift({email,name,plan:'paid',grantedAt});
-    toast('Foreman access granted.');
+  const nextEntry={email,name:name||(existing&&existing.name)||'',plan:'paid',grantedAt};
+  try{
+    if(db&&currentUser){
+      await getForemanAccessCollection().doc(email).set({
+        email,
+        name:nextEntry.name,
+        plan:'paid',
+        grantedAt:existing&&existing.grantedAt&&firebase.firestore.Timestamp?firebase.firestore.Timestamp.fromDate(new Date(existing.grantedAt)):firebase.firestore.FieldValue.serverTimestamp(),
+        updatedAt:firebase.firestore.FieldValue.serverTimestamp(),
+        updatedBy:currentUser.email||currentUser.uid||'admin'
+      },{merge:true});
+    }else{
+      if(existing){
+        accessRegistry.foremen=accessRegistry.foremen.map(item=>item.email===email?nextEntry:item);
+      }else{
+        accessRegistry.foremen.unshift(nextEntry);
+      }
+      saveAccessRegistry();
+    }
+    toast(existing?'Foreman access updated.':'Foreman access granted.');
+  }catch(err){
+    console.error(err);
+    toast('Could not save Foreman access.',true);
+    return;
   }
   document.getElementById('adminForemanEmail').value='';
   document.getElementById('adminForemanName').value='';
-  saveAccessRegistry();
   if(currentUser&&normalizeEmail(currentUser.email)===email){
     updateAuthUI(currentUser);
     setRole('foreman',false);
     toast('Foreman access is now active for the current signed-in user.');
   }
 }
-function revokeForemanAccess(email){
+async function revokeForemanAccess(email){
   if(!adminSessionActive){toast('Unlock the administrator portal first.',true);return;}
   const key=normalizeEmail(email);
-  accessRegistry.foremen=accessRegistry.foremen.filter(item=>item.email!==key);
-  saveAccessRegistry();
+  try{
+    if(db&&currentUser){
+      await getForemanAccessCollection().doc(key).delete();
+    }else{
+      accessRegistry.foremen=accessRegistry.foremen.filter(item=>item.email!==key);
+      saveAccessRegistry();
+    }
+  }catch(err){
+    console.error(err);
+    toast('Could not remove Foreman access.',true);
+    return;
+  }
   if(currentUser&&normalizeEmail(currentUser.email)===key&&S.role==='foreman'){
     setRole('member',false);
     toast('Current user was moved to the free member workspace.',true);
