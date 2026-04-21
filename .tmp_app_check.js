@@ -27,6 +27,8 @@ let sharedPaymentsUnsubscribe=null;
 let sharedPaymentKeys=new Set();
 let sharedLiveBids=[];
 let sharedLiveBidsUnsubscribe=null;
+let sharedAuctionSession=null;
+let sharedAuctionSessionUnsubscribe=null;
 const S={role:'foreman',theme:'dark',chits:[],members:[],payments:{},auctions:[],memberPayments:[],myChitFunds:[],liveBids:[],timerInterval:null,timerSecs:0,timerRunning:false,adCount:0,cur:'dashboard'};
 const ACCESS_STORAGE_KEY='cv_admin_access_registry_v1';
 const ADMIN_SESSION_KEY='cv_admin_portal_session_v1';
@@ -161,6 +163,9 @@ function getPaymentRecordRef(memberId,groupId,month){
 function getLiveBidRef(groupId,bidderKey){
   return db.collection('liveBids').doc(`${groupId}_${bidderKey}`);
 }
+function getAuctionSessionRef(){
+  return db.collection('auctionSessions').doc('current');
+}
 function getMatchedMembers(email=getCurrentUserEmail()){
   if(!email)return [];
   return S.members.filter(member=>normalizeEmail(member.email)===email);
@@ -207,6 +212,60 @@ function getVisibleAuctionGroupIds(){
   const memberGroups=getAssignedMemberFunds().map(item=>String(item.id));
   const foremanGroups=S.chits.map(item=>String(item.id));
   return Array.from(new Set([...memberGroups,...foremanGroups]));
+}
+function formatTimerFromSeconds(totalSeconds){
+  const safe=Math.max(0,Number(totalSeconds)||0);
+  const h=String(Math.floor(safe/3600)).padStart(2,'0');
+  const m=String(Math.floor((safe%3600)/60)).padStart(2,'0');
+  const s=String(safe%60).padStart(2,'0');
+  return `${h}:${m}:${s}`;
+}
+function getCurrentAuctionElapsedSecs(session=sharedAuctionSession){
+  if(!session) return 0;
+  const base=Number(session.elapsedSecs)||0;
+  if(session.status!=='live' || !session.startedAt) return base;
+  const startedAt=session.startedAt instanceof Date?session.startedAt:new Date(session.startedAt);
+  if(Number.isNaN(startedAt.getTime())) return base;
+  return base+Math.max(0,Math.floor((Date.now()-startedAt.getTime())/1000));
+}
+function updateAuctionStartButton(){
+  const btn=document.getElementById('aucStartBtn');
+  const gid=(document.getElementById('auc_group')||{}).value||'';
+  if(!btn) return;
+  btn.disabled=!gid;
+  btn.style.opacity=gid?'1':'.5';
+  btn.style.cursor=gid?'pointer':'not-allowed';
+}
+function isMemberInActiveAuction(session=sharedAuctionSession){
+  if(!session||!session.groupId) return false;
+  return getAssignedMemberFunds().some(item=>String(item.id)===String(session.groupId));
+}
+function renderSharedAuctionSession(){
+  const statusEl=document.getElementById('auc_status_lbl');
+  const foremanTimer=document.getElementById('auctionTimer');
+  const memberTimer=document.getElementById('mem_timer');
+  const memberGroupSelect=document.getElementById('mem_bid_grp');
+  const session=sharedAuctionSession;
+  let label='Ready';
+  let timer='00:00:00';
+  if(session){
+    label=session.status==='live'?'Live':session.status==='paused'?'Paused':'Ready';
+    timer=formatTimerFromSeconds(getCurrentAuctionElapsedSecs(session));
+  }
+  if(statusEl) statusEl.textContent=label;
+  if(foremanTimer) foremanTimer.textContent=timer;
+  if(memberTimer){
+    memberTimer.textContent=isMemberInActiveAuction(session)?timer:'00:00:00';
+  }
+  if(memberGroupSelect&&session&&session.groupId&&isMemberInActiveAuction(session)){
+    memberGroupSelect.value=String(session.groupId);
+  }
+}
+function startAuctionTicker(){
+  clearInterval(S.timerInterval);
+  if(sharedAuctionSession&&sharedAuctionSession.status==='live'){
+    S.timerInterval=setInterval(()=>renderSharedAuctionSession(),1000);
+  }
 }
 function applySharedLiveBidsToState(){
   const visibleIds=new Set(getVisibleAuctionGroupIds());
@@ -269,6 +328,36 @@ function subscribeSharedLiveBids(user){
     console.error(err);
     toast('Could not load live auction bids.',true);
   });
+}
+function subscribeSharedAuctionSession(user){
+  if(sharedAuctionSessionUnsubscribe){sharedAuctionSessionUnsubscribe();sharedAuctionSessionUnsubscribe=null;}
+  sharedAuctionSession=null;
+  renderSharedAuctionSession();
+  startAuctionTicker();
+  if(!db||!user) return;
+  sharedAuctionSessionUnsubscribe=getAuctionSessionRef().onSnapshot(snap=>{
+    const data=snap.data();
+    if(data){
+      sharedAuctionSession={
+        groupId:String(data.groupId||''),
+        groupName:data.groupName||'',
+        status:data.status||'ready',
+        elapsedSecs:Number(data.elapsedSecs)||0,
+        startedAt:data.startedAt&&data.startedAt.toDate?data.startedAt.toDate():(data.startedAt?new Date(data.startedAt):null)
+      };
+    }else{
+      sharedAuctionSession=null;
+    }
+    renderSharedAuctionSession();
+    startAuctionTicker();
+  },err=>{
+    console.error(err);
+    toast('Could not load live auction session.',true);
+  });
+}
+async function setAuctionSessionState(payload){
+  if(!db||!currentUser) return;
+  await getAuctionSessionRef().set(payload,{merge:true});
 }
 async function upsertSharedLiveBid(bid){
   if(!db||!currentUser||!bid||!bid.gid||!bid.bidderKey) return;
@@ -484,6 +573,7 @@ function initializeFirebase(){
     if(accessRegistryUnsubscribe){accessRegistryUnsubscribe();accessRegistryUnsubscribe=null;}
     if(sharedPaymentsUnsubscribe){sharedPaymentsUnsubscribe();sharedPaymentsUnsubscribe=null;}
     if(sharedLiveBidsUnsubscribe){sharedLiveBidsUnsubscribe();sharedLiveBidsUnsubscribe=null;}
+    if(sharedAuctionSessionUnsubscribe){sharedAuctionSessionUnsubscribe();sharedAuctionSessionUnsubscribe=null;}
     memberAssignments=[];
     memberAssignmentBackfillDone=false;
     sharedPayments=[];
@@ -491,12 +581,15 @@ function initializeFirebase(){
     sharedPaymentKeys=new Set();
     sharedLiveBids=[];
     S.liveBids=[];
+    sharedAuctionSession=null;
+    clearInterval(S.timerInterval);
     clearTimeout(saveTimer);
     if(!user){popDrops();renderMyChits();renderMPay();renderForemanAccessList();return;}
     subscribeAccessRegistry();
     syncMemberAssignments(user);
     subscribeSharedPayments(user);
     subscribeSharedLiveBids(user);
+    subscribeSharedAuctionSession(user);
     updateSyncStatus('Loading cloud data...',true);
     remoteUnsubscribe=getUserDocRef(user.uid).onSnapshot(async snap=>{
       const payload=snap.data();
@@ -785,6 +878,8 @@ function popDrops(){
   const bidName=document.getElementById('mem_bid_name');
   const matches=getMatchedMembers();
   if(bidName&&!bidName.value&&matches.length===1) bidName.value=matches[0].name||'';
+  updateAuctionStartButton();
+  renderSharedAuctionSession();
 }
 
 function foremanAddBid(){
@@ -925,20 +1020,64 @@ async function togPay(memberId,gid,mo,amt,memberEmail,memberName,memberTicket,gr
 }
 
 /* â”€â”€ AUCTION TIMER â”€â”€ */
-function startTimer(){
-  if(S.timerRunning)return;S.timerRunning=true;
-  const sl=document.getElementById('auc_status_lbl');if(sl)sl.textContent='Live';
-  S.timerInterval=setInterval(()=>{
-    S.timerSecs++;
-    const h=String(Math.floor(S.timerSecs/3600)).padStart(2,'0');
-    const m=String(Math.floor((S.timerSecs%3600)/60)).padStart(2,'0');
-    const s=String(S.timerSecs%60).padStart(2,'0');
-    const t=`${h}:${m}:${s}`;
-    ['auctionTimer','mem_timer'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=t;});
-  },1000);
+function handleAuctionGroupChange(){
+  calcAuction();
+  updateAuctionStartButton();
 }
-function pauseTimer(){S.timerRunning=false;clearInterval(S.timerInterval);const sl=document.getElementById('auc_status_lbl');if(sl)sl.textContent='Paused';}
-function resetTimer(){pauseTimer();S.timerSecs=0;['auctionTimer','mem_timer'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent='00:00:00';});const sl=document.getElementById('auc_status_lbl');if(sl)sl.textContent='Ready';}
+async function startTimer(){
+  const gid=(document.getElementById('auc_group').value||'').trim();
+  if(!gid){toast('Select a chit group before starting the auction.',true);return;}
+  const chit=S.chits.find(c=>String(c.id)===String(gid));
+  if(!chit){toast('Selected chit group was not found.',true);return;}
+  try{
+    await setAuctionSessionState({
+      groupId:String(gid),
+      groupName:chit.name||'',
+      status:'live',
+      elapsedSecs:0,
+      startedAt:firebase.firestore.FieldValue.serverTimestamp(),
+      updatedAt:firebase.firestore.FieldValue.serverTimestamp(),
+      updatedBy:currentUser&&currentUser.email?currentUser.email:(currentUser&&currentUser.uid?currentUser.uid:'foreman')
+    });
+    toast('Auction started for the selected chit fund.');
+  }catch(err){
+    console.error(err);
+    toast('Could not start the auction online.',true);
+  }
+}
+async function pauseTimer(){
+  try{
+    await setAuctionSessionState({
+      status:'paused',
+      elapsedSecs:getCurrentAuctionElapsedSecs(),
+      startedAt:null,
+      updatedAt:firebase.firestore.FieldValue.serverTimestamp(),
+      updatedBy:currentUser&&currentUser.email?currentUser.email:(currentUser&&currentUser.uid?currentUser.uid:'foreman')
+    });
+  }catch(err){
+    console.error(err);
+    toast('Could not pause the auction timer.',true);
+  }
+}
+async function resetTimer(){
+  try{
+    await setAuctionSessionState({
+      groupId:'',
+      groupName:'',
+      status:'ready',
+      elapsedSecs:0,
+      startedAt:null,
+      updatedAt:firebase.firestore.FieldValue.serverTimestamp(),
+      updatedBy:currentUser&&currentUser.email?currentUser.email:(currentUser&&currentUser.uid?currentUser.uid:'foreman')
+    });
+    const groupSelect=document.getElementById('auc_group');
+    if(groupSelect) groupSelect.value='';
+    updateAuctionStartButton();
+  }catch(err){
+    console.error(err);
+    toast('Could not reset the auction timer.',true);
+  }
+}
 
 function calcAuction(){
   const gid=document.getElementById('auc_group').value;
@@ -981,6 +1120,7 @@ function finalizeAuction(){
   // Clear live bids for this group
   S.liveBids=S.liveBids.filter(b=>b.gid!=gid);
   clearSharedLiveBidsForGroup(gid).catch(err=>console.error(err));
+  resetTimer().catch(err=>console.error(err));
   renderAucHist();renderBids();toast(`${winner} wins ${fmt(prize)}!`);maybeAd();updateDB();
   addAct(`Month ${mo} auction: ${winner} wins ${fmt(prize)}`,'gold');
   ['auc_month','auc_bid','auc_winner'].forEach(id=>document.getElementById(id).value='');
