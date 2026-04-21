@@ -889,9 +889,6 @@ function popDrops(){
       S.myChitFunds.map(f=>`<option value="m_${f.id}">${f.name} (My Fund)</option>`).join('');
     if(cur) mpGrp.value=cur;
   }
-  const bidName=document.getElementById('mem_bid_name');
-  const matches=getMatchedMembers();
-  if(bidName&&!bidName.value&&matches.length===1) bidName.value=matches[0].name||'';
   updateAuctionStartButton();
   renderSharedAuctionSession();
 }
@@ -1200,6 +1197,8 @@ function resolveFund(val){
   if(!val) return null;
   if(val.startsWith('c_')){const id=val.slice(2);return S.chits.find(c=>c.id==id)||null;}
   if(val.startsWith('m_')){const id=val.slice(2);return S.myChitFunds.find(f=>f.id==id)||null;}
+  const assigned=getAssignedMemberFunds().find(f=>String(f.id)===String(val));
+  if(assigned) return assigned;
   // legacy fallback
   return S.chits.find(c=>c.id==val)||S.myChitFunds.find(f=>f.id==val)||null;
 }
@@ -1354,13 +1353,16 @@ function renderMPay(){
 }
 function placeBid(){
   const bid=parseFloat(document.getElementById('mem_bid').value)||0;
-  const name=(document.getElementById('mem_bid_name').value||'').trim();
   const gid=document.getElementById('mem_bid_grp').value;
   if(!gid){toast('Select a chit group!',true);return;}
-  if(!name){toast('Enter your name!',true);return;}
   if(!bid||bid<=0){toast('Enter a valid bid amount!',true);return;}
-  const c=S.chits.find(c=>c.id==gid);if(!c){toast('Group not found',true);return;}
-  const bidderKey=normalizeEmail(currentUser&&currentUser.email?currentUser.email:'')||`member_${name.toLowerCase().replace(/\s+/g,'_')}`;
+  const c=resolveFund(gid);if(!c){toast('Group not found',true);return;}
+  const memberEmail=getCurrentUserEmail();
+  const assignedMember=getMatchedMembers(memberEmail).find(m=>String(m.groupId)===String(gid))
+    || getAssignedMemberFunds().find(f=>String(f.id)===String(gid));
+  const name=(assignedMember&&assignedMember.memberName)||(assignedMember&&assignedMember.name)||currentUser&&currentUser.displayName||memberEmail;
+  if(!memberEmail){toast('Your sign-in email could not be resolved for bidding.',true);return;}
+  const bidderKey=memberEmail;
   const bidObj={id:`${gid}_${bidderKey}`,name,gid:String(gid),groupName:c.name,amount:bid,time:new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}),bidderKey};
   document.getElementById('mem_bid').value='';
   upsertSharedLiveBid(bidObj).then(()=>{
