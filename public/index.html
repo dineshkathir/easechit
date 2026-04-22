@@ -1,15 +1,15 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en" data-theme="dark">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<title>ChitVault — Smart Chit Fund Manager</title>
+<title>EaseChit â€” Smart Chit Fund Manager</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
-/* ── DARK THEME ── */
+/* â”€â”€ DARK THEME â”€â”€ */
 [data-theme="dark"]{
   --bg:#0b0f14;--bg2:#141b24;--bg3:#1c2733;--bg4:#243040;
   --ln:#263345;--ln2:#2e3f55;
@@ -17,7 +17,7 @@
   --shd:0 8px 32px rgba(0,0,0,.55);--ovl:rgba(0,0,0,.8);
   --cline:rgba(46,63,85,.8);--scr:var(--ln2);
 }
-/* ── LIGHT THEME ── */
+/* â”€â”€ LIGHT THEME â”€â”€ */
 [data-theme="light"]{
   --bg:#eef2f7;--bg2:#ffffff;--bg3:#e4ecf4;--bg4:#d4e0ec;
   --ln:#c4d4e4;--ln2:#a8c0d8;
@@ -25,7 +25,7 @@
   --shd:0 4px 20px rgba(0,0,0,.1);--ovl:rgba(0,0,0,.5);
   --cline:rgba(180,210,235,.9);--scr:var(--ln);
 }
-/* ── BRAND ── */
+/* â”€â”€ BRAND â”€â”€ */
 :root{
   --gold:#d4a843;--gold2:#f0c96a;--gold3:#7a5510;
   --teal:#17c4a2;--teal2:#0d8a72;
@@ -34,7 +34,7 @@
 html{height:100%;height:-webkit-fill-available;}
 body{min-height:100vh;min-height:-webkit-fill-available;background:var(--bg);color:var(--t1);font-family:'IBM Plex Sans',sans-serif;font-size:14px;overflow:hidden;transition:background .28s,color .28s;position:relative;}
 
-/* ══════════ LAYOUT ══════════ */
+/* â•â•â•â•â•â•â•â•â•â• LAYOUT â•â•â•â•â•â•â•â•â•â• */
 .shell{display:flex;height:100vh;height:100dvh;overflow:hidden;}
 .sidebar{width:240px;background:var(--bg2);border-right:1px solid var(--ln);display:flex;flex-direction:column;flex-shrink:0;z-index:10;transition:background .28s,border-color .28s;}
 .main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0;}
@@ -43,7 +43,7 @@ body{min-height:100vh;min-height:-webkit-fill-available;background:var(--bg);col
 .content::-webkit-scrollbar{width:3px;}
 .content::-webkit-scrollbar-thumb{background:var(--scr);border-radius:2px;}
 
-/* ══════════ SIDEBAR ══════════ */
+/* â•â•â•â•â•â•â•â•â•â• SIDEBAR â•â•â•â•â•â•â•â•â•â• */
 .logo-wrap{padding:18px 16px 14px;border-bottom:1px solid var(--ln);}
 .logo-mark{display:flex;align-items:center;gap:10px;}
 .logo-icon{width:36px;height:36px;background:linear-gradient(135deg,var(--gold),var(--gold3));border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;font-family:'Playfair Display',serif;font-weight:700;color:#0b0800;flex-shrink:0;}
@@ -73,7 +73,7 @@ body{min-height:100vh;min-height:-webkit-fill-available;background:var(--bg);col
 .user-name{font-size:12px;font-weight:600;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .user-role{font-size:10px;color:var(--t3);}
 
-/* ══════════ TOPBAR ══════════ */
+/* â•â•â•â•â•â•â•â•â•â• TOPBAR â•â•â•â•â•â•â•â•â•â• */
 .topbar-title{font-family:'Playfair Display',serif;font-size:17px;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .topbar-title span{color:var(--gold);}
 .topbar-r{margin-left:auto;display:flex;align-items:center;gap:8px;}
@@ -82,13 +82,13 @@ body{min-height:100vh;min-height:-webkit-fill-available;background:var(--bg);col
 .ndot{position:absolute;top:6px;right:6px;width:6px;height:6px;background:var(--red);border-radius:50%;border:1px solid var(--bg2);}
 .mob-menu{display:none;width:36px;height:36px;background:var(--bg3);border:1px solid var(--ln);border-radius:8px;align-items:center;justify-content:center;cursor:pointer;color:var(--t2);}
 
-/* ══════════ AD BANNERS ══════════ */
+/* â•â•â•â•â•â•â•â•â•â• AD BANNERS â•â•â•â•â•â•â•â•â•â• */
 .ad-strip{background:var(--bg3);border:1px dashed var(--ln2);border-radius:8px;height:50px;display:flex;align-items:center;justify-content:center;margin-bottom:16px;position:relative;overflow:hidden;flex-shrink:0;}
 .ad-strip::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(-45deg,transparent,transparent 6px,rgba(128,128,128,.05) 6px,rgba(128,128,128,.05) 12px);}
 .ad-tag{font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--t3);letter-spacing:2px;text-transform:uppercase;background:var(--bg3);padding:3px 10px;border:1px solid var(--ln);border-radius:4px;position:relative;}
 .footer-ad{height:48px;background:var(--bg2);border-top:1px dashed var(--ln2);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 
-/* ══════════ CARDS ══════════ */
+/* â•â•â•â•â•â•â•â•â•â• CARDS â•â•â•â•â•â•â•â•â•â• */
 .card{background:var(--bg2);border:1px solid var(--ln);border-radius:14px;padding:18px;position:relative;overflow:hidden;transition:background .28s,border-color .28s;}
 .card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--cline),transparent);}
 .card-hd{font-size:10px;font-weight:600;color:var(--t3);letter-spacing:2px;text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:7px;}
@@ -98,7 +98,7 @@ body{min-height:100vh;min-height:-webkit-fill-available;background:var(--bg);col
 .g4{display:grid;grid-template-columns:repeat(4,1fr);gap:11px;}
 .gcol{display:flex;flex-direction:column;gap:14px;}
 
-/* ══════════ STAT CARDS ══════════ */
+/* â•â•â•â•â•â•â•â•â•â• STAT CARDS â•â•â•â•â•â•â•â•â•â• */
 .stat{background:var(--bg2);border:1px solid var(--ln);border-radius:12px;padding:14px;position:relative;overflow:hidden;transition:background .28s,border-color .28s;}
 .stat::after{content:'';position:absolute;bottom:-14px;right:-14px;width:55px;height:55px;border-radius:50%;}
 .stat.g::after{background:rgba(212,168,67,.1);}
@@ -115,7 +115,7 @@ body{min-height:100vh;min-height:-webkit-fill-available;background:var(--bg);col
 .stat-val.p{color:var(--purple);}
 .stat-sub{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--t3);}
 
-/* ══════════ FORMS ══════════ */
+/* â•â•â•â•â•â•â•â•â•â• FORMS â•â•â•â•â•â•â•â•â•â• */
 .fg{margin-bottom:13px;}
 label{display:block;font-size:10px;font-weight:600;color:var(--t2);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;}
 input,select,textarea{width:100%;background:var(--bg);border:1px solid var(--ln);border-radius:8px;padding:10px 13px;color:var(--t1);font-family:'IBM Plex Mono',monospace;font-size:14px;outline:none;transition:border-color .2s,box-shadow .2s,background .28s;-webkit-appearance:none;appearance:none;}
@@ -125,7 +125,7 @@ textarea{resize:vertical;min-height:70px;}
 select option{background:var(--bg2);color:var(--t1);}
 [data-theme="light"] input,[data-theme="light"] select,[data-theme="light"] textarea{background:var(--bg3);}
 
-/* ══════════ BUTTONS ══════════ */
+/* â•â•â•â•â•â•â•â•â•â• BUTTONS â•â•â•â•â•â•â•â•â•â• */
 .btn{padding:10px 18px;border:none;border-radius:9px;font-family:'IBM Plex Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;transition:all .18s;display:inline-flex;align-items:center;gap:7px;letter-spacing:.3px;touch-action:manipulation;}
 .btn-gold{background:linear-gradient(135deg,var(--gold),var(--gold3));color:#0a0700;box-shadow:0 3px 10px rgba(212,168,67,.25);}
 .btn-gold:active{transform:scale(.97);}
@@ -138,7 +138,7 @@ select option{background:var(--bg2);color:var(--t1);}
 .btn-full{width:100%;justify-content:center;}
 .btn-icon{width:34px;height:34px;padding:0;justify-content:center;background:var(--bg3);color:var(--t2);border:1px solid var(--ln);border-radius:8px;}
 
-/* ══════════ TABLES ══════════ */
+/* â•â•â•â•â•â•â•â•â•â• TABLES â•â•â•â•â•â•â•â•â•â• */
 .tbl-wrap{border-radius:10px;border:1px solid var(--ln);overflow:hidden;}
 .tbl-scroll{overflow-x:auto;max-height:300px;overflow-y:auto;-webkit-overflow-scrolling:touch;}
 .tbl-scroll::-webkit-scrollbar{height:3px;width:3px;}
@@ -151,7 +151,7 @@ tbody tr:hover{background:rgba(128,128,128,.04);}
 tbody td{padding:10px 13px;color:var(--t2);font-family:'IBM Plex Mono',monospace;font-size:12px;white-space:nowrap;}
 tbody td:first-child{color:var(--t1);font-family:'IBM Plex Sans',sans-serif;font-weight:500;}
 
-/* ══════════ BADGES ══════════ */
+/* â•â•â•â•â•â•â•â•â•â• BADGES â•â•â•â•â•â•â•â•â•â• */
 .badge{display:inline-flex;align-items:center;padding:2px 9px;border-radius:20px;font-size:9px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;}
 .bg{background:rgba(61,204,138,.12);color:var(--green);border:1px solid rgba(61,204,138,.2);}
 .bgold{background:rgba(212,168,67,.12);color:var(--gold2);border:1px solid rgba(212,168,67,.2);}
@@ -159,7 +159,7 @@ tbody td:first-child{color:var(--t1);font-family:'IBM Plex Sans',sans-serif;font
 .bb{background:rgba(79,156,249,.12);color:var(--blue);border:1px solid rgba(79,156,249,.2);}
 .bp{background:rgba(155,121,245,.12);color:var(--purple);border:1px solid rgba(155,121,245,.2);}
 
-/* ══════════ RESULT ROWS ══════════ */
+/* â•â•â•â•â•â•â•â•â•â• RESULT ROWS â•â•â•â•â•â•â•â•â•â• */
 .rr{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--ln);}
 .rr:last-child{border-bottom:none;}
 .rr-k{font-size:11px;color:var(--t3);font-weight:500;}
@@ -169,13 +169,13 @@ tbody td:first-child{color:var(--t1);font-family:'IBM Plex Sans',sans-serif;font
 .rr-v.rd{color:var(--red);}
 .rr-v.lg{font-size:15px;font-weight:500;color:var(--gold2);}
 
-/* ══════════ PROGRESS ══════════ */
+/* â•â•â•â•â•â•â•â•â•â• PROGRESS â•â•â•â•â•â•â•â•â•â• */
 .pb-track{height:5px;background:var(--bg4);border-radius:3px;overflow:hidden;margin:5px 0;}
 .pb-fill{height:100%;border-radius:3px;transition:width .5s ease;}
 .pb-teal{background:linear-gradient(90deg,var(--teal2),var(--teal));}
 .pb-gold{background:linear-gradient(90deg,var(--gold3),var(--gold2));}
 
-/* ══════════ MEMBER CHIT FUND CARDS ══════════ */
+/* â•â•â•â•â•â•â•â•â•â• MEMBER CHIT FUND CARDS â•â•â•â•â•â•â•â•â•â• */
 .mcf-card{background:var(--bg);border:1px solid var(--ln);border-radius:12px;padding:14px;margin-bottom:10px;transition:border-color .15s,background .28s;}
 [data-theme="light"] .mcf-card{background:var(--bg3);}
 .mcf-card:hover{border-color:var(--ln2);}
@@ -194,7 +194,7 @@ tbody td:first-child{color:var(--t1);font-family:'IBM Plex Sans',sans-serif;font
 .mcf-pct{font-size:11px;font-weight:600;color:var(--teal);font-family:'IBM Plex Mono',monospace;min-width:32px;text-align:right;}
 .mcf-note{font-size:11px;color:var(--t3);margin-top:7px;border-top:1px solid var(--ln);padding-top:7px;line-height:1.5;}
 
-/* ══════════ BID ROWS ══════════ */
+/* â•â•â•â•â•â•â•â•â•â• BID ROWS â•â•â•â•â•â•â•â•â•â• */
 .bid-row{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:9px;border:1px solid var(--ln);margin-bottom:7px;background:var(--bg);transition:border-color .15s;}
 [data-theme="light"] .bid-row{background:var(--bg3);}
 .bid-row.lowest{border-color:var(--gold2);background:rgba(212,168,67,.06);}
@@ -206,7 +206,7 @@ tbody td:first-child{color:var(--t1);font-family:'IBM Plex Sans',sans-serif;font
 .bid-row.lowest .bid-amt{color:var(--gold2);}
 .bid-winner-tag{font-size:9px;background:rgba(212,168,67,.15);color:var(--gold2);border:1px solid rgba(212,168,67,.3);border-radius:4px;padding:2px 6px;letter-spacing:.5px;text-transform:uppercase;white-space:nowrap;}
 
-/* ══════════ MEMBER ROW ══════════ */
+/* â•â•â•â•â•â•â•â•â•â• MEMBER ROW â•â•â•â•â•â•â•â•â•â• */
 .member-row{display:flex;align-items:center;gap:11px;padding:11px;background:var(--bg);border:1px solid var(--ln);border-radius:9px;margin-bottom:8px;transition:border-color .15s,background .28s;}
 .member-row:hover{border-color:var(--ln2);}
 [data-theme="light"] .member-row{background:var(--bg3);}
@@ -216,24 +216,24 @@ tbody td:first-child{color:var(--t1);font-family:'IBM Plex Sans',sans-serif;font
 .m-meta{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--t3);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .row-actions{display:flex;gap:5px;align-items:center;flex-shrink:0;}
 
-/* ══════════ AUCTION ══════════ */
+/* â•â•â•â•â•â•â•â•â•â• AUCTION â•â•â•â•â•â•â•â•â•â• */
 .auc-card{background:linear-gradient(135deg,rgba(212,168,67,.07),rgba(23,196,162,.04));border:1px solid rgba(212,168,67,.22);border-radius:14px;padding:20px;margin-bottom:14px;}
 .auc-timer{font-family:'Playfair Display',serif;font-size:38px;color:var(--gold2);text-align:center;letter-spacing:3px;}
 .auc-timer-lbl{font-size:10px;color:var(--t3);letter-spacing:2px;text-transform:uppercase;text-align:center;margin-bottom:10px;}
 
-/* ══════════ NOTIFICATIONS ══════════ */
+/* â•â•â•â•â•â•â•â•â•â• NOTIFICATIONS â•â•â•â•â•â•â•â•â•â• */
 .notif-item{display:flex;gap:10px;padding:11px 14px;border-bottom:1px solid var(--ln);}
 .notif-item:last-child{border-bottom:none;}
 .ndot-sm{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:4px;}
 .notif-text{font-size:12px;color:var(--t2);line-height:1.5;}
 .notif-time{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--t4);margin-top:2px;}
 
-/* ══════════ TOAST ══════════ */
+/* â•â•â•â•â•â•â•â•â•â• TOAST â•â•â•â•â•â•â•â•â•â• */
 .toast{position:fixed;bottom:68px;right:16px;background:var(--bg2);border:1px solid var(--green);border-radius:10px;padding:11px 16px;font-size:12px;color:var(--green);z-index:9999;box-shadow:var(--shd);transform:translateY(60px);opacity:0;transition:all .3s;font-weight:600;display:flex;align-items:center;gap:8px;max-width:260px;}
 .toast.show{transform:translateY(0);opacity:1;}
 .toast.err{border-color:var(--red);color:var(--red);}
 
-/* â•â•â•â•â•â•â•â•â•â• AUTH & SYNC â•â•â•â•â•â•â•â•â•â• */
+/* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â AUTH & SYNC Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */
 .auth-btn{min-width:118px;justify-content:center;}
 .auth-chip{padding:7px 10px;border-radius:999px;border:1px solid var(--ln);background:var(--bg3);font-size:10px;font-weight:600;letter-spacing:.6px;text-transform:uppercase;color:var(--t2);white-space:nowrap;}
 .auth-chip.ready{color:var(--green);border-color:rgba(61,204,138,.28);}
@@ -296,7 +296,7 @@ tbody td:first-child{color:var(--t1);font-family:'IBM Plex Sans',sans-serif;font
 .admin-session-row{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px;}
 .admin-session-row .btn{white-space:nowrap;}
 
-/* ══════════ MODAL ══════════ */
+/* â•â•â•â•â•â•â•â•â•â• MODAL â•â•â•â•â•â•â•â•â•â• */
 .modal-bg{display:none;position:fixed;inset:0;background:var(--ovl);z-index:9100;align-items:flex-end;justify-content:center;}
 .modal-bg.admin-modal{z-index:9905;}
 .modal-bg.open{display:flex;}
@@ -313,12 +313,12 @@ tbody td:first-child{color:var(--t1);font-family:'IBM Plex Sans',sans-serif;font
 .modal-foot{padding:14px 18px;border-top:1px solid var(--ln);display:flex;gap:8px;justify-content:flex-end;background:var(--bg2);flex-shrink:0;}
 .intst-inner{background:repeating-linear-gradient(-45deg,transparent,transparent 8px,rgba(128,128,128,.06) 8px,rgba(128,128,128,.06) 16px);border:1px dashed var(--ln2);border-radius:10px;height:220px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;}
 
-/* ══════════ SECTIONS ══════════ */
+/* â•â•â•â•â•â•â•â•â•â• SECTIONS â•â•â•â•â•â•â•â•â•â• */
 .section{display:none;}
 .section.active{display:block;animation:fadeUp .22s ease;}
 @keyframes fadeUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
 
-/* ══════════ MISC ══════════ */
+/* â•â•â•â•â•â•â•â•â•â• MISC â•â•â•â•â•â•â•â•â•â• */
 .div{height:1px;background:linear-gradient(90deg,transparent,var(--ln2),transparent);margin:16px 0;}
 .insight{background:rgba(212,168,67,.06);border:1px solid rgba(212,168,67,.14);border-radius:9px;padding:11px 13px;font-size:11px;color:var(--t2);line-height:1.6;display:flex;gap:8px;margin-top:13px;}
 .insight-icon{color:var(--gold);font-size:14px;flex-shrink:0;margin-top:1px;}
@@ -337,7 +337,7 @@ tbody td:first-child{color:var(--t1);font-family:'IBM Plex Sans',sans-serif;font
 .page-title{font-family:'Playfair Display',serif;font-size:20px;color:var(--t1);}
 .page-title span{color:var(--gold);}
 
-/* ══════════ MOBILE BOTTOM NAV ══════════ */
+/* â•â•â•â•â•â•â•â•â•â• MOBILE BOTTOM NAV â•â•â•â•â•â•â•â•â•â• */
 .mobile-nav{display:none;left:0;right:0;height:calc(64px + env(safe-area-inset-bottom,0px));background:var(--bg2);border-top:1px solid var(--ln);z-index:9000;padding:0;flex-shrink:0;transition:background .28s,border-color .28s;}
 .mn-inner{display:flex;height:64px;align-items:stretch;width:100%;}
 .mn-item{flex:1;height:64px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:6px 4px 4px;cursor:pointer;color:var(--t3);border:none;background:transparent;transition:color .2s;position:relative;touch-action:manipulation;-webkit-tap-highlight-color:transparent;min-width:0;outline:none;-webkit-user-select:none;user-select:none;}
@@ -349,11 +349,11 @@ tbody td:first-child{color:var(--t1);font-family:'IBM Plex Sans',sans-serif;font
 .mn-item.active{color:var(--gold2);}
 .mn-badge{position:absolute;top:5px;right:calc(50% - 20px);min-width:15px;height:15px;background:var(--red);color:#fff;font-size:8px;font-weight:700;border-radius:8px;display:flex;align-items:center;justify-content:center;border:2px solid var(--bg2);pointer-events:none;padding:0 3px;}
 
-/* ══════════ SIDEBAR OVERLAY (mobile) ══════════ */
+/* â•â•â•â•â•â•â•â•â•â• SIDEBAR OVERLAY (mobile) â•â•â•â•â•â•â•â•â•â• */
 .sb-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:8999;backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);}
 .sb-overlay.open{display:block;}
 
-/* ══════════ RESPONSIVE — TABLET ══════════ */
+/* â•â•â•â•â•â•â•â•â•â• RESPONSIVE â€” TABLET â•â•â•â•â•â•â•â•â•â• */
 @media(max-width:900px){
   .sidebar{position:fixed;top:0;left:-270px;height:100dvh;z-index:9500;width:260px;transition:left .3s cubic-bezier(.4,0,.2,1);box-shadow:6px 0 30px rgba(0,0,0,.4);}
   .sidebar.open{left:0;}
@@ -370,7 +370,7 @@ tbody td:first-child{color:var(--t1);font-family:'IBM Plex Sans',sans-serif;font
   .btn.btn-sm{padding:8px 14px;}
 }
 
-/* ══════════ RESPONSIVE — MOBILE ══════════ */
+/* â•â•â•â•â•â•â•â•â•â• RESPONSIVE â€” MOBILE â•â•â•â•â•â•â•â•â•â• */
 @media(max-width:600px){
   .g2,.g3,.g4{grid-template-columns:1fr;}
   .topbar{height:52px;padding:0 12px;}
@@ -433,7 +433,7 @@ tbody td:first-child{color:var(--t1);font-family:'IBM Plex Sans',sans-serif;font
 }
 
 
-/* ══════════ EMI CALCULATOR REDESIGN ══════════ */
+/* â•â•â•â•â•â•â•â•â•â• EMI CALCULATOR REDESIGN â•â•â•â•â•â•â•â•â•â• */
 .emi-hero{background:linear-gradient(135deg,rgba(212,168,67,.12),rgba(79,156,249,.08));border:1px solid rgba(212,168,67,.2);border-radius:18px;padding:20px;margin-bottom:16px;}
 .emi-input-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
 .emi-input-card{background:var(--bg);border:1px solid var(--ln);border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:4px;}
@@ -457,7 +457,7 @@ tbody td:first-child{color:var(--t1);font-family:'IBM Plex Sans',sans-serif;font
 .emi-row-v.gold{color:var(--gold2);font-size:15px;font-weight:600;}
 .emi-vs-card{background:linear-gradient(135deg,rgba(61,204,138,.06),rgba(79,156,249,.04));border:1px solid rgba(61,204,138,.15);border-radius:14px;padding:16px;margin-top:12px;}
 
-/* ══════════ PAYMENT TRACKER REDESIGN ══════════ */
+/* â•â•â•â•â•â•â•â•â•â• PAYMENT TRACKER REDESIGN â•â•â•â•â•â•â•â•â•â• */
 .pay-filter-bar{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
 .pay-progress-card{background:var(--bg2);border:1px solid var(--ln);border-radius:16px;padding:18px;margin-bottom:14px;}
 .pay-progress-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
@@ -483,9 +483,9 @@ tbody td:first-child{color:var(--t1);font-family:'IBM Plex Sans',sans-serif;font
 .pay-toggle.is-paid::after{left:21px;}
 .pay-toggle.is-due::after{left:3px;}
 
-/* ══════════ AUCTION REDESIGN ══════════ */
+/* â•â•â•â•â•â•â•â•â•â• AUCTION REDESIGN â•â•â•â•â•â•â•â•â•â• */
 .auc-hero{background:linear-gradient(160deg,rgba(212,168,67,.13) 0%,rgba(23,196,162,.07) 100%);border:1px solid rgba(212,168,67,.28);border-radius:20px;padding:24px 20px 20px;margin-bottom:16px;text-align:center;position:relative;overflow:hidden;}
-.auc-hero::after{content:'🏆';position:absolute;right:-8px;bottom:-12px;font-size:80px;opacity:.06;pointer-events:none;}
+.auc-hero::after{content:'ðŸ†';position:absolute;right:-8px;bottom:-12px;font-size:80px;opacity:.06;pointer-events:none;}
 .auc-live-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(61,204,138,.1);border:1px solid rgba(61,204,138,.25);border-radius:20px;padding:4px 12px;font-size:10px;font-weight:600;color:var(--green);letter-spacing:1px;text-transform:uppercase;margin-bottom:12px;}
 .auc-live-dot{width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse 2s infinite;}
 @keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(61,204,138,.4);}50%{opacity:.7;box-shadow:0 0 0 4px rgba(61,204,138,0);}}
@@ -540,7 +540,7 @@ tbody td:first-child{color:var(--t1);font-family:'IBM Plex Sans',sans-serif;font
 .mpay-hist-date{font-size:11px;color:var(--t3);font-family:'IBM Plex Mono',monospace;margin-top:2px;}
 .mpay-hist-amt{font-family:'Playfair Display',serif;font-size:16px;color:var(--teal);white-space:nowrap;}
 
-/* ══════════ MOBILE TOPBAR ROLE STRIP ══════════ */
+/* â•â•â•â•â•â•â•â•â•â• MOBILE TOPBAR ROLE STRIP â•â•â•â•â•â•â•â•â•â• */
 @media(max-width:900px){
   .mob-role-strip{display:flex;padding:8px 12px 4px;background:var(--bg2);border-bottom:1px solid var(--ln);gap:6px;flex-shrink:0;}
   .mob-role-btn{flex:1;padding:7px 8px;border:1px solid var(--ln);background:var(--bg3);color:var(--t3);font-family:'IBM Plex Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;border-radius:8px;transition:all .2s;text-align:center;touch-action:manipulation;}
@@ -551,20 +551,20 @@ tbody td:first-child{color:var(--t1);font-family:'IBM Plex Sans',sans-serif;font
 </head>
 <body>
 
-<div class="toast" id="toast"><span id="t-icon">✓</span><span id="t-msg">Done</span></div>
+<div class="toast" id="toast"><span id="t-icon">âœ“</span><span id="t-msg">Done</span></div>
 <div class="sb-overlay" id="sbOverlay" onclick="closeSB()"></div>
 
 <!-- ADD MEMBER MODAL -->
 <div class="modal-bg" id="memberModal">
   <div class="modal">
     <div class="modal-handle"></div>
-    <div class="modal-hd"><div class="modal-title">Add New Member</div><button class="modal-close" onclick="closeModal('memberModal')">✕</button></div>
+    <div class="modal-hd"><div class="modal-title">Add New Member</div><button class="modal-close" onclick="closeModal('memberModal')">âœ•</button></div>
     <div class="modal-body">
       <div class="fg"><label>Full Name</label><input id="mm_name" placeholder="e.g. Ravi Kumar"></div>
       <div class="fg"><label>Phone</label><input id="mm_phone" type="tel" placeholder="9876543210"></div>
       <div class="fg"><label>Email (optional)</label><input id="mm_email" type="email" placeholder="ravi@email.com"></div>
       <div class="g2">
-        <div class="fg"><label>Chit Group</label><select id="mm_group"><option value="">— Select —</option></select></div>
+        <div class="fg"><label>Chit Group</label><select id="mm_group"><option value="">â€” Select â€”</option></select></div>
         <div class="fg"><label>Ticket No.</label><input id="mm_ticket" type="number" placeholder="1"></div>
       </div>
     </div>
@@ -579,11 +579,11 @@ tbody td:first-child{color:var(--t1);font-family:'IBM Plex Sans',sans-serif;font
 <div class="modal-bg" id="chitModal">
   <div class="modal">
     <div class="modal-handle"></div>
-    <div class="modal-hd"><div class="modal-title">Create Chit Fund</div><button class="modal-close" onclick="closeModal('chitModal')">✕</button></div>
+    <div class="modal-hd"><div class="modal-title">Create Chit Fund</div><button class="modal-close" onclick="closeModal('chitModal')">âœ•</button></div>
     <div class="modal-body">
       <div class="fg"><label>Chit Name</label><input id="cm_name" placeholder="e.g. Gold Chit 2025"></div>
       <div class="g2">
-        <div class="fg"><label>Total Value (₹)</label><input id="cm_value" type="number" placeholder="100000"></div>
+        <div class="fg"><label>Total Value (â‚¹)</label><input id="cm_value" type="number" placeholder="100000"></div>
         <div class="fg"><label>Members</label><input id="cm_members" type="number" placeholder="20"></div>
       </div>
       <div class="g2">
@@ -602,14 +602,14 @@ tbody td:first-child{color:var(--t1);font-family:'IBM Plex Sans',sans-serif;font
 <!-- INTERSTITIAL AD -->
 <div class="modal-bg center" id="adModal">
   <div class="modal">
-    <div class="modal-hd"><div style="font-size:9px;letter-spacing:2px;color:var(--t3);text-transform:uppercase;font-family:'IBM Plex Mono',monospace;">Advertisement</div><button class="modal-close" onclick="closeModal('adModal')">✕</button></div>
+    <div class="modal-hd"><div style="font-size:9px;letter-spacing:2px;color:var(--t3);text-transform:uppercase;font-family:'IBM Plex Mono',monospace;">Advertisement</div><button class="modal-close" onclick="closeModal('adModal')">âœ•</button></div>
     <div class="modal-body">
       <div class="intst-inner">
         <div class="ad-tag">AdMob Interstitial</div>
-        <div style="font-size:10px;color:var(--t3);margin-top:4px;">320 × 480 — Full-screen Ad Unit</div>
+        <div style="font-size:10px;color:var(--t3);margin-top:4px;">320 Ã— 480 â€” Full-screen Ad Unit</div>
       </div>
     </div>
-    <div class="modal-foot"><button class="btn btn-ghost btn-sm btn-full" onclick="closeModal('adModal')">Continue to App →</button></div>
+    <div class="modal-foot"><button class="btn btn-ghost btn-sm btn-full" onclick="closeModal('adModal')">Continue to App â†’</button></div>
   </div>
 </div>
 
@@ -619,13 +619,13 @@ tbody td:first-child{color:var(--t1);font-family:'IBM Plex Sans',sans-serif;font
     <div class="modal-handle"></div>
     <div class="modal-hd">
       <div class="modal-title" id="mcfModalTitle">Add Chit Fund</div>
-      <button class="modal-close" onclick="closeModal('mcfModal')">✕</button>
+      <button class="modal-close" onclick="closeModal('mcfModal')">âœ•</button>
     </div>
     <div class="modal-body">
       <input type="hidden" id="mcf_edit_id">
-      <div class="fg"><label>Fund Name / Group</label><input id="mcf_name" placeholder="e.g. Mahalakshmi Chit, Office Chit…"></div>
+      <div class="fg"><label>Fund Name / Group</label><input id="mcf_name" placeholder="e.g. Mahalakshmi Chit, Office Chitâ€¦"></div>
       <div class="g2">
-        <div class="fg"><label>Chit Value (₹)</label><input id="mcf_value" type="number" placeholder="100000" inputmode="numeric"></div>
+        <div class="fg"><label>Chit Value (â‚¹)</label><input id="mcf_value" type="number" placeholder="100000" inputmode="numeric"></div>
         <div class="fg"><label>No. of Members</label><input id="mcf_members" type="number" placeholder="20" inputmode="numeric"></div>
       </div>
       <div class="g2">
@@ -637,7 +637,7 @@ tbody td:first-child{color:var(--t1);font-family:'IBM Plex Sans',sans-serif;font
         <div class="fg"><label>Month Paid Upto</label><input id="mcf_paid" type="number" placeholder="0" min="0" inputmode="numeric"></div>
       </div>
       <div class="fg"><label>Foreman / Organiser Name</label><input id="mcf_foreman" placeholder="Optional"></div>
-      <div class="fg"><label>Notes (optional)</label><textarea id="mcf_notes" placeholder="Any notes…" style="min-height:52px;"></textarea></div>
+      <div class="fg"><label>Notes (optional)</label><textarea id="mcf_notes" placeholder="Any notesâ€¦" style="min-height:52px;"></textarea></div>
     </div>
     <div class="modal-foot">
       <button class="btn btn-ghost btn-sm" onclick="closeModal('mcfModal')">Cancel</button>
@@ -649,9 +649,9 @@ tbody td:first-child{color:var(--t1);font-family:'IBM Plex Sans',sans-serif;font
 <!-- MY CHIT FUND DELETE CONFIRM -->
 <div class="modal-bg center" id="mcfDeleteModal">
   <div class="modal">
-    <div class="modal-hd"><div class="modal-title" style="color:var(--red);">Remove Fund?</div><button class="modal-close" onclick="closeModal('mcfDeleteModal')">✕</button></div>
+    <div class="modal-hd"><div class="modal-title" style="color:var(--red);">Remove Fund?</div><button class="modal-close" onclick="closeModal('mcfDeleteModal')">âœ•</button></div>
     <div class="modal-body" style="text-align:center;padding:24px 20px;">
-      <div style="font-size:36px;margin-bottom:12px;">🗑</div>
+      <div style="font-size:36px;margin-bottom:12px;">ðŸ—‘</div>
       <div style="font-size:14px;color:var(--t2);margin-bottom:6px;">Remove this fund from your tracker?</div>
       <div style="font-weight:600;color:var(--t1);font-size:15px;" id="mcf_del_name">this fund</div>
       <div style="font-size:12px;color:var(--t3);margin-top:6px;">This action cannot be undone.</div>
@@ -671,7 +671,7 @@ tbody td:first-child{color:var(--t1);font-family:'IBM Plex Sans',sans-serif;font
     <div class="auth-meta">
       <div class="rr"><span class="rr-k">Authentication</span><span class="rr-v">Google via Firebase</span></div>
       <div class="rr"><span class="rr-k">Database</span><span class="rr-v gold">Cloud Firestore</span></div>
-      <div class="rr"><span class="rr-k">Plans</span><span class="rr-v">Foreman paid · Member free</span></div>
+      <div class="rr"><span class="rr-k">Plans</span><span class="rr-v">Foreman paid Â· Member free</span></div>
     </div>
     <button class="btn btn-gold btn-full auth-btn" type="button" onclick="signInWithGoogle()">Continue With Google</button>
     <div class="auth-subactions">
@@ -748,8 +748,8 @@ tbody td:first-child{color:var(--t1);font-family:'IBM Plex Sans',sans-serif;font
   <div class="sidebar" id="sidebar">
     <div class="logo-wrap">
       <div class="logo-mark">
-        <div class="logo-icon">₹</div>
-        <div><div class="logo-name">Chit<em>Vault</em></div><div class="logo-tagline">Fund Manager</div></div>
+        <div class="logo-icon">â‚¹</div>
+        <div><div class="logo-name">Ease<em>Chit</em></div><div class="logo-tagline">Fund Manager</div></div>
       </div>
     </div>
     <div class="role-switch">
@@ -780,7 +780,7 @@ tbody td:first-child{color:var(--t1);font-family:'IBM Plex Sans',sans-serif;font
       <div class="theme-row">
         <span class="theme-lbl">Theme</span>
         <div class="tgl" onclick="toggleTheme()" title="Toggle dark/light mode">
-          <div class="tgl-track"><span>☀</span><span>🌙</span></div>
+          <div class="tgl-track"><span>â˜€</span><span>ðŸŒ™</span></div>
           <div class="tgl-knob" id="tglKnob"></div>
         </div>
       </div>
@@ -815,34 +815,34 @@ tbody td:first-child{color:var(--t1);font-family:'IBM Plex Sans',sans-serif;font
 
     <!-- MOBILE ROLE STRIP -->
     <div class="mob-role-strip" id="mobRoleStrip">
-      <button class="mob-role-btn active" id="mobRoleForeman" onclick="setRole('foreman')" type="button">⚙ Foreman</button>
-      <button class="mob-role-btn" id="mobRoleMember" onclick="setRole('member')" type="button">👤 Member</button>
+      <button class="mob-role-btn active" id="mobRoleForeman" onclick="setRole('foreman')" type="button">âš™ Foreman</button>
+      <button class="mob-role-btn" id="mobRoleMember" onclick="setRole('member')" type="button">ðŸ‘¤ Member</button>
     </div>
 
     <div class="ad-strip-wrap" style="padding:0 18px;flex-shrink:0;margin-top:12px;">
-      <div class="ad-strip"><div class="ad-tag">AdMob Banner — 728×90 Leaderboard</div></div>
+      <div class="ad-strip"><div class="ad-tag">AdMob Banner â€” 728Ã—90 Leaderboard</div></div>
     </div>
 
     <div class="content" id="mainContent">
 
-      <!-- ══ FOREMAN DASHBOARD ══ -->
+      <!-- â•â• FOREMAN DASHBOARD â•â• -->
       <div class="section active" id="sec-dashboard">
         <div class="g4" style="margin-bottom:14px;">
-          <div class="stat g"><div class="stat-lbl">Total Chit Value</div><div class="stat-val g" id="d_tv">₹0</div><div class="stat-sub" id="d_cc">0 funds</div></div>
+          <div class="stat g"><div class="stat-lbl">Total Chit Value</div><div class="stat-val g" id="d_tv">â‚¹0</div><div class="stat-sub" id="d_cc">0 funds</div></div>
           <div class="stat t"><div class="stat-lbl">Total Members</div><div class="stat-val t" id="d_mem">0</div><div class="stat-sub">all groups</div></div>
-          <div class="stat b"><div class="stat-lbl">Monthly Collection</div><div class="stat-val b" id="d_mo">₹0</div><div class="stat-sub">per cycle</div></div>
-          <div class="stat p"><div class="stat-lbl">Foreman Earnings</div><div class="stat-val p" id="d_earn">₹0</div><div class="stat-sub">commission</div></div>
+          <div class="stat b"><div class="stat-lbl">Monthly Collection</div><div class="stat-val b" id="d_mo">â‚¹0</div><div class="stat-sub">per cycle</div></div>
+          <div class="stat p"><div class="stat-lbl">Foreman Earnings</div><div class="stat-val p" id="d_earn">â‚¹0</div><div class="stat-sub">commission</div></div>
         </div>
         <div class="g2">
           <div class="gcol">
             <div class="card">
               <div class="card-hd"><span class="pip"></span>Active Chit Funds</div>
-              <div id="d_chitList"><div class="empty"><div class="empty-icon">💼</div><p>No chit funds yet.<br>Tap "+ New Chit" to create one.</p></div></div>
+              <div id="d_chitList"><div class="empty"><div class="empty-icon">ðŸ’¼</div><p>No chit funds yet.<br>Tap "+ New Chit" to create one.</p></div></div>
               <button class="btn btn-ghost btn-sm btn-full" style="margin-top:10px;" onclick="openModal('chitModal')">+ Create Chit Fund</button>
             </div>
             <div class="card">
               <div class="card-hd"><span class="pip"></span>Collection Progress</div>
-              <div id="d_prog"><div class="empty"><div class="empty-icon">📊</div><p>Create a chit fund to track.</p></div></div>
+              <div id="d_prog"><div class="empty"><div class="empty-icon">ðŸ“Š</div><p>Create a chit fund to track.</p></div></div>
             </div>
           </div>
           <div class="gcol">
@@ -865,24 +865,24 @@ tbody td:first-child{color:var(--t1);font-family:'IBM Plex Sans',sans-serif;font
         </div>
       </div>
 
-      <!-- ══ MEMBERS ══ -->
+      <!-- â•â• MEMBERS â•â• -->
       <div class="section" id="sec-members">
         <div class="page-hd"><div class="page-title">Member <span>Registry</span></div><button class="btn btn-gold btn-sm" onclick="openAddMember()">+ Add Member</button></div>
         <div class="card" style="margin-bottom:14px;">
           <div class="card-hd"><span class="pip"></span>Filter</div>
           <div class="g2">
-            <div class="fg" style="margin:0;"><label>Search</label><input id="m_search" placeholder="Name or phone…" oninput="renderMembers()"></div>
+            <div class="fg" style="margin:0;"><label>Search</label><input id="m_search" placeholder="Name or phoneâ€¦" oninput="renderMembers()"></div>
             <div class="fg" style="margin:0;"><label>Group</label><select id="m_filter" onchange="renderMembers()"><option value="">All Groups</option></select></div>
           </div>
         </div>
-        <div class="card"><div class="card-hd"><span class="pip"></span>All Members</div><div id="memberList"><div class="empty"><div class="empty-icon">👥</div><p>No members yet.</p></div></div></div>
+        <div class="card"><div class="card-hd"><span class="pip"></span>All Members</div><div id="memberList"><div class="empty"><div class="empty-icon">ðŸ‘¥</div><p>No members yet.</p></div></div></div>
       </div>
 
-      <!-- ══ PAYMENTS ══ -->
+      <!-- â•â• PAYMENTS â•â• -->
       <div class="section" id="sec-payments">
         <div class="page-hd"><div class="page-title">Payment <span>Tracker</span></div></div>
         <div class="pay-filter-bar">
-          <select id="pt_group" onchange="renderPayTable()"><option value="">— Select Group —</option></select>
+          <select id="pt_group" onchange="renderPayTable()"><option value="">â€” Select Group â€”</option></select>
           <input id="pt_month" type="number" placeholder="Month #" min="1" oninput="renderPayTable()">
         </div>
         <div class="pay-progress-card" id="pay_progress_card" style="display:none;">
@@ -892,15 +892,15 @@ tbody td:first-child{color:var(--t1);font-family:'IBM Plex Sans',sans-serif;font
           </div>
           <div class="pay-track-wrap"><div class="pay-track-fill" id="pay_track_fill" style="width:0%"></div></div>
           <div class="pay-stats-row">
-            <div class="pay-stat-mini"><div class="pay-stat-mini-val" style="color:var(--green)" id="pt_col">₹0</div><div class="pay-stat-mini-lbl">Collected</div></div>
-            <div class="pay-stat-mini"><div class="pay-stat-mini-val" style="color:var(--red)" id="pt_out">₹0</div><div class="pay-stat-mini-lbl">Due</div></div>
+            <div class="pay-stat-mini"><div class="pay-stat-mini-val" style="color:var(--green)" id="pt_col">â‚¹0</div><div class="pay-stat-mini-lbl">Collected</div></div>
+            <div class="pay-stat-mini"><div class="pay-stat-mini-val" style="color:var(--red)" id="pt_out">â‚¹0</div><div class="pay-stat-mini-lbl">Due</div></div>
             <div class="pay-stat-mini"><div class="pay-stat-mini-val" style="color:var(--blue)" id="pt_cc">0</div><div class="pay-stat-mini-lbl">Paid</div></div>
           </div>
         </div>
-        <div id="payMemberList"><div style="text-align:center;padding:48px 20px;color:var(--t3);"><div style="font-size:36px;margin-bottom:12px;opacity:.3;">💳</div><p style="font-size:13px;">Select a group and month<br>to track payments</p></div></div>
+        <div id="payMemberList"><div style="text-align:center;padding:48px 20px;color:var(--t3);"><div style="font-size:36px;margin-bottom:12px;opacity:.3;">ðŸ’³</div><p style="font-size:13px;">Select a group and month<br>to track payments</p></div></div>
       </div>
 
-      <!-- ══ AUCTION ══ -->
+      <!-- â•â• AUCTION â•â• -->
       <div class="section" id="sec-auction">
         <div class="page-hd"><div class="page-title">Auction <span>Management</span></div></div>
         <!-- Timer Hero -->
@@ -909,20 +909,20 @@ tbody td:first-child{color:var(--t1);font-family:'IBM Plex Sans',sans-serif;font
           <div class="auc-hero-time" id="auctionTimer">00:00:00</div>
           <div class="auc-timer-btns">
             <button class="btn btn-gold btn-sm" id="aucStartBtn" onclick="startTimer()" type="button" disabled>Auction Start</button>
-            <button class="btn btn-ghost btn-sm" onclick="pauseTimer()" type="button">⏸ Pause</button>
-            <button class="btn btn-danger btn-sm" onclick="resetTimer()" type="button">↺ Reset</button>
+            <button class="btn btn-ghost btn-sm" onclick="pauseTimer()" type="button">â¸ Pause</button>
+            <button class="btn btn-danger btn-sm" onclick="resetTimer()" type="button">â†º Reset</button>
           </div>
         </div>
         <!-- Foreman: Add Bid on Behalf -->
         <div class="card" style="margin-bottom:14px;">
           <div class="card-hd"><span class="pip"></span>Add Bid on Behalf of Member</div>
           <div class="g2" style="margin-bottom:10px;">
-            <div class="fg" style="margin:0;"><label>Chit Group</label><select id="fm_bid_grp" onchange="handleAuctionGroupChange('fm_bid_grp')"><option value="">— Select —</option></select></div>
+            <div class="fg" style="margin:0;"><label>Chit Group</label><select id="fm_bid_grp" onchange="handleAuctionGroupChange('fm_bid_grp')"><option value="">â€” Select â€”</option></select></div>
             <div class="fg" style="margin:0;"><label>Member Name</label>
-              <select id="fm_bid_member"><option value="">— Select Member —</option></select>
+              <select id="fm_bid_member"><option value="">â€” Select Member â€”</option></select>
             </div>
           </div>
-          <div class="fg"><label>Bid / Discount Amount (₹)</label><input id="fm_bid_amt" type="number" placeholder="e.g. 5000" inputmode="numeric"></div>
+          <div class="fg"><label>Bid / Discount Amount (â‚¹)</label><input id="fm_bid_amt" type="number" placeholder="e.g. 5000" inputmode="numeric"></div>
           <button class="btn btn-gold btn-sm btn-full" onclick="foremanAddBid()" type="button">+ Add Bid</button>
         </div>
         <!-- Live Bids from Members -->
@@ -931,76 +931,76 @@ tbody td:first-child{color:var(--t1);font-family:'IBM Plex Sans',sans-serif;font
             <span style="display:flex;align-items:center;gap:7px;"><span class="pip"></span>Live Member Bids</span>
             <span id="auc_bid_count" style="font-size:10px;color:var(--t3);font-family:'IBM Plex Mono',monospace;">0 bids</span>
           </div>
-          <div id="foreman_bids_list"><div class="empty"><div class="empty-icon">🔨</div><p>No bids yet. Members can place bids from the Auction tab.</p></div></div>
+          <div id="foreman_bids_list"><div class="empty"><div class="empty-icon">ðŸ”¨</div><p>No bids yet. Members can place bids from the Auction tab.</p></div></div>
         </div>
         <!-- Finalize -->
         <div class="card" style="margin-bottom:14px;">
           <div class="card-hd"><span class="pip"></span>Finalize Auction</div>
           <div class="auc-fields-grid">
-            <div class="auc-field wide"><label>Chit Group</label><select id="auc_group" onchange="handleAuctionGroupChange('auc_group')"><option value="">— Select Group —</option></select></div>
+            <div class="auc-field wide"><label>Chit Group</label><select id="auc_group" onchange="handleAuctionGroupChange('auc_group')"><option value="">â€” Select Group â€”</option></select></div>
             <div class="auc-field"><label>Month #</label><input id="auc_month" type="number" placeholder="3" min="1" oninput="calcAuction()"></div>
-            <div class="auc-field"><label>Winning Bid (Discount ₹)</label><input id="auc_bid" type="number" placeholder="5000" oninput="calcAuction()"></div>
+            <div class="auc-field"><label>Winning Bid (Discount â‚¹)</label><input id="auc_bid" type="number" placeholder="5000" oninput="calcAuction()"></div>
             <div class="auc-field wide"><label>Winner Name</label><input id="auc_winner" placeholder="Member name"></div>
           </div>
-          <button class="btn btn-teal btn-full" onclick="finalizeAuction()" type="button" style="margin-top:4px;">✓ Close Auction &amp; Declare Winner</button>
+          <button class="btn btn-teal btn-full" onclick="finalizeAuction()" type="button" style="margin-top:4px;">âœ“ Close Auction &amp; Declare Winner</button>
         </div>
         <!-- Live Calc -->
         <div class="card" style="margin-bottom:14px;" id="auc_live_card">
           <div class="card-hd"><span class="pip"></span>Live Calculation</div>
           <div class="auc-prize-banner">
             <div class="auc-prize-lbl">Prize Amount</div>
-            <div class="auc-prize-val" id="ar_pr">—</div>
+            <div class="auc-prize-val" id="ar_pr">â€”</div>
           </div>
           <div class="auc-calc-grid">
-            <div class="auc-calc-chip"><div class="auc-calc-chip-lbl">Chit Value</div><div class="auc-calc-chip-val" id="ar_cv">—</div></div>
-            <div class="auc-calc-chip"><div class="auc-calc-chip-lbl">Monthly EMI</div><div class="auc-calc-chip-val" id="ar_mo">—</div></div>
-            <div class="auc-calc-chip"><div class="auc-calc-chip-lbl">Commission</div><div class="auc-calc-chip-val r" id="ar_cm">—</div></div>
-            <div class="auc-calc-chip"><div class="auc-calc-chip-lbl">Total Pool</div><div class="auc-calc-chip-val" id="ar_pl">—</div></div>
-            <div class="auc-calc-chip"><div class="auc-calc-chip-lbl">Discount</div><div class="auc-calc-chip-val" id="ar_dc">—</div></div>
-            <div class="auc-calc-chip"><div class="auc-calc-chip-lbl">Dividend/Member</div><div class="auc-calc-chip-val g" id="ar_dv">—</div></div>
-            <div class="auc-calc-chip" style="grid-column:1/-1"><div class="auc-calc-chip-lbl">Net Instalment (after dividend)</div><div class="auc-calc-chip-val g" id="ar_ni">—</div></div>
+            <div class="auc-calc-chip"><div class="auc-calc-chip-lbl">Chit Value</div><div class="auc-calc-chip-val" id="ar_cv">â€”</div></div>
+            <div class="auc-calc-chip"><div class="auc-calc-chip-lbl">Monthly EMI</div><div class="auc-calc-chip-val" id="ar_mo">â€”</div></div>
+            <div class="auc-calc-chip"><div class="auc-calc-chip-lbl">Commission</div><div class="auc-calc-chip-val r" id="ar_cm">â€”</div></div>
+            <div class="auc-calc-chip"><div class="auc-calc-chip-lbl">Total Pool</div><div class="auc-calc-chip-val" id="ar_pl">â€”</div></div>
+            <div class="auc-calc-chip"><div class="auc-calc-chip-lbl">Discount</div><div class="auc-calc-chip-val" id="ar_dc">â€”</div></div>
+            <div class="auc-calc-chip"><div class="auc-calc-chip-lbl">Dividend/Member</div><div class="auc-calc-chip-val g" id="ar_dv">â€”</div></div>
+            <div class="auc-calc-chip" style="grid-column:1/-1"><div class="auc-calc-chip-lbl">Net Instalment (after dividend)</div><div class="auc-calc-chip-val g" id="ar_ni">â€”</div></div>
           </div>
         </div>
         <!-- History -->
         <div class="card">
           <div class="card-hd"><span class="pip"></span>Auction History</div>
-          <div id="auc_hist"><div class="empty"><div class="empty-icon">🔨</div><p>No auctions yet.</p></div></div>
+          <div id="auc_hist"><div class="empty"><div class="empty-icon">ðŸ”¨</div><p>No auctions yet.</p></div></div>
         </div>
       </div>
 
-      <!-- ══ EMI ══ -->
+      <!-- â•â• EMI â•â• -->
       <div class="section" id="sec-emi">
         <div class="page-hd"><div class="page-title">EMI <span>Calculator</span></div></div>
         <!-- Inputs -->
         <div class="card" style="margin-bottom:14px;">
           <div class="card-hd"><span class="pip"></span>Parameters</div>
           <div class="emi-input-grid">
-            <div class="emi-input-card"><div class="emi-input-lbl">Chit Value ₹</div><input id="e_val" type="number" placeholder="100000" oninput="calcEMI()" inputmode="numeric"></div>
+            <div class="emi-input-card"><div class="emi-input-lbl">Chit Value â‚¹</div><input id="e_val" type="number" placeholder="100000" oninput="calcEMI()" inputmode="numeric"></div>
             <div class="emi-input-card"><div class="emi-input-lbl">Members</div><input id="e_mem" type="number" placeholder="20" oninput="calcEMI()" inputmode="numeric"></div>
             <div class="emi-input-card"><div class="emi-input-lbl">Duration (Months)</div><input id="e_dur" type="number" placeholder="20" oninput="calcEMI()" inputmode="numeric"></div>
             <div class="emi-input-card"><div class="emi-input-lbl">Commission %</div><input id="e_comm" type="number" value="5" step=".1" oninput="calcEMI()" inputmode="decimal"></div>
-            <div class="emi-input-card"><div class="emi-input-lbl">Auction Discount ₹</div><input id="e_disc" type="number" placeholder="3000" oninput="calcEMI()" inputmode="numeric"></div>
+            <div class="emi-input-card"><div class="emi-input-lbl">Auction Discount â‚¹</div><input id="e_disc" type="number" placeholder="3000" oninput="calcEMI()" inputmode="numeric"></div>
             <div class="emi-input-card"><div class="emi-input-lbl">Dividend Split</div><select id="e_divm" onchange="calcEMI()"><option value="all">All Members</option><option value="nonprized">Non-Prized</option></select></div>
           </div>
         </div>
         <!-- Results Pills -->
         <div class="emi-result-strip" id="emi_results" style="display:none;">
-          <div class="emi-pill g"><div class="emi-pill-val" id="er_mo">₹0</div><div class="emi-pill-lbl">Monthly EMI</div></div>
-          <div class="emi-pill t"><div class="emi-pill-val" id="er_net">₹0</div><div class="emi-pill-lbl">Net (after div)</div></div>
-          <div class="emi-pill b"><div class="emi-pill-val" id="er_dv">₹0</div><div class="emi-pill-lbl">Dividend</div></div>
-          <div class="emi-pill p"><div class="emi-pill-val" id="er_pr">₹0</div><div class="emi-pill-lbl">Prize</div></div>
+          <div class="emi-pill g"><div class="emi-pill-val" id="er_mo">â‚¹0</div><div class="emi-pill-lbl">Monthly EMI</div></div>
+          <div class="emi-pill t"><div class="emi-pill-val" id="er_net">â‚¹0</div><div class="emi-pill-lbl">Net (after div)</div></div>
+          <div class="emi-pill b"><div class="emi-pill-val" id="er_dv">â‚¹0</div><div class="emi-pill-lbl">Dividend</div></div>
+          <div class="emi-pill p"><div class="emi-pill-val" id="er_pr">â‚¹0</div><div class="emi-pill-lbl">Prize</div></div>
         </div>
         <!-- Breakdown -->
         <div class="card" style="margin-bottom:14px;" id="emi_breakdown" style="display:none;">
           <div class="card-hd"><span class="pip"></span>Breakdown</div>
-          <div class="emi-row"><span class="emi-row-k">Chit Value</span><span class="emi-row-v" id="ed_cv">—</span></div>
-          <div class="emi-row"><span class="emi-row-k">Foreman Commission</span><span class="emi-row-v r" id="ed_cm">—</span></div>
-          <div class="emi-row"><span class="emi-row-k">Auction Discount</span><span class="emi-row-v" id="ed_dc">—</span></div>
-          <div class="emi-row"><span class="emi-row-k">Dividend / Member</span><span class="emi-row-v g" id="ed_dv">—</span></div>
-          <div class="emi-row"><span class="emi-row-k">Total Paid (all months)</span><span class="emi-row-v" id="ed_tot">—</span></div>
-          <div class="emi-row"><span class="emi-row-k">Foreman Total Earn</span><span class="emi-row-v" id="ed_fe">—</span></div>
-          <div class="emi-row"><span class="emi-row-k">Early Winner Cost</span><span class="emi-row-v" id="ed_ew">—</span></div>
-          <div class="emi-row"><span class="emi-row-k">Mid Winner Cost</span><span class="emi-row-v" id="ed_mw">—</span></div>
+          <div class="emi-row"><span class="emi-row-k">Chit Value</span><span class="emi-row-v" id="ed_cv">â€”</span></div>
+          <div class="emi-row"><span class="emi-row-k">Foreman Commission</span><span class="emi-row-v r" id="ed_cm">â€”</span></div>
+          <div class="emi-row"><span class="emi-row-k">Auction Discount</span><span class="emi-row-v" id="ed_dc">â€”</span></div>
+          <div class="emi-row"><span class="emi-row-k">Dividend / Member</span><span class="emi-row-v g" id="ed_dv">â€”</span></div>
+          <div class="emi-row"><span class="emi-row-k">Total Paid (all months)</span><span class="emi-row-v" id="ed_tot">â€”</span></div>
+          <div class="emi-row"><span class="emi-row-k">Foreman Total Earn</span><span class="emi-row-v" id="ed_fe">â€”</span></div>
+          <div class="emi-row"><span class="emi-row-k">Early Winner Cost</span><span class="emi-row-v" id="ed_ew">â€”</span></div>
+          <div class="emi-row"><span class="emi-row-k">Mid Winner Cost</span><span class="emi-row-v" id="ed_mw">â€”</span></div>
           <div class="emi-row"><span class="emi-row-k">Last Winner Cost</span><span class="emi-row-v g">0% (Free!)</span></div>
         </div>
         <!-- FD Comparison -->
@@ -1010,29 +1010,29 @@ tbody td:first-child{color:var(--t1);font-family:'IBM Plex Sans',sans-serif;font
             <span style="font-size:12px;color:var(--t3);font-weight:600;letter-spacing:.5px;text-transform:uppercase;white-space:nowrap;">FD Rate % p.a.</span>
             <input id="e_fd" type="number" value="7" step=".1" oninput="calcEMI()" inputmode="decimal" style="background:transparent;border:none;font-size:18px;font-family:'IBM Plex Mono',monospace;font-weight:500;color:var(--t1);outline:none;width:80px;">
           </div>
-          <div class="emi-row"><span class="emi-row-k">Total Investment</span><span class="emi-row-v" id="ec_inv">—</span></div>
-          <div class="emi-row"><span class="emi-row-k">FD Maturity</span><span class="emi-row-v g" id="ec_fd">—</span></div>
-          <div class="emi-row"><span class="emi-row-k">FD Interest</span><span class="emi-row-v g" id="ec_fi">—</span></div>
-          <div class="emi-row"><span class="emi-row-k">Chit Commission Cost</span><span class="emi-row-v r" id="ec_cc">—</span></div>
-          <div class="emi-vs-card"><span style="font-size:16px;margin-right:8px;">💡</span><span id="ec_v" style="font-size:12px;color:var(--t2);line-height:1.6;">Enter parameters above.</span></div>
+          <div class="emi-row"><span class="emi-row-k">Total Investment</span><span class="emi-row-v" id="ec_inv">â€”</span></div>
+          <div class="emi-row"><span class="emi-row-k">FD Maturity</span><span class="emi-row-v g" id="ec_fd">â€”</span></div>
+          <div class="emi-row"><span class="emi-row-k">FD Interest</span><span class="emi-row-v g" id="ec_fi">â€”</span></div>
+          <div class="emi-row"><span class="emi-row-k">Chit Commission Cost</span><span class="emi-row-v r" id="ec_cc">â€”</span></div>
+          <div class="emi-vs-card"><span style="font-size:16px;margin-right:8px;">ðŸ’¡</span><span id="ec_v" style="font-size:12px;color:var(--t2);line-height:1.6;">Enter parameters above.</span></div>
         </div>
       </div>
 
-      <!-- ══ REPORTS ══ -->
+      <!-- â•â• REPORTS â•â• -->
       <div class="section" id="sec-reports">
         <div class="page-hd"><div class="page-title">Reports <span>&amp; History</span></div></div>
         <div class="g4" style="margin-bottom:14px;">
-          <div class="stat g"><div class="stat-lbl">Total Funds</div><div class="stat-val g" id="rp_f">₹0</div><div class="stat-sub" id="rp_fc">0 chits</div></div>
+          <div class="stat g"><div class="stat-lbl">Total Funds</div><div class="stat-val g" id="rp_f">â‚¹0</div><div class="stat-sub" id="rp_fc">0 chits</div></div>
           <div class="stat t"><div class="stat-lbl">Members</div><div class="stat-val t" id="rp_m">0</div></div>
           <div class="stat b"><div class="stat-lbl">Auctions</div><div class="stat-val b" id="rp_a">0</div></div>
-          <div class="stat p"><div class="stat-lbl">Commission</div><div class="stat-val p" id="rp_c">₹0</div></div>
+          <div class="stat p"><div class="stat-lbl">Commission</div><div class="stat-val p" id="rp_c">â‚¹0</div></div>
         </div>
         <div class="g2" style="margin-bottom:14px;">
           <div class="card">
             <div class="card-hd"><span class="pip"></span>Chit Fund Summary</div>
             <div class="tbl-wrap"><div class="tbl-scroll"><table><thead><tr><th>Name</th><th>Value</th><th>Members</th><th>Duration</th><th>Monthly</th><th>Status</th></tr></thead><tbody id="rp_ct"><tr><td colspan="6" style="text-align:center;color:var(--t3);padding:20px;">No funds yet</td></tr></tbody></table></div></div>
           </div>
-          <div class="card"><div class="card-hd"><span class="pip"></span>Collection Chart</div><div id="colChart"><div class="empty"><div class="empty-icon">📈</div><p>Create chits to see chart.</p></div></div></div>
+          <div class="card"><div class="card-hd"><span class="pip"></span>Collection Chart</div><div id="colChart"><div class="empty"><div class="empty-icon">ðŸ“ˆ</div><p>Create chits to see chart.</p></div></div></div>
         </div>
         <div class="card">
           <div class="card-hd"><span class="pip"></span>Auction History</div>
@@ -1040,61 +1040,61 @@ tbody td:first-child{color:var(--t1);font-family:'IBM Plex Sans',sans-serif;font
         </div>
       </div>
 
-      <!-- ══ NOTIFICATIONS ══ -->
+      <!-- â•â• NOTIFICATIONS â•â• -->
       <div class="section" id="sec-notifications">
         <div class="page-hd"><div class="page-title">Alerts <span>&amp; Reminders</span></div></div>
         <div class="g2">
           <div class="card">
             <div class="card-hd"><span class="pip"></span>Send Reminder</div>
-            <div class="fg"><label>Chit Group</label><select id="notif_group"><option value="">— Select —</option></select></div>
+            <div class="fg"><label>Chit Group</label><select id="notif_group"><option value="">â€” Select â€”</option></select></div>
             <div class="fg"><label>Message Type</label><select id="notif_type"><option>Payment Reminder</option><option>Auction Date Announcement</option><option>Dividend Credit Notice</option><option>Custom Message</option></select></div>
-            <div class="fg"><label>Custom Message</label><textarea id="notif_msg" placeholder="Optional custom message…"></textarea></div>
-            <button class="btn btn-gold btn-sm btn-full" onclick="sendNotif()">📣 Send to Group</button>
+            <div class="fg"><label>Custom Message</label><textarea id="notif_msg" placeholder="Optional custom messageâ€¦"></textarea></div>
+            <button class="btn btn-gold btn-sm btn-full" onclick="sendNotif()">ðŸ“£ Send to Group</button>
           </div>
           <div class="card">
             <div class="card-hd"><span class="pip"></span>Notification Log</div>
             <div id="notifLog">
               <div class="notif-item"><div class="ndot-sm" style="background:var(--gold)"></div><div><div class="notif-text">Auction for Gold Chit 2025 scheduled for 15th Jan</div><div class="notif-time">2 days ago</div></div></div>
               <div class="notif-item"><div class="ndot-sm" style="background:var(--red)"></div><div><div class="notif-text">3 members have pending payments this month</div><div class="notif-time">5 days ago</div></div></div>
-              <div class="notif-item"><div class="ndot-sm" style="background:var(--green)"></div><div><div class="notif-text">Dividend of ₹150 credited to all members</div><div class="notif-time">1 week ago</div></div></div>
+              <div class="notif-item"><div class="ndot-sm" style="background:var(--green)"></div><div><div class="notif-text">Dividend of â‚¹150 credited to all members</div><div class="notif-time">1 week ago</div></div></div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- ══ MEMBER: MY DASHBOARD ══ -->
+      <!-- â•â• MEMBER: MY DASHBOARD â•â• -->
       <div class="section" id="sec-m_dashboard">
         <div class="page-hd"><div class="page-title">My <span>Dashboard</span></div><button class="btn btn-gold btn-sm" onclick="openMCFModal()">+ Add Fund</button></div>
         <div class="g3" style="margin-bottom:14px;">
-          <div class="stat g"><div class="stat-lbl">Total Chit Value</div><div class="stat-val g" id="mcf_total">₹0</div><div class="stat-sub" id="mcf_count_lbl">0 funds</div></div>
-          <div class="stat t"><div class="stat-lbl">Monthly Outgo</div><div class="stat-val t" id="mcf_monthly">₹0</div><div class="stat-sub">total instalments</div></div>
-          <div class="stat p"><div class="stat-lbl">Dividend Earned</div><div class="stat-val p" id="md_d">₹0</div><div class="stat-sub">total so far</div></div>
+          <div class="stat g"><div class="stat-lbl">Total Chit Value</div><div class="stat-val g" id="mcf_total">â‚¹0</div><div class="stat-sub" id="mcf_count_lbl">0 funds</div></div>
+          <div class="stat t"><div class="stat-lbl">Monthly Outgo</div><div class="stat-val t" id="mcf_monthly">â‚¹0</div><div class="stat-sub">total instalments</div></div>
+          <div class="stat p"><div class="stat-lbl">Dividend Earned</div><div class="stat-val p" id="md_d">â‚¹0</div><div class="stat-sub">total so far</div></div>
         </div>
         <div class="card">
           <div class="card-hd"><span class="pip"></span>My Chit Funds</div>
-          <div id="mcf_list"><div class="empty"><div class="empty-icon">🏦</div><p>No chit funds yet.<br>Tap "+ Add Fund" to add one.</p></div></div>
+          <div id="mcf_list"><div class="empty"><div class="empty-icon">ðŸ¦</div><p>No chit funds yet.<br>Tap "+ Add Fund" to add one.</p></div></div>
         </div>
       </div>
 
-      <!-- ══ MEMBER: MY PAYMENTS ══ -->
+      <!-- â•â• MEMBER: MY PAYMENTS â•â• -->
       <div class="section" id="sec-m_payments">
         <div class="page-hd"><div class="page-title">My <span>Payments</span></div></div>
         <div class="card" style="margin-bottom:14px;">
           <div class="card-hd"><span class="pip"></span>Pay This Month</div>
           <div class="mpay-select-grid">
-            <select id="mp_grp" onchange="updateMpayDetail()"><option value="">— Select Group —</option></select>
+            <select id="mp_grp" onchange="updateMpayDetail()"><option value="">â€” Select Group â€”</option></select>
             <input id="mp_mo" type="number" placeholder="Month #" min="1" oninput="updateMpayDetail()" inputmode="numeric">
           </div>
           <div id="mp_det"></div>
-          <button class="btn btn-teal btn-full" onclick="makePayment()" type="button" style="margin-top:4px;">✓ Mark as Paid</button>
+          <button class="btn btn-teal btn-full" onclick="makePayment()" type="button" style="margin-top:4px;">âœ“ Mark as Paid</button>
         </div>
         <div class="card">
           <div class="card-hd"><span class="pip"></span>Payment History</div>
-          <div id="mp_rec"><div class="empty"><div class="empty-icon">💳</div><p>No records yet.</p></div></div>
+          <div id="mp_rec"><div class="empty"><div class="empty-icon">ðŸ’³</div><p>No records yet.</p></div></div>
         </div>
       </div>
 
-      <!-- ══ MEMBER: LIVE AUCTION ══ -->
+      <!-- â•â• MEMBER: LIVE AUCTION â•â• -->
       <div class="section" id="sec-m_auction">
         <div class="page-hd"><div class="page-title">Live <span>Auction</span></div></div>
         <div class="mem-auc-hero">
@@ -1106,55 +1106,55 @@ tbody td:first-child{color:var(--t1);font-family:'IBM Plex Sans',sans-serif;font
         <div id="mem_lowest_banner" style="display:none;background:linear-gradient(135deg,rgba(212,168,67,.1),rgba(240,201,106,.07));border:1px solid rgba(212,168,67,.25);border-radius:12px;padding:14px 18px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;">
           <div>
             <div style="font-size:10px;color:var(--gold2);letter-spacing:1.5px;text-transform:uppercase;font-weight:600;margin-bottom:3px;">Current Highest Bid</div>
-            <div style="font-family:'Playfair Display',serif;font-size:22px;color:var(--gold2);" id="mem_lowest_val">—</div>
+            <div style="font-family:'Playfair Display',serif;font-size:22px;color:var(--gold2);" id="mem_lowest_val">â€”</div>
           </div>
           <div style="text-align:right;">
             <div style="font-size:10px;color:var(--t3);margin-bottom:2px;">by</div>
-            <div style="font-size:13px;font-weight:600;color:var(--t1);" id="mem_lowest_name">—</div>
+            <div style="font-size:13px;font-weight:600;color:var(--t1);" id="mem_lowest_name">â€”</div>
           </div>
         </div>
         <div class="card" style="margin-bottom:14px;">
           <div class="card-hd"><span class="pip"></span>Place Your Bid</div>
-          <div class="fg" style="margin-bottom:10px;"><label>Chit Group</label><select id="mem_bid_grp"><option value="">— Select —</option></select></div>
+          <div class="fg" style="margin-bottom:10px;"><label>Chit Group</label><select id="mem_bid_grp"><option value="">â€” Select â€”</option></select></div>
           <div style="font-size:12px;color:var(--t3);margin-bottom:8px;line-height:1.5;">Your bid is linked automatically to your signed-in member email.</div>
           <div style="font-size:12px;color:var(--t3);margin-bottom:8px;line-height:1.5;">Enter discount amount. Highest bid wins the prize.</div>
           <div class="mem-bid-wrap">
-            <span class="mem-bid-prefix">₹</span>
+            <span class="mem-bid-prefix">â‚¹</span>
             <input id="mem_bid" type="number" placeholder="0" inputmode="numeric">
           </div>
-          <button class="btn btn-gold btn-full" onclick="placeBid()" type="button">🔨 Place My Bid</button>
+          <button class="btn btn-gold btn-full" onclick="placeBid()" type="button">ðŸ”¨ Place My Bid</button>
         </div>
         <!-- My current bid status -->
         <div class="card" style="margin-bottom:14px;">
           <div class="card-hd"><span class="pip"></span>All Active Bids</div>
-          <div id="mem_bids_list"><div class="empty"><div class="empty-icon">🔨</div><p>No bids placed yet.</p></div></div>
+          <div id="mem_bids_list"><div class="empty"><div class="empty-icon">ðŸ”¨</div><p>No bids placed yet.</p></div></div>
         </div>
         <div class="card">
           <div class="card-hd"><span class="pip"></span>How It Works</div>
-          <div class="mem-rule-item"><div class="mem-rule-icon" style="background:rgba(212,168,67,.12);">🏆</div><div><div class="mem-rule-title">Highest Discount Wins</div><div class="mem-rule-sub">The member offering the largest discount wins the prize pot</div></div></div>
-          <div class="mem-rule-item"><div class="mem-rule-icon" style="background:rgba(232,85,85,.1);">⚙️</div><div><div class="mem-rule-title">Commission Deducted</div><div class="mem-rule-sub">Foreman's commission is taken from the prize amount</div></div></div>
-          <div class="mem-rule-item"><div class="mem-rule-icon" style="background:rgba(61,204,138,.1);">💰</div><div><div class="mem-rule-title">Dividend for Everyone</div><div class="mem-rule-sub">Remaining discount is split equally among all members</div></div></div>
-          <div class="mem-rule-item"><div class="mem-rule-icon" style="background:rgba(79,156,249,.1);">📊</div><div><div class="mem-rule-title">Net Prize = Value − Deductions</div><div class="mem-rule-sub">Your payout after commission and bid discount</div></div></div>
+          <div class="mem-rule-item"><div class="mem-rule-icon" style="background:rgba(212,168,67,.12);">ðŸ†</div><div><div class="mem-rule-title">Highest Discount Wins</div><div class="mem-rule-sub">The member offering the largest discount wins the prize pot</div></div></div>
+          <div class="mem-rule-item"><div class="mem-rule-icon" style="background:rgba(232,85,85,.1);">âš™ï¸</div><div><div class="mem-rule-title">Commission Deducted</div><div class="mem-rule-sub">Foreman's commission is taken from the prize amount</div></div></div>
+          <div class="mem-rule-item"><div class="mem-rule-icon" style="background:rgba(61,204,138,.1);">ðŸ’°</div><div><div class="mem-rule-title">Dividend for Everyone</div><div class="mem-rule-sub">Remaining discount is split equally among all members</div></div></div>
+          <div class="mem-rule-item"><div class="mem-rule-icon" style="background:rgba(79,156,249,.1);">ðŸ“Š</div><div><div class="mem-rule-title">Net Prize = Value âˆ’ Deductions</div><div class="mem-rule-sub">Your payout after commission and bid discount</div></div></div>
         </div>
       </div>
 
-      <!-- ══ MEMBER: EMI ══ -->
+      <!-- â•â• MEMBER: EMI â•â• -->
       <div class="section" id="sec-m_emi">
         <div class="page-hd"><div class="page-title">My EMI <span>Calculator</span></div></div>
         <div class="card" style="margin-bottom:14px;">
           <div class="card-hd"><span class="pip"></span>My Instalment</div>
           <div class="emi-input-grid">
-            <div class="emi-input-card"><div class="emi-input-lbl">Chit Value ₹</div><input id="me_val" type="number" placeholder="100000" oninput="calcMemberEMI()" inputmode="numeric"></div>
+            <div class="emi-input-card"><div class="emi-input-lbl">Chit Value â‚¹</div><input id="me_val" type="number" placeholder="100000" oninput="calcMemberEMI()" inputmode="numeric"></div>
             <div class="emi-input-card"><div class="emi-input-lbl">Members</div><input id="me_mem" type="number" placeholder="20" oninput="calcMemberEMI()" inputmode="numeric"></div>
             <div class="emi-input-card"><div class="emi-input-lbl">Commission %</div><input id="me_comm" type="number" value="5" oninput="calcMemberEMI()" inputmode="decimal"></div>
-            <div class="emi-input-card"><div class="emi-input-lbl">Discount ₹</div><input id="me_disc" type="number" placeholder="3000" oninput="calcMemberEMI()" inputmode="numeric"></div>
+            <div class="emi-input-card"><div class="emi-input-lbl">Discount â‚¹</div><input id="me_disc" type="number" placeholder="3000" oninput="calcMemberEMI()" inputmode="numeric"></div>
           </div>
         </div>
         <div id="me_res"></div>
       </div>
 
     </div><!-- /content -->
-    <div class="footer-ad"><div class="ad-tag">AdMob Banner — 320×50 Mobile Footer</div></div>
+    <div class="footer-ad"><div class="ad-tag">AdMob Banner â€” 320Ã—50 Mobile Footer</div></div>
     <!-- MOBILE BOTTOM NAV -->
     <nav class="mobile-nav"><div class="mn-inner" id="mnInner"></div></nav>
   </div>
@@ -1198,7 +1198,7 @@ let sharedAuctionSessionUnsubscribe=null;
 const S={role:'foreman',theme:'dark',chits:[],members:[],payments:{},auctions:[],memberPayments:[],myChitFunds:[],liveBids:[],timerInterval:null,timerSecs:0,timerRunning:false,adCount:0,cur:'dashboard'};
 const ACCESS_STORAGE_KEY='cv_admin_access_registry_v1';
 const ADMIN_SESSION_KEY='cv_admin_portal_session_v1';
-const fmt=v=>'₹'+Number(v).toLocaleString('en-IN',{maximumFractionDigits:2});
+const fmt=v=>'â‚¹'+Number(v).toLocaleString('en-IN',{maximumFractionDigits:2});
 const fmtN=v=>Number(v).toLocaleString('en-IN',{maximumFractionDigits:2});
 const pct=v=>v.toFixed(2)+'%';
 function normalizeEmail(v){return String(v||'').trim().toLowerCase();}
@@ -1460,7 +1460,7 @@ function applySharedPaymentsToState(){
   sharedPayments.forEach(item=>{
     const key=`${item.memberId}_${item.groupId}_${item.month}`;
     sharedPaymentKeys.add(key);
-    S.payments[key]=!!item.paid;
+    S.payments[key]=(item.status||'approved')==='approved';
   });
   renderPayTable();
   renderMyChits();
@@ -1565,10 +1565,19 @@ function getAssignedRecordByPaymentGroup(gid){
   const clean=String(gid||'').replace(/^c_/,'');
   return memberAssignments.find(item=>String(item.groupId)===clean)||null;
 }
+function getSharedPaymentEntry(memberId,groupId,month){
+  return sharedPayments.find(item=>String(item.memberId)===String(memberId)&&String(item.groupId)===String(groupId)&&Number(item.month)===Number(month))||null;
+}
+function getPaymentStatusLabel(status){
+  return status==='approved'?'Paid':status==='pending'?'Pending Approval':'Due';
+}
+function getPaymentStatusColor(status){
+  return status==='approved'?'var(--green)':status==='pending'?'var(--gold2)':'var(--red)';
+}
 async function setSharedPaymentStatus(opts){
   if(!db||!currentUser||!opts||!opts.memberId||!opts.groupId||!opts.month) return;
   const ref=getPaymentRecordRef(opts.memberId,opts.groupId,opts.month);
-  if(opts.paid){
+  if(opts.status&&opts.status!=='none'){
     await ref.set({
       memberId:String(opts.memberId),
       memberEmail:normalizeEmail(opts.memberEmail||''),
@@ -1578,7 +1587,10 @@ async function setSharedPaymentStatus(opts){
       groupName:opts.groupName||'',
       month:Number(opts.month),
       amount:Number(opts.amount)||0,
-      paid:true,
+      status:opts.status,
+      paid:opts.status==='approved',
+      requestedBy:opts.requestedBy||currentUser.email||currentUser.uid||'user',
+      approvedBy:opts.status==='approved'?(opts.approvedBy||currentUser.email||currentUser.uid||'user'):'',
       foremanUid:opts.foremanUid||currentUser.uid||'',
       updatedAt:firebase.firestore.FieldValue.serverTimestamp(),
       updatedBy:currentUser.email||currentUser.uid||'user'
@@ -1691,7 +1703,7 @@ function updateAuthUI(user){
     const name=user.displayName||user.email||'Firebase User';
     const grant=getForemanGrant(user.email);
     document.getElementById('sbName').textContent=name;
-    document.getElementById('sbRole').textContent=grant?`${grant.plan==='paid'?'Paid Foreman eligible':'Approved'} · ${user.email||'Google account'}`:`${ADMIN_PORTAL_CONFIG.memberPlanLabel} · ${user.email||'Google account'}`;
+    document.getElementById('sbRole').textContent=grant?`${grant.plan==='paid'?'Paid Foreman eligible':'Approved'} Â· ${user.email||'Google account'}`:`${ADMIN_PORTAL_CONFIG.memberPlanLabel} Â· ${user.email||'Google account'}`;
     document.getElementById('sbAvatar').textContent=(name.trim()[0]||DEFAULT_AVATAR[S.role]||'U').toUpperCase();
     updateSyncStatus('Connected to Firebase',true);
   }else{
@@ -1915,23 +1927,23 @@ async function revokeForemanAccess(email){
   }
 }
 
-/* ── THEME ── */
+/* â”€â”€ THEME â”€â”€ */
 function toggleTheme(){S.theme=S.theme==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',S.theme);localStorage.setItem('cv_t',S.theme);queueCloudSave();}
 (()=>{const t=localStorage.getItem('cv_t');if(t){S.theme=t;document.documentElement.setAttribute('data-theme',t);}})();
 
-/* ── TOAST ── */
-function toast(msg,err=false){const el=document.getElementById('toast');document.getElementById('t-msg').textContent=msg;document.getElementById('t-icon').textContent=err?'✗':'✓';el.className='toast show'+(err?' err':'');clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('show'),2800);}
+/* â”€â”€ TOAST â”€â”€ */
+function toast(msg,err=false){const el=document.getElementById('toast');document.getElementById('t-msg').textContent=msg;document.getElementById('t-icon').textContent=err?'âœ—':'âœ“';el.className='toast show'+(err?' err':'');clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('show'),2800);}
 
-/* ── MODAL ── */
+/* â”€â”€ MODAL â”€â”€ */
 function openModal(id){document.getElementById(id).classList.add('open');}
 function closeModal(id){document.getElementById(id).classList.remove('open');}
 function maybeAd(){S.adCount++;if(S.adCount%4===0)openModal('adModal');}
 
-/* ── SIDEBAR ── */
+/* â”€â”€ SIDEBAR â”€â”€ */
 function openSB(){document.getElementById('sidebar').classList.add('open');document.getElementById('sbOverlay').classList.add('open');}
 function closeSB(){document.getElementById('sidebar').classList.remove('open');document.getElementById('sbOverlay').classList.remove('open');}
 
-/* ── MOBILE NAV ITEMS ── */
+/* â”€â”€ MOBILE NAV ITEMS â”€â”€ */
 const FN=[{id:'dashboard',svg:'<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>',lbl:'Home'},
 {id:'members',svg:'<circle cx="9" cy="7" r="4"/><path d="M2 21v-2a4 4 0 0 1 4-4h6a4 4 0 0 1 4 4v2"/>',lbl:'Members',bid:true},
 {id:'payments',svg:'<rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/>',lbl:'Payments'},
@@ -1956,7 +1968,7 @@ function renderMN(){
     </button>`).join('');
 }
 
-/* ── ROLE ── */
+/* â”€â”€ ROLE â”€â”€ */
 function setRole(r,sync=true){
   if(r==='foreman'&&currentUser&&!userHasForemanAccess(currentUser)){
     toast('Foreman access requires administrator approval. Member access is still free.',true);
@@ -1982,7 +1994,7 @@ function setRole(r,sync=true){
   if(sync) queueCloudSave();
 }
 
-/* ── NAV ── */
+/* â”€â”€ NAV â”€â”€ */
 const TITLES={dashboard:'Fund Dashboard',members:'Member Registry',payments:'Payment Tracker',auction:'Auction Management',emi:'EMI Calculator',reports:'Reports & History',notifications:'Alerts & Reminders',m_dashboard:'My Dashboard',m_payments:'My Payments',m_auction:'Live Auction',m_emi:'My EMI Calc'};
 function nav(sec,el){
   document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
@@ -2005,7 +2017,7 @@ function nav(sec,el){
   renderMN();
 }
 
-/* ── CHIT ── */
+/* â”€â”€ CHIT â”€â”€ */
 function saveChit(){
   const name=document.getElementById('cm_name').value.trim();
   const value=parseFloat(document.getElementById('cm_value').value);
@@ -2019,7 +2031,7 @@ function saveChit(){
   ['cm_name','cm_value','cm_members','cm_duration','cm_start'].forEach(i=>document.getElementById(i).value='');
   document.getElementById('cm_comm').value='5';
   queueCloudSave();
-  popDrops();updateDB();addAct(`Chit "${name}" created — ${fmt(value)} / ${members} members`,'gold');
+  popDrops();updateDB();addAct(`Chit "${name}" created â€” ${fmt(value)} / ${members} members`,'gold');
 }
 
 function popDrops(){
@@ -2030,7 +2042,7 @@ function popDrops(){
     const cur=el.value;
     const baseOptions=S.chits.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
     const options=id==='mem_bid_grp'&&S.role==='member'?memberFundOptions:baseOptions;
-    el.innerHTML=(id==='m_filter'?'<option value="">All Groups</option>':'<option value="">— Select —</option>')+options;
+    el.innerHTML=(id==='m_filter'?'<option value="">All Groups</option>':'<option value="">â€” Select â€”</option>')+options;
     if(cur) el.value=cur;
   });
   // Populate fm_bid_member when fm_bid_grp changes
@@ -2040,7 +2052,7 @@ function popDrops(){
     fmGrp.onchange=function(){
       const gid=this.value;
       const mems=S.members.filter(m=>m.groupId==gid);
-      fmMem.innerHTML='<option value="">— Select Member —</option>'+mems.map(m=>`<option value="${m.name}">${m.name}</option>`).join('');
+      fmMem.innerHTML='<option value="">â€” Select Member â€”</option>'+mems.map(m=>`<option value="${m.name}">${m.name}</option>`).join('');
     };
     // Trigger if already selected
     if(fmGrp.value) fmGrp.onchange.call(fmGrp);
@@ -2050,7 +2062,7 @@ function popDrops(){
   if(mpGrp){
     const cur=mpGrp.value;
     const assignedOptions=getAssignedMemberFunds().map(c=>`<option value="c_${c.id}">${c.name} (Assigned)</option>`).join('');
-    mpGrp.innerHTML='<option value="">— Select Group —</option>'+
+    mpGrp.innerHTML='<option value="">â€” Select Group â€”</option>'+
       assignedOptions+
       S.myChitFunds.map(f=>`<option value="m_${f.id}">${f.name} (My Fund)</option>`).join('');
     if(cur) mpGrp.value=cur;
@@ -2079,7 +2091,7 @@ function foremanAddBid(){
   queueCloudSave();
 }
 
-/* ── MEMBERS ── */
+/* â”€â”€ MEMBERS â”€â”€ */
 function openAddMember(){popDrops();openModal('memberModal');}
 const CLR=['#d4a843','#17c4a2','#4f9cf9','#e85555','#3dcc8a','#9b79f5','#f09c4a'];
 
@@ -2108,22 +2120,22 @@ function renderMembers(){
   const gf=document.getElementById('m_filter').value;
   const list=S.members.filter(m=>(m.name.toLowerCase().includes(search)||m.phone.includes(search))&&(!gf||m.groupId==gf));
   const el=document.getElementById('memberList');
-  if(!list.length){el.innerHTML='<div class="empty"><div class="empty-icon">👥</div><p>No members found.</p></div>';return;}
+  if(!list.length){el.innerHTML='<div class="empty"><div class="empty-icon">ðŸ‘¥</div><p>No members found.</p></div>';return;}
   el.innerHTML=list.map(m=>`
     <div class="member-row">
       <div class="av" style="background:${m.color}22;color:${m.color};border:1px solid ${m.color}33">${m.name[0].toUpperCase()}</div>
-      <div class="m-info"><div class="m-name">${m.name}</div><div class="m-meta">📱 ${m.phone} · #${m.ticket} · ${m.groupName}</div></div>
+      <div class="m-info"><div class="m-name">${m.name}</div><div class="m-meta">ðŸ“± ${m.phone} Â· #${m.ticket} Â· ${m.groupName}</div></div>
       <div class="row-actions">
         ${m.prized?'<span class="badge bgold">Prized</span>':'<span class="badge bg">Active</span>'}
-        <button class="btn btn-icon btn-sm" onclick="togglePrize(${m.id})">🏆</button>
-        <button class="btn btn-icon btn-sm btn-danger" onclick="removeMember(${m.id})">✕</button>
+        <button class="btn btn-icon btn-sm" onclick="togglePrize(${m.id})">ðŸ†</button>
+        <button class="btn btn-icon btn-sm btn-danger" onclick="removeMember(${m.id})">âœ•</button>
       </div>
     </div>`).join('');
 }
 function togglePrize(id){const m=S.members.find(m=>m.id===id);if(m){m.prized=!m.prized;renderMembers();toast(m.name+(m.prized?' prized':' active'));queueCloudSave();}}
 function removeMember(id){const m=S.members.find(m=>m.id===id);S.members=S.members.filter(m=>m.id!==id);renderMembers();updateDB();document.getElementById('memberBadge').textContent=S.members.length;if(m){toast(`${m.name} removed.`);deleteMemberAssignmentRecord(m);}queueCloudSave();}
 
-/* ── PAYMENTS ── */
+/* â”€â”€ PAYMENTS â”€â”€ */
 function renderPayTable(){
   const gid=document.getElementById('pt_group').value;
   const mo=parseInt(document.getElementById('pt_month').value)||0;
@@ -2131,45 +2143,48 @@ function renderPayTable(){
   const progCard=document.getElementById('pay_progress_card');
   if(!gid||!mo){
     progCard.style.display='none';
-    list.innerHTML='<div style="text-align:center;padding:48px 20px;color:var(--t3);"><div style="font-size:36px;margin-bottom:12px;opacity:.3;">💳</div><p style="font-size:13px;">Select a group and month<br>to track payments</p></div>';
+    list.innerHTML='<div style="text-align:center;padding:48px 20px;color:var(--t3);"><div style="font-size:36px;margin-bottom:12px;opacity:.3;">ðŸ’³</div><p style="font-size:13px;">Select a group and month<br>to track payments</p></div>';
     return;
   }
   const chit=S.chits.find(c=>c.id==gid);if(!chit)return;
   const mems=S.members.filter(m=>m.groupId==gid);
   if(!mems.length){
     progCard.style.display='none';
-    list.innerHTML='<div style="text-align:center;padding:40px 20px;color:var(--t3);"><div style="font-size:30px;margin-bottom:10px;opacity:.3;">👥</div><p style="font-size:13px;">No members in this group</p></div>';
+    list.innerHTML='<div style="text-align:center;padding:40px 20px;color:var(--t3);"><div style="font-size:30px;margin-bottom:10px;opacity:.3;">ðŸ‘¥</div><p style="font-size:13px;">No members in this group</p></div>';
     return;
   }
   const mly=chit.value/chit.members;
   let paid=0,due=0;
   const items=mems.map(m=>{
-    const k=`${m.id}_${gid}_${mo}`;const ip=!!S.payments[k];ip?paid++:due++;
-    return {m,k,ip,mly};
+    const entry=getSharedPaymentEntry(m.id,gid,mo);
+    const status=entry&&entry.status?entry.status:(S.payments[`${m.id}_${gid}_${mo}`]?'approved':'due');
+    status==='approved'?paid++:due++;
+    return {m,status,mly};
   });
   const pp=mems.length?paid/mems.length*100:0;
   progCard.style.display='';
-  document.getElementById('pay_group_title').textContent=chit.name+' — Month '+mo;
+  document.getElementById('pay_group_title').textContent=chit.name+' â€” Month '+mo;
   document.getElementById('pt_pct').textContent=pp.toFixed(0)+'%';
   document.getElementById('pay_track_fill').style.width=pp+'%';
   document.getElementById('pt_col').textContent=fmt(paid*mly);
   document.getElementById('pt_out').textContent=fmt(due*mly);
   document.getElementById('pt_cc').textContent=paid;
-  list.innerHTML=items.map(({m,k,ip})=>`
-    <div class="pay-member-item ${ip?'is-paid':'is-due'}">
+  list.innerHTML=items.map(({m,status})=>`
+    <div class="pay-member-item ${status==='approved'?'is-paid':'is-due'}">
       <div class="pay-av" style="background:${m.color}22;color:${m.color};border:1px solid ${m.color}33">${m.name[0].toUpperCase()}</div>
       <div style="flex:1;min-width:0;">
         <div class="pay-member-name">${m.name}</div>
-        <div class="pay-member-meta">#${m.ticket} · ${fmtN(mly)}</div>
+        <div class="pay-member-meta">#${m.ticket} Â· ${fmtN(mly)}</div>
       </div>
-      <span style="font-size:11px;font-weight:600;color:${ip?'var(--green)':'var(--red)'};margin-right:10px;">${ip?'Paid':'Due'}</span>
-      <button class="pay-toggle ${ip?'is-paid':'is-due'}" onclick="togPay('${m.id}','${gid}','${mo}',${mly},'${escJsSingle(m.email)}','${escJsSingle(m.name)}','${m.ticket||0}','${escJsSingle(chit.name)}')" type="button" title="${ip?'Mark as due':'Mark as paid'}"></button>
+      <span style="font-size:11px;font-weight:600;color:${getPaymentStatusColor(status)};margin-right:10px;">${getPaymentStatusLabel(status)}</span>
+      <button class="pay-toggle ${status==='approved'?'is-paid':'is-due'}" onclick="togPay('${m.id}','${gid}','${mo}',${mly},'${escJsSingle(m.email)}','${escJsSingle(m.name)}','${m.ticket||0}','${escJsSingle(chit.name)}')" type="button" title="${status==='pending'?'Approve payment request':status==='approved'?'Remove approval':'Approve payment'}"></button>
     </div>`).join('');
 }
 async function togPay(memberId,gid,mo,amt,memberEmail,memberName,memberTicket,groupName){
   const key=`${memberId}_${gid}_${mo}`;
-  const next=!S.payments[key];
-  S.payments[key]=next;
+  const existing=getSharedPaymentEntry(memberId,gid,mo);
+  const nextStatus=existing&&existing.status==='approved'?'none':'approved';
+  S.payments[key]=nextStatus==='approved';
   renderPayTable();
   updateDB();
   try{
@@ -2178,17 +2193,18 @@ async function togPay(memberId,gid,mo,amt,memberEmail,memberName,memberTicket,gr
       groupId:gid,
       month:mo,
       amount:amt,
-      paid:next,
+      status:nextStatus,
       memberEmail,
       memberName,
       memberTicket,
       groupName,
-      foremanUid:currentUser&&currentUser.uid?currentUser.uid:''
+      foremanUid:currentUser&&currentUser.uid?currentUser.uid:'',
+      approvedBy:currentUser&&currentUser.email?currentUser.email:''
     });
-    toast(next?'Marked as paid':'Marked as due');
+    toast(nextStatus==='approved'?'Payment approved.':'Payment approval removed.');
   }catch(err){
     console.error(err);
-    S.payments[key]=!next;
+    S.payments[key]=existing&&existing.status==='approved';
     renderPayTable();
     updateDB();
     toast('Could not update payment status online.',true);
@@ -2196,7 +2212,7 @@ async function togPay(memberId,gid,mo,amt,memberEmail,memberName,memberTicket,gr
   queueCloudSave();
 }
 
-/* ── AUCTION TIMER ── */
+/* â”€â”€ AUCTION TIMER â”€â”€ */
 function handleAuctionGroupChange(sourceId='auc_group'){
   syncAuctionGroupSelectors(sourceId);
   calcAuction();
@@ -2289,7 +2305,7 @@ function closeAuctionWithWinner(bidId){
   calcAuction();
   // Scroll to finalize section
   document.getElementById('auc_group').closest('.card').scrollIntoView({behavior:'smooth',block:'start'});
-  toast('Highest bid loaded — review and confirm!');
+  toast('Highest bid loaded â€” review and confirm!');
 }
 function finalizeAuction(){
   const gid=document.getElementById('auc_group').value,mo=document.getElementById('auc_month').value;
@@ -2311,19 +2327,19 @@ function finalizeAuction(){
 }
 function renderAucHist(){
   const el=document.getElementById('auc_hist');
-  if(!S.auctions.length){el.innerHTML='<div class="empty"><div class="empty-icon">🔨</div><p>No auctions yet.</p></div>';return;}
+  if(!S.auctions.length){el.innerHTML='<div class="empty"><div class="empty-icon">ðŸ”¨</div><p>No auctions yet.</p></div>';return;}
   el.innerHTML=S.auctions.slice().reverse().map(a=>`
     <div class="auc-hist-row">
       <div class="auc-hist-mo-chip"><span>Mo</span><span>${a.month}</span></div>
       <div class="auc-hist-info">
         <div class="auc-hist-winner">${a.winner}</div>
-        <div class="auc-hist-sub">${a.groupName} · Div: ${fmt(a.dividend)}/mbr</div>
+        <div class="auc-hist-sub">${a.groupName} Â· Div: ${fmt(a.dividend)}/mbr</div>
       </div>
       <div class="auc-hist-prize">${fmt(a.prize)}</div>
     </div>`).join('');
 }
 
-/* ── EMI ── */
+/* â”€â”€ EMI â”€â”€ */
 function calcEMI(){
   const val=parseFloat(document.getElementById('e_val').value)||0;
   const mem=parseInt(document.getElementById('e_mem').value)||0;
@@ -2357,7 +2373,7 @@ function calcEMI(){
   document.getElementById('ec_fd').textContent=fmt(fdm.toFixed(0));
   document.getElementById('ec_fi').textContent=fmt(fdi.toFixed(0));
   document.getElementById('ec_cc').textContent=fmt(fc);
-  document.getElementById('ec_v').textContent=fdi>fc?`FD earns ₹${fmtN((fdi-fc).toFixed(0))} more than chit cost. But chit gives auction liquidity!`:`Chit commission (${fmt(fc)}) compared to FD interest earned (${fmt(fdi.toFixed(0))}). Chit offers early fund access.`;
+  document.getElementById('ec_v').textContent=fdi>fc?`FD earns â‚¹${fmtN((fdi-fc).toFixed(0))} more than chit cost. But chit gives auction liquidity!`:`Chit commission (${fmt(fc)}) compared to FD interest earned (${fmt(fdi.toFixed(0))}). Chit offers early fund access.`;
 }
 function resolveFund(val){
   if(!val) return null;
@@ -2378,7 +2394,7 @@ function updateMpayDetail(){
   if(!gid||!mo){el.innerHTML='';return;}
   const c=resolveFund(gid);if(!c){el.innerHTML='';return;}
   const mly=c.value/c.members;
-  el.innerHTML=`<div class="mpay-amount-display"><div class="mpay-amount-lbl">Amount Due — Month ${mo}</div><div class="mpay-amount-val">${fmt(mly)}</div></div>`;
+  el.innerHTML=`<div class="mpay-amount-display"><div class="mpay-amount-lbl">Amount Due â€” Month ${mo}</div><div class="mpay-amount-val">${fmt(mly)}</div></div>`;
 }
 function calcMemberEMI(){
   const val=parseFloat(document.getElementById('me_val').value)||0;
@@ -2399,7 +2415,7 @@ function calcMemberEMI(){
     </div>`;
 }
 
-/* ── REPORTS ── */
+/* â”€â”€ REPORTS â”€â”€ */
 function renderReports(){
   const tv=S.chits.reduce((a,c)=>a+c.value,0);
   const tc=S.chits.reduce((a,c)=>a+(c.comm/100)*c.value*c.duration,0);
@@ -2417,7 +2433,7 @@ function renderReports(){
   }
 }
 
-/* ── NOTIFICATIONS ── */
+/* â”€â”€ NOTIFICATIONS â”€â”€ */
 function sendNotif(){
   const gid=document.getElementById('notif_group').value;
   const type=document.getElementById('notif_type').value;
@@ -2428,7 +2444,7 @@ function sendNotif(){
   document.getElementById('notif_msg').value='';toast('Notification sent!');
 }
 
-/* ── MEMBER VIEW ── */
+/* â”€â”€ MEMBER VIEW â”€â”€ */
 function loadMemberView(){
   const gid=document.getElementById('mem_mygrp').value;if(!gid)return;
   const c=S.chits.find(c=>c.id==gid);if(!c)return;
@@ -2449,7 +2465,7 @@ async function makePayment(){
     || sharedPayments.find(p=>`c_${p.groupId}`===gid&&Number(p.month)===mo&&normalizeEmail(p.memberEmail)===getCurrentUserEmail());
   if(already){toast('Month '+mo+' already paid!',true);return;}
   const amount=c.value/c.members;
-  const record={gid,month:mo,groupName:c.name,amount,date:new Date().toLocaleDateString('en-IN'),status:'Paid'};
+  const record={gid,month:mo,groupName:c.name,amount,date:new Date().toLocaleDateString('en-IN'),status:'Pending Approval'};
   S.memberPayments.push(record);
   // If it's a member-added fund, update the paid count
   if(gid.startsWith('m_')){
@@ -2473,7 +2489,7 @@ async function makePayment(){
     return;
   }
   const key=`${assignment.memberId}_${assignment.groupId}_${mo}`;
-  S.payments[key]=true;
+  S.payments[key]=false;
   renderMyChits();
   renderMPay();
   updateDB();
@@ -2483,14 +2499,15 @@ async function makePayment(){
       groupId:assignment.groupId,
       month:mo,
       amount,
-      paid:true,
+      status:'pending',
       memberEmail:assignment.memberEmail,
       memberName:assignment.memberName,
       memberTicket:assignment.memberTicket,
       groupName:assignment.groupName,
-      foremanUid:assignment.foremanUid||''
+      foremanUid:assignment.foremanUid||'',
+      requestedBy:currentUser&&currentUser.email?currentUser.email:''
     });
-    toast(`Month ${mo} payment recorded!`);
+    toast(`Month ${mo} payment request sent for approval.`);
   }catch(err){
     console.error(err);
     delete S.payments[key];
@@ -2503,21 +2520,42 @@ async function makePayment(){
   }
   queueCloudSave();
 }
+async function removePaymentRequest(gid,month){
+  const entry=sharedPayments.find(p=>`c_${p.groupId}`===gid&&Number(p.month)===Number(month)&&normalizeEmail(p.memberEmail)===getCurrentUserEmail());
+  if(!entry){toast('Payment request not found.',true);return;}
+  try{
+    await setSharedPaymentStatus({
+      memberId:entry.memberId,
+      groupId:entry.groupId,
+      month:entry.month,
+      status:'none'
+    });
+    S.memberPayments=S.memberPayments.filter(p=>!(p.gid===gid&&Number(p.month)===Number(month)));
+    renderMPay();
+    renderMyChits();
+    updateDB();
+    toast('Payment request removed.');
+  }catch(err){
+    console.error(err);
+    toast('Could not remove payment request.',true);
+  }
+}
 function renderMPay(){
   const el=document.getElementById('mp_rec');
   const sharedHistory=sharedPayments
     .filter(p=>normalizeEmail(p.memberEmail)===getCurrentUserEmail())
-    .map(p=>({gid:`c_${p.groupId}`,month:Number(p.month),groupName:p.groupName,amount:Number(p.amount)||0,date:'Online sync',status:p.paid?'Paid':'Due'}));
+    .map(p=>({gid:`c_${p.groupId}`,month:Number(p.month),groupName:p.groupName,amount:Number(p.amount)||0,date:'Online sync',status:p.status==='approved'?'Paid':p.status==='pending'?'Pending Approval':'Due',statusKey:p.status||'approved'}));
   const combined=[...S.memberPayments,...sharedHistory].filter((item,index,arr)=>arr.findIndex(x=>x.gid===item.gid&&x.month===item.month)===index);
-  if(!combined.length){el.innerHTML='<div class="empty"><div class="empty-icon">💳</div><p>No records yet.</p></div>';return;}
+  if(!combined.length){el.innerHTML='<div class="empty"><div class="empty-icon">ðŸ’³</div><p>No records yet.</p></div>';return;}
   el.innerHTML=combined.slice().sort((a,b)=>b.month-a.month).map(p=>`
     <div class="mpay-hist-item">
       <div class="mpay-hist-mo">M${p.month}</div>
       <div style="flex:1;min-width:0;">
         <div class="mpay-hist-group">${p.groupName}</div>
-        <div class="mpay-hist-date">${p.date} · <span style="color:var(--green);font-weight:600;">${p.status}</span></div>
+        <div class="mpay-hist-date">${p.date} Â· <span style="color:${p.statusKey==='pending'?'var(--gold2)':'var(--green)'};font-weight:600;">${p.status}</span></div>
       </div>
       <div class="mpay-hist-amt">${fmt(p.amount)}</div>
+      ${p.statusKey==='pending'?`<button class="btn btn-ghost btn-sm" type="button" onclick="removePaymentRequest('${p.gid}',${p.month})">Remove</button>`:''}
     </div>`).join('');
 }
 function placeBid(){
@@ -2547,12 +2585,12 @@ function renderBids(){
   const bids=[...S.liveBids].sort((a,b)=>b.amount-a.amount);
   const highest=bids[0]||null;
 
-  // ── Member view ──
+  // â”€â”€ Member view â”€â”€
   const memEl=document.getElementById('mem_bids_list');
   const memBanner=document.getElementById('mem_lowest_banner');
   if(memEl){
     if(!bids.length){
-      memEl.innerHTML='<div class="empty"><div class="empty-icon">🔨</div><p>No bids placed yet.</p></div>';
+      memEl.innerHTML='<div class="empty"><div class="empty-icon">ðŸ”¨</div><p>No bids placed yet.</p></div>';
       if(memBanner) memBanner.style.display='none';
     } else {
       if(memBanner){
@@ -2565,36 +2603,36 @@ function renderBids(){
           <div class="bid-rank">${i+1}</div>
           <div style="flex:1;min-width:0;">
             <div class="bid-name">${b.name}${i===0?' <span class="bid-winner-tag">Highest</span>':''}${b.byForeman?' <span style="font-size:9px;color:var(--blue);background:rgba(79,156,249,.1);border:1px solid rgba(79,156,249,.2);border-radius:4px;padding:2px 5px;">Foreman</span>':''}</div>
-            <div class="bid-grp">${b.groupName} · ${b.time}</div>
+            <div class="bid-grp">${b.groupName} Â· ${b.time}</div>
           </div>
           <div class="bid-amt">${fmt(b.amount)}</div>
         </div>`).join('');
     }
   }
 
-  // ── Foreman view ──
+  // â”€â”€ Foreman view â”€â”€
   const fmEl=document.getElementById('foreman_bids_list');
   const cntEl=document.getElementById('auc_bid_count');
   if(cntEl) cntEl.textContent=bids.length+' bid'+(bids.length===1?'':'s');
   if(fmEl){
     if(!bids.length){
-      fmEl.innerHTML='<div class="empty"><div class="empty-icon">🔨</div><p>No bids yet. Members can place bids from the Auction tab.</p></div>';
+      fmEl.innerHTML='<div class="empty"><div class="empty-icon">ðŸ”¨</div><p>No bids yet. Members can place bids from the Auction tab.</p></div>';
     } else {
       fmEl.innerHTML=bids.map((b,i)=>`
         <div class="bid-row${i===0?' lowest':''}">
           <div class="bid-rank">${i+1}</div>
           <div style="flex:1;min-width:0;">
-            <div class="bid-name">${b.name}${i===0?' <span class="bid-winner-tag">Highest — Winner</span>':''}${b.byForeman?' <span style="font-size:9px;background:rgba(79,156,249,.12);color:var(--blue);border:1px solid rgba(79,156,249,.25);border-radius:4px;padding:2px 5px;letter-spacing:.3px;">Foreman</span>':''}</div>
-            <div class="bid-grp">${b.groupName} · ${b.time}</div>
+            <div class="bid-name">${b.name}${i===0?' <span class="bid-winner-tag">Highest â€” Winner</span>':''}${b.byForeman?' <span style="font-size:9px;background:rgba(79,156,249,.12);color:var(--blue);border:1px solid rgba(79,156,249,.25);border-radius:4px;padding:2px 5px;letter-spacing:.3px;">Foreman</span>':''}</div>
+            <div class="bid-grp">${b.groupName} Â· ${b.time}</div>
           </div>
           <div class="bid-amt">${fmt(b.amount)}</div>
-          ${i===0?`<button class="btn btn-gold btn-sm" onclick="closeAuctionWithWinner(${b.id})" style="white-space:nowrap;">✓ Declare</button>`:''}
+          ${i===0?`<button class="btn btn-gold btn-sm" onclick="closeAuctionWithWinner(${b.id})" style="white-space:nowrap;">âœ“ Declare</button>`:''}
         </div>`).join('');
     }
   }
 }
 
-/* ── DASHBOARD ── */
+/* â”€â”€ DASHBOARD â”€â”€ */
 function updateDB(){
   const tv=S.chits.reduce((a,c)=>a+c.value,0);
   const tm=S.chits.reduce((a,c)=>a+c.value/c.members,0);
@@ -2604,8 +2642,8 @@ function updateDB(){
   document.getElementById('d_mem').textContent=S.members.length;
   document.getElementById('d_mo').textContent=fmt(tm);
   document.getElementById('d_earn').textContent=fmt(te);
-  document.getElementById('d_chitList').innerHTML=S.chits.length?S.chits.map(c=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--ln);"><div><div style="font-weight:600;font-size:13px;color:var(--t1);">${c.name}</div><div style="font-size:11px;color:var(--t3);font-family:'IBM Plex Mono',monospace;">${fmt(c.value)} · ${c.members} members</div></div><span class="badge bg">Active</span></div>`).join(''):'<div class="empty"><div class="empty-icon">💼</div><p>No chit funds yet.</p></div>';
-  document.getElementById('d_prog').innerHTML=S.chits.length?S.chits.map(c=>{const pk=Object.keys(S.payments).filter(k=>k.includes(`_${c.id}_`)&&S.payments[k]);const p=Math.min(100,c.members?pk.length/c.members*100:0);return `<div style="margin-bottom:12px;"><div style="display:flex;justify-content:space-between;font-size:11px;color:var(--t3);margin-bottom:4px;"><span>${c.name}</span><span>${p.toFixed(0)}%</span></div><div class="pb-track"><div class="pb-fill pb-teal" style="width:${p}%"></div></div></div>`;}).join(''):'<div class="empty"><div class="empty-icon">📊</div><p>No funds to track.</p></div>';
+  document.getElementById('d_chitList').innerHTML=S.chits.length?S.chits.map(c=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--ln);"><div><div style="font-weight:600;font-size:13px;color:var(--t1);">${c.name}</div><div style="font-size:11px;color:var(--t3);font-family:'IBM Plex Mono',monospace;">${fmt(c.value)} Â· ${c.members} members</div></div><span class="badge bg">Active</span></div>`).join(''):'<div class="empty"><div class="empty-icon">ðŸ’¼</div><p>No chit funds yet.</p></div>';
+  document.getElementById('d_prog').innerHTML=S.chits.length?S.chits.map(c=>{const pk=Object.keys(S.payments).filter(k=>k.includes(`_${c.id}_`)&&S.payments[k]);const p=Math.min(100,c.members?pk.length/c.members*100:0);return `<div style="margin-bottom:12px;"><div style="display:flex;justify-content:space-between;font-size:11px;color:var(--t3);margin-bottom:4px;"><span>${c.name}</span><span>${p.toFixed(0)}%</span></div><div class="pb-track"><div class="pb-fill pb-teal" style="width:${p}%"></div></div></div>`;}).join(''):'<div class="empty"><div class="empty-icon">ðŸ“Š</div><p>No funds to track.</p></div>';
   const ap=Object.values(S.payments).filter(Boolean).length;
   document.getElementById('qs_paid').textContent=ap;
   document.getElementById('qs_due').textContent=Math.max(0,S.members.length-ap);
@@ -2619,7 +2657,7 @@ function addAct(text,color){
   el.insertBefore(d,el.firstChild);if(el.children.length>6)el.removeChild(el.lastChild);
 }
 
-/* ── MY CHIT FUNDS ── */
+/* â”€â”€ MY CHIT FUNDS â”€â”€ */
 let mcf_del_pending=null;
 
 function openMCFModal(id){
@@ -2704,7 +2742,7 @@ function renderMyChits(){
   const el=document.getElementById('mcf_list');
   if(!funds.length){
     const email=getCurrentUserEmail();
-    el.innerHTML=`<div class="empty"><div class="empty-icon">🏦</div><p>No chit funds are linked yet.${email?'<br>Add this email to a member record: <strong>'+email+'</strong>':''}</p></div>`;
+    el.innerHTML=`<div class="empty"><div class="empty-icon">ðŸ¦</div><p>No chit funds are linked yet.${email?'<br>Add this email to a member record: <strong>'+email+'</strong>':''}</p></div>`;
     return;
   }
   el.innerHTML=funds.map(f=>{
@@ -2716,14 +2754,14 @@ function renderMyChits(){
     const totalPaid=paidRecords.reduce((a,p)=>a+p.amount,0);
     const barColor=pct>=75?'var(--green)':pct>=40?'var(--teal)':'var(--gold2)';
     const sourceMeta=f.source==='assigned'
-      ?`${f.members} members · ${f.duration} months · ${f.comm}% comm${f.memberTicket?' · Ticket #'+f.memberTicket:''}${f.foremanName?' · Foreman '+f.foremanName:''}`
-      :`${f.members} members · ${f.duration} months · ${f.comm}% comm${f.foremanName?' · '+f.foremanName:''}`;
+      ?`${f.members} members Â· ${f.duration} months Â· ${f.comm}% comm${f.memberTicket?' Â· Ticket #'+f.memberTicket:''}${f.foremanName?' Â· Foreman '+f.foremanName:''}`
+      :`${f.members} members Â· ${f.duration} months Â· ${f.comm}% comm${f.foremanName?' Â· '+f.foremanName:''}`;
     const sourceBadge=f.source==='assigned'
       ?'<span class="badge bb">Assigned</span>'
       :'<span class="badge bg">My Fund</span>';
     return `<div class="mcf-card">
       <div class="mcf-top">
-        <div class="mcf-icon">🏛</div>
+        <div class="mcf-icon">ðŸ›</div>
         <div class="mcf-info">
           <div class="mcf-name">${f.name}</div>
           <div class="mcf-meta">${sourceMeta}</div>
@@ -2748,13 +2786,13 @@ function renderMyChits(){
         <div class="pb-track" style="flex:1;"><div class="pb-fill" style="width:${pct}%;background:${barColor};"></div></div>
         <div class="mcf-pct">${pct}%</div>
       </div>
-      <div style="font-size:10px;color:var(--t4);font-family:'IBM Plex Mono',monospace;margin-top:4px;">${remaining>0?remaining+' month(s) remaining':'✅ Chit completed!'}${f.start?' · Started '+f.start:''}</div>
+      <div style="font-size:10px;color:var(--t4);font-family:'IBM Plex Mono',monospace;margin-top:4px;">${remaining>0?remaining+' month(s) remaining':'âœ… Chit completed!'}${f.start?' Â· Started '+f.start:''}</div>
       ${f.notes?`<div class="mcf-note">${f.notes}</div>`:''}
     </div>`;
   }).join('');
 }
 
-/* ── INIT ── */
+/* â”€â”€ INIT â”€â”€ */
 (function(){
   const today=new Date();
   const ym=`${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}`;
@@ -2776,3 +2814,4 @@ function renderMyChits(){
 </script>
 </body>
 </html>
+
