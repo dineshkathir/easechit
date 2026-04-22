@@ -884,9 +884,14 @@ tbody td:first-child{color:var(--t1);font-family:'IBM Plex Sans',sans-serif;font
       <!-- -- PAYMENTS -- -->
       <div class="section" id="sec-payments">
         <div class="page-hd"><div class="page-title">Payment <span>Tracker</span></div></div>
+        <div class="role-switch" style="margin:0 0 14px;">
+          <button class="role-btn active" id="ptViewMonth" type="button" onclick="setPaymentView('month')">Month-wise</button>
+          <button class="role-btn" id="ptViewMember" type="button" onclick="setPaymentView('member')">Member-wise</button>
+        </div>
         <div class="pay-filter-bar">
           <select id="pt_group" onchange="renderPayTable()"><option value="">- Select Group -</option></select>
           <input id="pt_month" type="number" placeholder="Month #" min="1" oninput="renderPayTable()">
+          <select id="pt_member" onchange="renderPayTable()" style="display:none;"><option value="">- Select Member -</option></select>
         </div>
         <div class="pay-progress-card" id="pay_progress_card" style="display:none;">
           <div class="pay-progress-hd">
@@ -1199,6 +1204,7 @@ let sharedLiveBidsUnsubscribe=null;
 let sharedAuctionSession=null;
 let sharedAuctionSessionUnsubscribe=null;
 const S={role:'foreman',theme:'dark',chits:[],members:[],payments:{},auctions:[],memberPayments:[],myChitFunds:[],liveBids:[],timerInterval:null,timerSecs:0,timerRunning:false,adCount:0,cur:'dashboard'};
+let paymentViewMode='month';
 const ACCESS_STORAGE_KEY='cv_admin_access_registry_v1';
 const ADMIN_SESSION_KEY='cv_admin_portal_session_v1';
 const fmt=v=>'Rs.'+Number(v).toLocaleString('en-IN',{maximumFractionDigits:2});
@@ -2213,8 +2219,34 @@ function popDrops(){
       S.myChitFunds.map(f=>`<option value="m_${f.id}">${f.name} (My Fund)</option>`).join('');
     if(cur) mpGrp.value=cur;
   }
+  refreshPaymentMemberOptions();
   updateAuctionStartButton();
   renderSharedAuctionSession();
+}
+function refreshPaymentMemberOptions(){
+  const memberSelect=document.getElementById('pt_member');
+  const groupSelect=document.getElementById('pt_group');
+  if(!memberSelect||!groupSelect) return;
+  const current=memberSelect.value;
+  const gid=groupSelect.value;
+  const members=S.members
+    .filter(member=>!gid||String(member.groupId)===String(gid))
+    .sort((a,b)=>a.name.localeCompare(b.name));
+  memberSelect.innerHTML='<option value="">- Select Member -</option>'+members.map(member=>`<option value="${member.id}">${member.name}${member.groupName?` - ${member.groupName}`:''}</option>`).join('');
+  if(current) memberSelect.value=current;
+}
+function setPaymentView(mode){
+  paymentViewMode=mode==='member'?'member':'month';
+  const monthBtn=document.getElementById('ptViewMonth');
+  const memberBtn=document.getElementById('ptViewMember');
+  const monthInput=document.getElementById('pt_month');
+  const memberSelect=document.getElementById('pt_member');
+  if(monthBtn) monthBtn.className='role-btn'+(paymentViewMode==='month'?' active':'');
+  if(memberBtn) memberBtn.className='role-btn'+(paymentViewMode==='member'?' active':'');
+  if(monthInput) monthInput.style.display=paymentViewMode==='month'?'':'none';
+  if(memberSelect) memberSelect.style.display=paymentViewMode==='member'?'':'none';
+  refreshPaymentMemberOptions();
+  renderPayTable();
 }
 
 function foremanAddBid(){
@@ -2322,6 +2354,11 @@ function removeMember(id){const m=S.members.find(m=>m.id===id);S.members=S.membe
 
 /* -- PAYMENTS -- */
 function renderPayTable(){
+  refreshPaymentMemberOptions();
+  if(paymentViewMode==='member'){
+    renderMemberWisePaymentTable();
+    return;
+  }
   const gid=document.getElementById('pt_group').value;
   const mo=ensureFundMonthSelection('pt_group','pt_month');
   const list=document.getElementById('payMemberList');
@@ -2370,14 +2407,17 @@ function renderPayTable(){
           Approved: ${approvedOn}${approvedBy!=='-'?` by ${approvedBy}`:''}
         </div>
       </div>
-      <span style="font-size:11px;font-weight:600;color:${getPaymentStatusColor(status)};margin-right:10px;">${getPaymentStatusLabel(status)}</span>
-      <button class="pay-toggle ${status==='approved'?'is-paid':'is-due'}" onclick="togPay('${m.id}','${gid}','${mo}',${mly},'${escJsSingle(m.email)}','${escJsSingle(m.name)}','${m.ticket||0}','${escJsSingle(chit.name)}')" type="button" title="${status==='pending'?'Approve payment request':status==='approved'?'Remove approval':'Approve payment'}"></button>
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end;">
+        <span style="font-size:11px;font-weight:600;color:${getPaymentStatusColor(status)};">${getPaymentStatusLabel(status)}</span>
+        ${status!=='approved'?`<button class="btn btn-teal btn-sm" type="button" onclick="setPaymentDecision('${m.id}','${gid}','${mo}',${mly},'${escJsSingle(m.email)}','${escJsSingle(m.name)}','${m.ticket||0}','${escJsSingle(chit.name)}','approved')">Approve</button>`:''}
+        ${status==='pending'?`<button class="btn btn-danger btn-sm" type="button" onclick="setPaymentDecision('${m.id}','${gid}','${mo}',${mly},'${escJsSingle(m.email)}','${escJsSingle(m.name)}','${m.ticket||0}','${escJsSingle(chit.name)}','none')">Decline</button>`:''}
+        ${status==='approved'?`<button class="btn btn-danger btn-sm" type="button" onclick="setPaymentDecision('${m.id}','${gid}','${mo}',${mly},'${escJsSingle(m.email)}','${escJsSingle(m.name)}','${m.ticket||0}','${escJsSingle(chit.name)}','none')">Remove</button>`:''}
+      </div>
     </div>`;}).join('');
 }
-async function togPay(memberId,gid,mo,amt,memberEmail,memberName,memberTicket,groupName){
+async function setPaymentDecision(memberId,gid,mo,amt,memberEmail,memberName,memberTicket,groupName,nextStatus){
   const key=`${memberId}_${gid}_${mo}`;
   const existing=getSharedPaymentEntry(memberId,gid,mo);
-  const nextStatus=existing&&existing.status==='approved'?'none':'approved';
   S.payments[key]=nextStatus==='approved';
   renderPayTable();
   updateDB();
@@ -2395,7 +2435,7 @@ async function togPay(memberId,gid,mo,amt,memberEmail,memberName,memberTicket,gr
       foremanUid:currentUser&&currentUser.uid?currentUser.uid:'',
       approvedBy:currentUser&&currentUser.email?currentUser.email:''
     });
-    toast(nextStatus==='approved'?'Payment approved.':'Payment approval removed.');
+    toast(nextStatus==='approved'?'Payment approved.':existing&&existing.status==='pending'?'Payment declined.':'Payment approval removed.');
   }catch(err){
     console.error(err);
     S.payments[key]=existing&&existing.status==='approved';
@@ -2404,6 +2444,62 @@ async function togPay(memberId,gid,mo,amt,memberEmail,memberName,memberTicket,gr
     toast('Could not update payment status online.',true);
   }
   queueCloudSave();
+}
+function renderMemberWisePaymentTable(){
+  const gid=document.getElementById('pt_group').value;
+  const memberId=document.getElementById('pt_member').value;
+  const list=document.getElementById('payMemberList');
+  const progCard=document.getElementById('pay_progress_card');
+  if(!gid||!memberId){
+    progCard.style.display='none';
+    list.innerHTML='<div style="text-align:center;padding:48px 20px;color:var(--t3);"><div style="font-size:36px;margin-bottom:12px;opacity:.3;">DL</div><p style="font-size:13px;">Select a group and member<br>to view payment history</p></div>';
+    return;
+  }
+  const chit=S.chits.find(c=>String(c.id)===String(gid));
+  const member=S.members.find(m=>String(m.id)===String(memberId));
+  if(!chit||!member){
+    progCard.style.display='none';
+    list.innerHTML='<div style="text-align:center;padding:40px 20px;color:var(--t3);"><div style="font-size:30px;margin-bottom:10px;opacity:.3;">DL</div><p style="font-size:13px;">Member or group not found</p></div>';
+    return;
+  }
+  const monthlyAmount=chit.value/chit.members;
+  const rows=Array.from({length:Number(chit.duration)||0},(_,index)=>{
+    const month=index+1;
+    const entry=getSharedPaymentEntry(member.id,gid,month);
+    const status=entry&&entry.status?entry.status:(S.payments[`${member.id}_${gid}_${month}`]?'approved':'due');
+    return {
+      month,
+      amount:monthlyAmount,
+      status,
+      requestedOn:entry?formatPaymentDate(entry.requestedAt||entry.updatedAt,'Not requested yet'):'Not requested yet',
+      approvedOn:status==='approved'&&entry?formatPaymentDate(entry.approvedAt||entry.updatedAt,'Approved online'):'Not approved yet',
+      requestedBy:entry&&entry.requestedBy?entry.requestedBy:'-',
+      approvedBy:entry&&entry.approvedBy?entry.approvedBy:'-'
+    };
+  });
+  const paidCount=rows.filter(row=>row.status==='approved').length;
+  const dueCount=rows.filter(row=>row.status!=='approved').length;
+  const pct=rows.length?paidCount/rows.length*100:0;
+  progCard.style.display='';
+  document.getElementById('pay_group_title').textContent=`${member.name} - ${chit.name}`;
+  document.getElementById('pt_pct').textContent=`${pct.toFixed(0)}%`;
+  document.getElementById('pay_track_fill').style.width=`${pct}%`;
+  document.getElementById('pt_col').textContent=fmt(paidCount*monthlyAmount);
+  document.getElementById('pt_out').textContent=fmt(dueCount*monthlyAmount);
+  document.getElementById('pt_cc').textContent=paidCount;
+  list.innerHTML=rows.map(row=>`
+    <div class="pay-member-item ${row.status==='approved'?'is-paid':'is-due'}">
+      <div class="pay-av" style="background:${member.color}22;color:${member.color};border:1px solid ${member.color}33">M${row.month}</div>
+      <div style="flex:1;min-width:0;">
+        <div class="pay-member-name">Month ${row.month}</div>
+        <div class="pay-member-meta">${fmt(row.amount)} - ${getPaymentStatusLabel(row.status)}</div>
+        <div class="pay-member-meta" style="margin-top:4px;white-space:normal;line-height:1.5;">
+          Requested: ${row.requestedOn}${row.requestedBy!=='-'?` by ${row.requestedBy}`:''}<br>
+          Approved: ${row.approvedOn}${row.approvedBy!=='-'?` by ${row.approvedBy}`:''}
+        </div>
+      </div>
+      <span style="font-size:11px;font-weight:600;color:${getPaymentStatusColor(row.status)};">${getPaymentStatusLabel(row.status)}</span>
+    </div>`).join('');
 }
 
 /* -- AUCTION TIMER -- */
@@ -2604,6 +2700,16 @@ function ensureFundMonthSelection(selectId,inputId){
   if(existing<=0) input.value=month;
   return month;
 }
+function isMemberMonthCompleted(gid,month){
+  const targetMonth=Number(month);
+  if(targetMonth<=0) return false;
+  if(String(gid||'').startsWith('m_')){
+    const local=S.memberPayments.find(p=>p.gid===gid&&Number(p.month)===targetMonth);
+    return !!local;
+  }
+  const shared=sharedPayments.find(p=>`c_${p.groupId}`===gid&&Number(p.month)===targetMonth&&normalizeEmail(p.memberEmail)===getCurrentUserEmail());
+  return !!(shared&&shared.status==='approved');
+}
 function updateMpayDetail(){
   const gid=document.getElementById('mp_grp').value;
   const mo=ensureFundMonthSelection('mp_grp','mp_mo');
@@ -2611,7 +2717,8 @@ function updateMpayDetail(){
   if(!gid||!mo){el.innerHTML='';return;}
   const c=resolveFund(gid);if(!c){el.innerHTML='';return;}
   const mly=c.value/c.members;
-  el.innerHTML=`<div class="mpay-amount-display"><div class="mpay-amount-lbl">Amount Due - Month ${mo}</div><div class="mpay-amount-val">${fmt(mly)}</div></div>`;
+  const gateNote=mo>1&&!isMemberMonthCompleted(gid,mo-1)?`<div style="margin-top:10px;font-size:12px;color:var(--red);line-height:1.5;">Complete payment for month ${mo-1} before paying month ${mo}.</div>`:'';
+  el.innerHTML=`<div class="mpay-amount-display"><div class="mpay-amount-lbl">Amount Due - Month ${mo}</div><div class="mpay-amount-val">${fmt(mly)}</div></div>${gateNote}`;
 }
 function calcMemberEMI(){
   const val=parseFloat(document.getElementById('me_val').value)||0;
@@ -2677,6 +2784,10 @@ async function makePayment(){
   const mo=ensureFundMonthSelection('mp_grp','mp_mo');
   if(!gid||!mo){toast('Select group and month!',true);return;}
   const c=resolveFund(gid);if(!c){toast('Fund not found',true);return;}
+  if(mo>1&&!isMemberMonthCompleted(gid,mo-1)){
+    toast(`Month ${mo-1} must be paid before paying month ${mo}.`,true);
+    return;
+  }
   // Check for duplicate
   const already=S.memberPayments.find(p=>p.gid===gid&&p.month===mo)
     || sharedPayments.find(p=>`c_${p.groupId}`===gid&&Number(p.month)===mo&&normalizeEmail(p.memberEmail)===getCurrentUserEmail());
