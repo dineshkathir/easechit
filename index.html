@@ -2361,7 +2361,10 @@ function calcEMI(){
 }
 function resolveFund(val){
   if(!val) return null;
-  if(val.startsWith('c_')){const id=val.slice(2);return S.chits.find(c=>c.id==id)||null;}
+  if(val.startsWith('c_')){
+    const id=val.slice(2);
+    return S.chits.find(c=>c.id==id)||getAssignedMemberFunds().find(f=>String(f.id)===String(id))||null;
+  }
   if(val.startsWith('m_')){const id=val.slice(2);return S.myChitFunds.find(f=>f.id==id)||null;}
   const assigned=getAssignedMemberFunds().find(f=>String(f.id)===String(val));
   if(assigned) return assigned;
