@@ -2748,14 +2748,16 @@ function refreshPaymentMonthOptions(selectId,groupId,mode){
   }
   let months=[];
   if(mode==='member'){
-    const nextMonth=getFirstIncompleteMemberMonth(groupId,maxMonth);
-    if(nextMonth>=1&&nextMonth<=maxMonth) months=[nextMonth];
+    months=Array.from({length:maxMonth},(_,index)=>index+1);
   }else{
     months=Array.from({length:maxMonth},(_,index)=>index+1);
   }
   select.innerHTML='<option value="">- Select Month -</option>'+months.map(month=>`<option value="${month}">Month ${month}</option>`).join('');
   if(current&&months.includes(Number(current))) select.value=String(current);
-  else if(months.length===1) select.value=String(months[0]);
+  else if(mode==='member'){
+    const nextMonth=getFirstIncompleteMemberMonth(groupId,maxMonth);
+    if(nextMonth>=1&&months.includes(nextMonth)) select.value=String(nextMonth);
+  }else if(months.length===1) select.value=String(months[0]);
   return parseInt(select.value)||0;
 }
 function updateMpayDetail(){
