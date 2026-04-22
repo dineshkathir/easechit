@@ -1462,6 +1462,7 @@ function applySharedPaymentsToState(){
     sharedPaymentKeys.add(key);
     S.payments[key]=(item.status||'approved')==='approved';
   });
+  S.memberPayments=S.memberPayments.filter(local=>!sharedPayments.some(item=>`c_${item.groupId}`===local.gid&&Number(item.month)===Number(local.month)&&normalizeEmail(item.memberEmail)===getCurrentUserEmail()));
   renderPayTable();
   renderMyChits();
   renderMPay();
@@ -2522,7 +2523,17 @@ async function makePayment(){
 }
 async function removePaymentRequest(gid,month){
   const entry=sharedPayments.find(p=>`c_${p.groupId}`===gid&&Number(p.month)===Number(month)&&normalizeEmail(p.memberEmail)===getCurrentUserEmail());
-  if(!entry){toast('Payment request not found.',true);return;}
+  if(!entry){
+    const localExists=S.memberPayments.some(p=>p.gid===gid&&Number(p.month)===Number(month));
+    if(!localExists){toast('Payment request not found.',true);return;}
+    S.memberPayments=S.memberPayments.filter(p=>!(p.gid===gid&&Number(p.month)===Number(month)));
+    renderMPay();
+    renderMyChits();
+    updateDB();
+    queueCloudSave();
+    toast('Payment entry removed.');
+    return;
+  }
   try{
     await setSharedPaymentStatus({
       memberId:entry.memberId,
@@ -2545,7 +2556,10 @@ function renderMPay(){
   const sharedHistory=sharedPayments
     .filter(p=>normalizeEmail(p.memberEmail)===getCurrentUserEmail())
     .map(p=>({gid:`c_${p.groupId}`,month:Number(p.month),groupName:p.groupName,amount:Number(p.amount)||0,date:'Online sync',status:p.status==='approved'?'Paid':p.status==='pending'?'Pending Approval':'Due',statusKey:p.status||'approved'}));
-  const combined=[...S.memberPayments,...sharedHistory].filter((item,index,arr)=>arr.findIndex(x=>x.gid===item.gid&&x.month===item.month)===index);
+  const merged=new Map();
+  S.memberPayments.forEach(item=>merged.set(`${item.gid}_${item.month}`,item));
+  sharedHistory.forEach(item=>merged.set(`${item.gid}_${item.month}`,item));
+  const combined=[...merged.values()];
   if(!combined.length){el.innerHTML='<div class="empty"><div class="empty-icon">CF</div><p>No records yet.</p></div>';return;}
   el.innerHTML=combined.slice().sort((a,b)=>b.month-a.month).map(p=>`
     <div class="mpay-hist-item">
@@ -2555,7 +2569,7 @@ function renderMPay(){
         <div class="mpay-hist-date">${p.date} - <span style="color:${p.statusKey==='pending'?'var(--gold2)':'var(--green)'};font-weight:600;">${p.status}</span></div>
       </div>
       <div class="mpay-hist-amt">${fmt(p.amount)}</div>
-      ${p.statusKey==='pending'?`<button class="btn btn-ghost btn-sm" type="button" onclick="removePaymentRequest('${p.gid}',${p.month})">Remove</button>`:''}
+      ${(p.statusKey==='pending'||p.statusKey==='approved'||!p.statusKey)?`<button class="btn btn-ghost btn-sm" type="button" onclick="removePaymentRequest('${p.gid}',${p.month})">Remove</button>`:''}
     </div>`).join('');
 }
 function placeBid(){
