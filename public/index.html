@@ -1578,6 +1578,16 @@ function getPaymentStatusLabel(status){
 function getPaymentStatusColor(status){
   return status==='approved'?'var(--green)':status==='pending'?'var(--gold2)':'var(--red)';
 }
+function formatPaymentDate(value,fallback=''){
+  if(!value) return fallback;
+  try{
+    const date=value&&value.toDate?value.toDate():new Date(value);
+    if(Number.isNaN(date.getTime())) return fallback;
+    return date.toLocaleString('en-IN',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
+  }catch(err){
+    return fallback;
+  }
+}
 async function setSharedPaymentStatus(opts){
   if(!db||!currentUser||!opts||!opts.memberId||!opts.groupId||!opts.month) return;
   const ref=getPaymentRecordRef(opts.memberId,opts.groupId,opts.month);
@@ -1595,6 +1605,8 @@ async function setSharedPaymentStatus(opts){
       paid:opts.status==='approved',
       requestedBy:opts.requestedBy||currentUser.email||currentUser.uid||'user',
       approvedBy:opts.status==='approved'?(opts.approvedBy||currentUser.email||currentUser.uid||'user'):'',
+      requestedAt:opts.status==='pending'?firebase.firestore.FieldValue.serverTimestamp():(opts.requestedAt||firebase.firestore.FieldValue.serverTimestamp()),
+      approvedAt:opts.status==='approved'?firebase.firestore.FieldValue.serverTimestamp():'',
       foremanUid:opts.foremanUid||currentUser.uid||'',
       updatedAt:firebase.firestore.FieldValue.serverTimestamp(),
       updatedBy:currentUser.email||currentUser.uid||'user'
@@ -2332,7 +2344,7 @@ function renderPayTable(){
     const entry=getSharedPaymentEntry(m.id,gid,mo);
     const status=entry&&entry.status?entry.status:(S.payments[`${m.id}_${gid}_${mo}`]?'approved':'due');
     status==='approved'?paid++:due++;
-    return {m,status,mly};
+    return {m,status,mly,entry};
   });
   const pp=mems.length?paid/mems.length*100:0;
   progCard.style.display='';
@@ -2342,16 +2354,25 @@ function renderPayTable(){
   document.getElementById('pt_col').textContent=fmt(paid*mly);
   document.getElementById('pt_out').textContent=fmt(due*mly);
   document.getElementById('pt_cc').textContent=paid;
-  list.innerHTML=items.map(({m,status})=>`
+  list.innerHTML=items.map(({m,status,entry})=>{
+    const requestedOn=entry?formatPaymentDate(entry.requestedAt||entry.updatedAt,'Not requested yet'):'No request yet';
+    const approvedOn=status==='approved'&&entry?formatPaymentDate(entry.approvedAt||entry.updatedAt,'Approved online'):'Not approved yet';
+    const requestedBy=entry&&entry.requestedBy?entry.requestedBy:'-';
+    const approvedBy=entry&&entry.approvedBy?entry.approvedBy:'-';
+    return `
     <div class="pay-member-item ${status==='approved'?'is-paid':'is-due'}">
       <div class="pay-av" style="background:${m.color}22;color:${m.color};border:1px solid ${m.color}33">${m.name[0].toUpperCase()}</div>
       <div style="flex:1;min-width:0;">
         <div class="pay-member-name">${m.name}</div>
-        <div class="pay-member-meta">#${m.ticket} - ${fmtN(mly)}</div>
+        <div class="pay-member-meta">#${m.ticket} - ${fmtN(mly)} - Month ${mo}</div>
+        <div class="pay-member-meta" style="margin-top:4px;white-space:normal;line-height:1.5;">
+          Requested: ${requestedOn} by ${requestedBy}<br>
+          Approved: ${approvedOn}${approvedBy!=='-'?` by ${approvedBy}`:''}
+        </div>
       </div>
       <span style="font-size:11px;font-weight:600;color:${getPaymentStatusColor(status)};margin-right:10px;">${getPaymentStatusLabel(status)}</span>
       <button class="pay-toggle ${status==='approved'?'is-paid':'is-due'}" onclick="togPay('${m.id}','${gid}','${mo}',${mly},'${escJsSingle(m.email)}','${escJsSingle(m.name)}','${m.ticket||0}','${escJsSingle(chit.name)}')" type="button" title="${status==='pending'?'Approve payment request':status==='approved'?'Remove approval':'Approve payment'}"></button>
-    </div>`).join('');
+    </div>`;}).join('');
 }
 async function togPay(memberId,gid,mo,amt,memberEmail,memberName,memberTicket,groupName){
   const key=`${memberId}_${gid}_${mo}`;
@@ -2661,7 +2682,8 @@ async function makePayment(){
     || sharedPayments.find(p=>`c_${p.groupId}`===gid&&Number(p.month)===mo&&normalizeEmail(p.memberEmail)===getCurrentUserEmail());
   if(already){toast('Month '+mo+' already paid!',true);return;}
   const amount=c.value/c.members;
-  const record={gid,month:mo,groupName:c.name,amount,date:new Date().toLocaleDateString('en-IN'),status:'Pending Approval'};
+  const nowIso=new Date().toISOString();
+  const record={gid,month:mo,groupName:c.name,amount,date:new Date().toLocaleDateString('en-IN'),status:'Pending Approval',statusKey:'pending',requestedAt:nowIso,approvedAt:'',requestedBy:getCurrentUserEmail()||'Member',approvedBy:''};
   S.memberPayments.push(record);
   // If it's a member-added fund, update the paid count
   if(gid.startsWith('m_')){
@@ -2750,22 +2772,41 @@ function renderMPay(){
   const el=document.getElementById('mp_rec');
   const sharedHistory=sharedPayments
     .filter(p=>normalizeEmail(p.memberEmail)===getCurrentUserEmail())
-    .map(p=>({gid:`c_${p.groupId}`,month:Number(p.month),groupName:p.groupName,amount:Number(p.amount)||0,date:'Online sync',status:p.status==='approved'?'Paid':p.status==='pending'?'Pending Approval':'Due',statusKey:p.status||'approved'}));
+    .map(p=>({
+      gid:`c_${p.groupId}`,
+      month:Number(p.month),
+      groupName:p.groupName,
+      amount:Number(p.amount)||0,
+      date:'Online sync',
+      status:p.status==='approved'?'Paid':p.status==='pending'?'Pending Approval':'Due',
+      statusKey:p.status||'approved',
+      requestedAt:p.requestedAt||p.updatedAt||'',
+      approvedAt:p.approvedAt||'',
+      requestedBy:p.requestedBy||p.memberEmail||'',
+      approvedBy:p.approvedBy||''
+    }));
   const merged=new Map();
   S.memberPayments.forEach(item=>merged.set(`${item.gid}_${item.month}`,item));
   sharedHistory.forEach(item=>merged.set(`${item.gid}_${item.month}`,item));
   const combined=[...merged.values()];
   if(!combined.length){el.innerHTML='<div class="empty"><div class="empty-icon">CF</div><p>No records yet.</p></div>';return;}
-  el.innerHTML=combined.slice().sort((a,b)=>b.month-a.month).map(p=>`
+  el.innerHTML=combined.slice().sort((a,b)=>b.month-a.month).map(p=>{
+    const requestedOn=formatPaymentDate(p.requestedAt,p.date||'');
+    const approvedOn=p.statusKey==='approved'?formatPaymentDate(p.approvedAt,'Approved'): 'Pending';
+    return `
     <div class="mpay-hist-item">
       <div class="mpay-hist-mo">M${p.month}</div>
       <div style="flex:1;min-width:0;">
         <div class="mpay-hist-group">${p.groupName}</div>
         <div class="mpay-hist-date">${p.date} - <span style="color:${p.statusKey==='pending'?'var(--gold2)':'var(--green)'};font-weight:600;">${p.status}</span></div>
+        <div class="mpay-hist-date" style="margin-top:4px;white-space:normal;line-height:1.5;">
+          Requested on: ${requestedOn}${p.requestedBy?` by ${p.requestedBy}`:''}<br>
+          ${p.statusKey==='approved'?`Approved on: ${approvedOn}${p.approvedBy?` by ${p.approvedBy}`:''}`:`Approval status: Awaiting foreman action`}
+        </div>
       </div>
       <div class="mpay-hist-amt">${fmt(p.amount)}</div>
       ${(p.statusKey==='pending'||p.statusKey==='approved'||!p.statusKey)?`<button class="btn btn-ghost btn-sm" type="button" onclick="removePaymentRequest('${p.gid}',${p.month})">Remove</button>`:''}
-    </div>`).join('');
+    </div>`;}).join('');
 }
 function placeBid(){
   const bid=parseFloat(document.getElementById('mem_bid').value)||0;
