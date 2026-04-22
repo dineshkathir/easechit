@@ -1575,6 +1575,14 @@ function getAssignedRecordByPaymentGroup(gid){
   const clean=String(gid||'').replace(/^c_/,'');
   return memberAssignments.find(item=>String(item.groupId)===clean)||null;
 }
+function getMemberPaymentIdentity(member,groupId){
+  const assignment=memberAssignments.find(item=>String(item.groupId)===String(groupId)&&String(item.memberId)===String(member&&member.id));
+  return {
+    email:normalizeEmail((assignment&&assignment.memberEmail)||(member&&member.email)||''),
+    name:(assignment&&assignment.memberName)||(member&&member.name)||'',
+    ticket:Number((assignment&&assignment.memberTicket)||(member&&member.ticket)||0)
+  };
+}
 function getSharedPaymentEntry(memberId,groupId,month){
   return sharedPayments.find(item=>String(item.memberId)===String(memberId)&&String(item.groupId)===String(groupId)&&Number(item.month)===Number(month))||null;
 }
@@ -2382,8 +2390,9 @@ function renderPayTable(){
   const items=mems.map(m=>{
     const entry=getSharedPaymentEntry(m.id,gid,mo);
     const status=entry&&entry.status?entry.status:(S.payments[`${m.id}_${gid}_${mo}`]?'approved':'due');
+    const paymentIdentity=getMemberPaymentIdentity(m,gid);
     status==='approved'?paid++:due++;
-    return {m,status,mly,entry};
+    return {m,status,mly,entry,paymentIdentity};
   });
   const pp=mems.length?paid/mems.length*100:0;
   progCard.style.display='';
@@ -2393,7 +2402,7 @@ function renderPayTable(){
   document.getElementById('pt_col').textContent=fmt(paid*mly);
   document.getElementById('pt_out').textContent=fmt(due*mly);
   document.getElementById('pt_cc').textContent=paid;
-  list.innerHTML=items.map(({m,status,entry})=>{
+  list.innerHTML=items.map(({m,status,entry,paymentIdentity})=>{
     const requestedOn=entry?formatPaymentDate(entry.requestedAt||entry.updatedAt,'Not requested yet'):'No request yet';
     const approvedOn=status==='approved'&&entry?formatPaymentDate(entry.approvedAt||entry.updatedAt,'Approved online'):'Not approved yet';
     const requestedBy=entry&&entry.requestedBy?entry.requestedBy:'-';
@@ -2411,15 +2420,18 @@ function renderPayTable(){
       </div>
       <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end;">
         <span style="font-size:11px;font-weight:600;color:${getPaymentStatusColor(status)};">${getPaymentStatusLabel(status)}</span>
-        ${status!=='approved'?`<button class="btn btn-teal btn-sm" type="button" onclick="setPaymentDecision('${m.id}','${gid}','${mo}',${mly},'${escJsSingle(m.email)}','${escJsSingle(m.name)}','${m.ticket||0}','${escJsSingle(chit.name)}','approved')">${status==='pending'?'Approve':'Paid'}</button>`:''}
-        ${status==='pending'?`<button class="btn btn-danger btn-sm" type="button" onclick="setPaymentDecision('${m.id}','${gid}','${mo}',${mly},'${escJsSingle(m.email)}','${escJsSingle(m.name)}','${m.ticket||0}','${escJsSingle(chit.name)}','none')">Decline</button>`:''}
-        ${status==='approved'?`<button class="btn btn-danger btn-sm" type="button" onclick="setPaymentDecision('${m.id}','${gid}','${mo}',${mly},'${escJsSingle(m.email)}','${escJsSingle(m.name)}','${m.ticket||0}','${escJsSingle(chit.name)}','none')">Remove</button>`:''}
+        ${status!=='approved'?`<button class="btn btn-teal btn-sm" type="button" onclick="setPaymentDecision('${m.id}','${gid}','${mo}',${mly},'${escJsSingle(paymentIdentity.email)}','${escJsSingle(paymentIdentity.name)}','${paymentIdentity.ticket||0}','${escJsSingle(chit.name)}','approved')">${status==='pending'?'Approve':'Paid'}</button>`:''}
+        ${status==='pending'?`<button class="btn btn-danger btn-sm" type="button" onclick="setPaymentDecision('${m.id}','${gid}','${mo}',${mly},'${escJsSingle(paymentIdentity.email)}','${escJsSingle(paymentIdentity.name)}','${paymentIdentity.ticket||0}','${escJsSingle(chit.name)}','none')">Decline</button>`:''}
+        ${status==='approved'?`<button class="btn btn-danger btn-sm" type="button" onclick="setPaymentDecision('${m.id}','${gid}','${mo}',${mly},'${escJsSingle(paymentIdentity.email)}','${escJsSingle(paymentIdentity.name)}','${paymentIdentity.ticket||0}','${escJsSingle(chit.name)}','none')">Remove</button>`:''}
       </div>
     </div>`;}).join('');
 }
 async function setPaymentDecision(memberId,gid,mo,amt,memberEmail,memberName,memberTicket,groupName,nextStatus){
   const key=`${memberId}_${gid}_${mo}`;
   const existing=getSharedPaymentEntry(memberId,gid,mo);
+  const resolvedEmail=normalizeEmail(memberEmail||existing&&existing.memberEmail||'');
+  const resolvedName=memberName||existing&&existing.memberName||'';
+  const resolvedTicket=Number(memberTicket||existing&&existing.memberTicket||0);
   S.payments[key]=nextStatus==='approved';
   renderPayTable();
   updateDB();
@@ -2430,9 +2442,9 @@ async function setPaymentDecision(memberId,gid,mo,amt,memberEmail,memberName,mem
       month:mo,
       amount:amt,
       status:nextStatus,
-      memberEmail,
-      memberName,
-      memberTicket,
+      memberEmail:resolvedEmail,
+      memberName:resolvedName,
+      memberTicket:resolvedTicket,
       groupName,
       foremanUid:currentUser&&currentUser.uid?currentUser.uid:'',
       approvedBy:currentUser&&currentUser.email?currentUser.email:''
@@ -2469,10 +2481,12 @@ function renderMemberWisePaymentTable(){
     const month=index+1;
     const entry=getSharedPaymentEntry(member.id,gid,month);
     const status=entry&&entry.status?entry.status:(S.payments[`${member.id}_${gid}_${month}`]?'approved':'due');
+    const paymentIdentity=getMemberPaymentIdentity(member,gid);
     return {
       month,
       amount:monthlyAmount,
       status,
+      paymentIdentity,
       requestedOn:entry?formatPaymentDate(entry.requestedAt||entry.updatedAt,'Not requested yet'):'Not requested yet',
       approvedOn:status==='approved'&&entry?formatPaymentDate(entry.approvedAt||entry.updatedAt,'Approved online'):'Not approved yet',
       requestedBy:entry&&entry.requestedBy?entry.requestedBy:'-',
@@ -2502,9 +2516,9 @@ function renderMemberWisePaymentTable(){
       </div>
       <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end;">
         <span style="font-size:11px;font-weight:600;color:${getPaymentStatusColor(row.status)};">${getPaymentStatusLabel(row.status)}</span>
-        ${row.status!=='approved'?`<button class="btn btn-teal btn-sm" type="button" onclick="setPaymentDecision('${member.id}','${gid}','${row.month}',${row.amount},'${escJsSingle(member.email)}','${escJsSingle(member.name)}','${member.ticket||0}','${escJsSingle(chit.name)}','approved')">${row.status==='pending'?'Approve':'Paid'}</button>`:''}
-        ${row.status==='pending'?`<button class="btn btn-danger btn-sm" type="button" onclick="setPaymentDecision('${member.id}','${gid}','${row.month}',${row.amount},'${escJsSingle(member.email)}','${escJsSingle(member.name)}','${member.ticket||0}','${escJsSingle(chit.name)}','none')">Decline</button>`:''}
-        ${row.status==='approved'?`<button class="btn btn-danger btn-sm" type="button" onclick="setPaymentDecision('${member.id}','${gid}','${row.month}',${row.amount},'${escJsSingle(member.email)}','${escJsSingle(member.name)}','${member.ticket||0}','${escJsSingle(chit.name)}','none')">Remove</button>`:''}
+        ${row.status!=='approved'?`<button class="btn btn-teal btn-sm" type="button" onclick="setPaymentDecision('${member.id}','${gid}','${row.month}',${row.amount},'${escJsSingle(row.paymentIdentity.email)}','${escJsSingle(row.paymentIdentity.name)}','${row.paymentIdentity.ticket||0}','${escJsSingle(chit.name)}','approved')">${row.status==='pending'?'Approve':'Paid'}</button>`:''}
+        ${row.status==='pending'?`<button class="btn btn-danger btn-sm" type="button" onclick="setPaymentDecision('${member.id}','${gid}','${row.month}',${row.amount},'${escJsSingle(row.paymentIdentity.email)}','${escJsSingle(row.paymentIdentity.name)}','${row.paymentIdentity.ticket||0}','${escJsSingle(chit.name)}','none')">Decline</button>`:''}
+        ${row.status==='approved'?`<button class="btn btn-danger btn-sm" type="button" onclick="setPaymentDecision('${member.id}','${gid}','${row.month}',${row.amount},'${escJsSingle(row.paymentIdentity.email)}','${escJsSingle(row.paymentIdentity.name)}','${row.paymentIdentity.ticket||0}','${escJsSingle(chit.name)}','none')">Remove</button>`:''}
       </div>
     </div>`).join('');
 }
