@@ -1462,7 +1462,7 @@ function applySharedPaymentsToState(){
     sharedPaymentKeys.add(key);
     S.payments[key]=(item.status||'approved')==='approved';
   });
-  S.memberPayments=S.memberPayments.filter(local=>!sharedPayments.some(item=>`c_${item.groupId}`===local.gid&&Number(item.month)===Number(local.month)&&normalizeEmail(item.memberEmail)===getCurrentUserEmail()));
+  S.memberPayments=S.memberPayments.filter(local=>!String(local.gid||'').startsWith('c_'));
   renderPayTable();
   renderMyChits();
   renderMPay();
@@ -2139,7 +2139,7 @@ function removeMember(id){const m=S.members.find(m=>m.id===id);S.members=S.membe
 /* -- PAYMENTS -- */
 function renderPayTable(){
   const gid=document.getElementById('pt_group').value;
-  const mo=parseInt(document.getElementById('pt_month').value)||0;
+  const mo=ensureFundMonthSelection('pt_group','pt_month');
   const list=document.getElementById('payMemberList');
   const progCard=document.getElementById('pay_progress_card');
   if(!gid||!mo){
@@ -2216,6 +2216,7 @@ async function togPay(memberId,gid,mo,amt,memberEmail,memberName,memberTicket,gr
 /* -- AUCTION TIMER -- */
 function handleAuctionGroupChange(sourceId='auc_group'){
   syncAuctionGroupSelectors(sourceId);
+  ensureFundMonthSelection('auc_group','auc_month');
   calcAuction();
   updateAuctionStartButton();
 }
@@ -2388,9 +2389,31 @@ function resolveFund(val){
   // legacy fallback
   return S.chits.find(c=>c.id==val)||S.myChitFunds.find(f=>f.id==val)||null;
 }
+function getDefaultChitMonth(startValue,duration){
+  if(!startValue) return 1;
+  const parts=String(startValue).split('-');
+  const year=Number(parts[0]);
+  const month=Number(parts[1]);
+  if(!year||!month) return 1;
+  const now=new Date();
+  const diff=((now.getFullYear()-year)*12)+(now.getMonth()-(month-1))+1;
+  const current=Math.max(1,diff);
+  return duration?Math.min(Number(duration)||current,current):current;
+}
+function ensureFundMonthSelection(selectId,inputId){
+  const select=document.getElementById(selectId);
+  const input=document.getElementById(inputId);
+  if(!select||!input||!select.value) return 0;
+  const fund=resolveFund(select.value);
+  if(!fund) return 0;
+  const existing=parseInt(input.value)||0;
+  const month=existing>0?existing:getDefaultChitMonth(fund.start,fund.duration);
+  if(existing<=0) input.value=month;
+  return month;
+}
 function updateMpayDetail(){
   const gid=document.getElementById('mp_grp').value;
-  const mo=parseInt(document.getElementById('mp_mo').value)||0;
+  const mo=ensureFundMonthSelection('mp_grp','mp_mo');
   const el=document.getElementById('mp_det');
   if(!gid||!mo){el.innerHTML='';return;}
   const c=resolveFund(gid);if(!c){el.innerHTML='';return;}
@@ -2458,7 +2481,7 @@ function loadMemberView(){
 }
 async function makePayment(){
   const gid=document.getElementById('mp_grp').value;
-  const mo=parseInt(document.getElementById('mp_mo').value);
+  const mo=ensureFundMonthSelection('mp_grp','mp_mo');
   if(!gid||!mo){toast('Select group and month!',true);return;}
   const c=resolveFund(gid);if(!c){toast('Fund not found',true);return;}
   // Check for duplicate
