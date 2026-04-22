@@ -560,6 +560,7 @@ tbody td:first-child{color:var(--t1);font-family:'IBM Plex Sans',sans-serif;font
     <div class="modal-handle"></div>
     <div class="modal-hd"><div class="modal-title">Add New Member</div><button class="modal-close" onclick="closeModal('memberModal')">x</button></div>
     <div class="modal-body">
+      <input id="mm_edit_id" type="hidden">
       <div class="fg"><label>Full Name</label><input id="mm_name" placeholder="e.g. Ravi Kumar"></div>
       <div class="fg"><label>Phone</label><input id="mm_phone" type="tel" placeholder="9876543210"></div>
       <div class="fg"><label>Email (optional)</label><input id="mm_email" type="email" placeholder="ravi@email.com"></div>
@@ -581,6 +582,7 @@ tbody td:first-child{color:var(--t1);font-family:'IBM Plex Sans',sans-serif;font
     <div class="modal-handle"></div>
     <div class="modal-hd"><div class="modal-title">Create Chit Fund</div><button class="modal-close" onclick="closeModal('chitModal')">x</button></div>
     <div class="modal-body">
+      <input id="cm_edit_id" type="hidden">
       <div class="fg"><label>Chit Name</label><input id="cm_name" placeholder="e.g. Gold Chit 2025"></div>
       <div class="g2">
         <div class="fg"><label>Total Value (Rs.)</label><input id="cm_value" type="number" placeholder="100000"></div>
@@ -594,7 +596,8 @@ tbody td:first-child{color:var(--t1);font-family:'IBM Plex Sans',sans-serif;font
     </div>
     <div class="modal-foot">
       <button class="btn btn-ghost btn-sm" onclick="closeModal('chitModal')">Cancel</button>
-      <button class="btn btn-gold btn-sm" onclick="saveChit()">Create Fund</button>
+      <button class="btn btn-danger btn-sm" id="cm_delete_btn" onclick="deleteForemanChit()" style="display:none;">Delete Fund</button>
+      <button class="btn btn-gold btn-sm" id="cm_save_btn" onclick="saveChit()">Create Fund</button>
     </div>
   </div>
 </div>
@@ -1734,7 +1737,7 @@ function applyState(data){
   localStorage.setItem('cv_t',S.theme);
   popDrops();renderMembers();renderPayTable();renderAucHist();renderMPay();renderBids();renderMyChits();renderReports();updateDB();
   document.getElementById('memberBadge').textContent=S.members.length;
-  setRole(S.role,false);
+  setRole(S.role,false,true);
   nav(S.cur,null);
   isApplyingRemoteState=false;
 }
@@ -1970,7 +1973,7 @@ function renderMN(){
 }
 
 /* -- ROLE -- */
-function setRole(r,sync=true){
+function setRole(r,sync=true,preserveSection=false){
   if(r==='foreman'&&currentUser&&!userHasForemanAccess(currentUser)){
     toast('Foreman access requires administrator approval. Member access is still free.',true);
     r='member';
@@ -1988,7 +1991,9 @@ function setRole(r,sync=true){
     document.getElementById('sbRole').textContent=r==='foreman'?'Fund Manager':'Subscriber';
     document.getElementById('sbAvatar').textContent=DEFAULT_AVATAR[r]||'F';
   }
-  nav(r==='foreman'?'dashboard':'m_dashboard',null);
+  if(!preserveSection){
+    nav(r==='foreman'?'dashboard':'m_dashboard',null);
+  }
   if(r==='member') renderMyChits();
   popDrops();
   updateAccessUI();
@@ -2019,6 +2024,36 @@ function nav(sec,el){
 }
 
 /* -- CHIT -- */
+function openChitModal(id){
+  const titleEl=document.querySelector('#chitModal .modal-title');
+  const saveBtn=document.getElementById('cm_save_btn');
+  const deleteBtn=document.getElementById('cm_delete_btn');
+  document.getElementById('cm_edit_id').value='';
+  document.getElementById('cm_name').value='';
+  document.getElementById('cm_value').value='';
+  document.getElementById('cm_members').value='';
+  document.getElementById('cm_duration').value='';
+  document.getElementById('cm_start').value='';
+  document.getElementById('cm_comm').value='5';
+  if(titleEl) titleEl.textContent='Create Chit Fund';
+  if(saveBtn) saveBtn.textContent='Create Fund';
+  if(deleteBtn) deleteBtn.style.display='none';
+  if(id){
+    const chit=S.chits.find(item=>String(item.id)===String(id));
+    if(!chit) return;
+    document.getElementById('cm_edit_id').value=String(chit.id);
+    document.getElementById('cm_name').value=chit.name||'';
+    document.getElementById('cm_value').value=chit.value||'';
+    document.getElementById('cm_members').value=chit.members||'';
+    document.getElementById('cm_duration').value=chit.duration||'';
+    document.getElementById('cm_start').value=chit.start||'';
+    document.getElementById('cm_comm').value=Number.isFinite(Number(chit.comm))?String(chit.comm):'5';
+    if(titleEl) titleEl.textContent='Edit Chit Fund';
+    if(saveBtn) saveBtn.textContent='Save Fund';
+    if(deleteBtn) deleteBtn.style.display='';
+  }
+  openModal('chitModal');
+}
 function saveChit(){
   const name=document.getElementById('cm_name').value.trim();
   const value=parseFloat(document.getElementById('cm_value').value);
@@ -2026,13 +2061,111 @@ function saveChit(){
   const duration=parseInt(document.getElementById('cm_duration').value);
   const comm=parseFloat(document.getElementById('cm_comm').value)||5;
   const start=document.getElementById('cm_start').value;
+  const editId=document.getElementById('cm_edit_id').value;
   if(!name||!value||!members||!duration){toast('Fill all chit details!',true);return;}
-  S.chits.push({id:Date.now(),name,value,members,duration,comm,start,created:new Date().toLocaleDateString('en-IN')});
-  closeModal('chitModal');toast(`"${name}" created!`);maybeAd();
-  ['cm_name','cm_value','cm_members','cm_duration','cm_start'].forEach(i=>document.getElementById(i).value='');
+  if(editId){
+    const idx=S.chits.findIndex(item=>String(item.id)===String(editId));
+    if(idx===-1){toast('Chit fund not found.',true);return;}
+    S.chits[idx]={...S.chits[idx],name,value,members,duration,comm,start};
+    S.members=S.members.map(member=>String(member.groupId)===String(editId)?{...member,groupName:name}:member);
+    toast(`"${name}" updated!`);
+  }else{
+    S.chits.push({id:Date.now(),name,value,members,duration,comm,start,created:new Date().toLocaleDateString('en-IN')});
+    toast(`"${name}" created!`);
+    maybeAd();
+  }
+  closeModal('chitModal');
+  ['cm_edit_id','cm_name','cm_value','cm_members','cm_duration','cm_start'].forEach(i=>document.getElementById(i).value='');
   document.getElementById('cm_comm').value='5';
   queueCloudSave();
-  popDrops();updateDB();addAct(`Chit "${name}" created - ${fmt(value)} / ${members} members`,'gold');
+  popDrops();updateDB();renderMembers();renderPayTable();renderReports();addAct(`Chit "${name}" ${editId?'updated':'created'} - ${fmt(value)} / ${members} members`,'gold');
+}
+async function deleteLinkedOnlineRecordsForChit(chitId){
+  if(!db||!chitId) return;
+  const groupId=String(chitId);
+  const tasks=[
+    db.collection('memberAssignments').where('groupId','==',groupId).get(),
+    db.collection('paymentRecords').where('groupId','==',groupId).get()
+  ];
+  const [assignmentSnap,paymentSnap]=await Promise.all(tasks);
+  const docs=[...assignmentSnap.docs,...paymentSnap.docs];
+  if(docs.length){
+    const batch=db.batch();
+    docs.forEach(doc=>batch.delete(doc.ref));
+    await batch.commit();
+  }
+  await clearSharedLiveBidsForGroup(groupId);
+  if(sharedAuctionSession&&String(sharedAuctionSession.groupId)===groupId){
+    await setAuctionSessionState({
+      groupId:'',
+      groupName:'',
+      status:'ready',
+      elapsedSecs:0,
+      startedAt:null,
+      updatedAt:firebase.firestore.FieldValue.serverTimestamp(),
+      updatedBy:currentUser&&currentUser.email?currentUser.email:(currentUser&&currentUser.uid?currentUser.uid:'foreman')
+    });
+  }
+}
+async function deleteForemanChit(idArg){
+  const editId=idArg||document.getElementById('cm_edit_id').value;
+  if(!editId){toast('Select a chit fund to delete.',true);return;}
+  const chit=S.chits.find(item=>String(item.id)===String(editId));
+  if(!chit){toast('Chit fund not found.',true);return;}
+  const ok=window.confirm(`Delete chit fund "${chit.name}"? This will also remove its members and payment records.`);
+  if(!ok) return;
+  const removedMembers=S.members.filter(member=>String(member.groupId)===String(editId));
+  const prevState={
+    chits:[...S.chits],
+    members:[...S.members],
+    myChitFunds:[...S.myChitFunds],
+    auctions:[...S.auctions],
+    memberPayments:[...S.memberPayments],
+    payments:{...S.payments}
+  };
+  S.chits=S.chits.filter(item=>String(item.id)!==String(editId));
+  S.members=S.members.filter(member=>String(member.groupId)!==String(editId));
+  S.auctions=S.auctions.filter(auction=>auction.groupName!==chit.name);
+  S.memberPayments=S.memberPayments.filter(item=>item.gid!==`c_${editId}`&&item.gid!==String(editId));
+  Object.keys(S.payments).forEach(key=>{
+    if(key.includes(`_${editId}_`)) delete S.payments[key];
+  });
+  closeModal('chitModal');
+  popDrops();
+  updateDB();
+  renderMembers();
+  renderPayTable();
+  renderAucHist();
+  renderMPay();
+  renderBids();
+  renderMyChits();
+  renderReports();
+  updateAuctionStartButton();
+  try{
+    await deleteLinkedOnlineRecordsForChit(editId);
+    await Promise.allSettled(removedMembers.map(member=>deleteMemberAssignmentRecord(member)));
+    queueCloudSave();
+    toast(`"${chit.name}" deleted.`);
+  }catch(err){
+    console.error(err);
+    S.chits=prevState.chits;
+    S.members=prevState.members;
+    S.myChitFunds=prevState.myChitFunds;
+    S.auctions=prevState.auctions;
+    S.memberPayments=prevState.memberPayments;
+    S.payments=prevState.payments;
+    popDrops();
+    updateDB();
+    renderMembers();
+    renderPayTable();
+    renderAucHist();
+    renderMPay();
+    renderBids();
+    renderMyChits();
+    renderReports();
+    updateAuctionStartButton();
+    toast('Could not delete the chit fund online.',true);
+  }
 }
 
 function popDrops(){
@@ -2093,10 +2226,34 @@ function foremanAddBid(){
 }
 
 /* -- MEMBERS -- */
-function openAddMember(){popDrops();openModal('memberModal');}
+function openMemberModal(id){
+  popDrops();
+  const titleEl=document.querySelector('#memberModal .modal-title');
+  document.getElementById('mm_edit_id').value='';
+  document.getElementById('mm_name').value='';
+  document.getElementById('mm_phone').value='';
+  document.getElementById('mm_email').value='';
+  document.getElementById('mm_group').value='';
+  document.getElementById('mm_ticket').value='';
+  if(titleEl) titleEl.textContent='Add New Member';
+  if(id){
+    const member=S.members.find(item=>String(item.id)===String(id));
+    if(!member) return;
+    document.getElementById('mm_edit_id').value=String(member.id);
+    document.getElementById('mm_name').value=member.name||'';
+    document.getElementById('mm_phone').value=member.phone||'';
+    document.getElementById('mm_email').value=member.email||'';
+    document.getElementById('mm_group').value=member.groupId||'';
+    document.getElementById('mm_ticket').value=member.ticket||'';
+    if(titleEl) titleEl.textContent='Edit Member';
+  }
+  openModal('memberModal');
+}
+function openAddMember(){openMemberModal();}
 const CLR=['#d4a843','#17c4a2','#4f9cf9','#e85555','#3dcc8a','#9b79f5','#f09c4a'];
 
 function saveMember(){
+  const editId=document.getElementById('mm_edit_id').value;
   const name=document.getElementById('mm_name').value.trim();
   const phone=document.getElementById('mm_phone').value.trim();
   const email=normalizeEmail(document.getElementById('mm_email').value.trim());
@@ -2104,14 +2261,28 @@ function saveMember(){
   const ticket=parseInt(document.getElementById('mm_ticket').value)||S.members.length+1;
   if(!name||!phone||!gid){toast('Fill name, phone & group!',true);return;}
   const grp=S.chits.find(c=>c.id==gid);
-  const member={id:Date.now(),name,phone,email,groupId:gid,groupName:grp?grp.name:'',ticket,color:CLR[S.members.length%CLR.length],prized:false};
-  S.members.push(member);
-  closeModal('memberModal');toast(`${name} added!`);
-  ['mm_name','mm_phone','mm_email','mm_ticket'].forEach(i=>document.getElementById(i).value='');
+  let member=null;
+  if(editId){
+    const idx=S.members.findIndex(item=>String(item.id)===String(editId));
+    if(idx===-1){toast('Member not found.',true);return;}
+    const previous=S.members[idx];
+    member={...S.members[idx],name,phone,email,groupId:gid,groupName:grp?grp.name:'',ticket};
+    S.members[idx]=member;
+    if(previous&&(String(previous.groupId)!==String(gid)||normalizeEmail(previous.email)!==email)){
+      deleteMemberAssignmentRecord(previous).catch(err=>console.error(err));
+    }
+    toast(`${name} updated!`);
+  }else{
+    member={id:Date.now(),name,phone,email,groupId:gid,groupName:grp?grp.name:'',ticket,color:CLR[S.members.length%CLR.length],prized:false};
+    S.members.push(member);
+    toast(`${name} added!`);
+  }
+  closeModal('memberModal');
+  ['mm_edit_id','mm_name','mm_phone','mm_email','mm_ticket'].forEach(i=>document.getElementById(i).value='');
   document.getElementById('mm_group').value='';
   renderMembers();updateDB();
   document.getElementById('memberBadge').textContent=S.members.length;
-  addAct(`${name} added to ${grp?grp.name:'group'}`,'teal');
+  addAct(`${name} ${editId?'updated in':'added to'} ${grp?grp.name:'group'}`,'teal');
   queueCloudSave();
   if(grp&&email) syncMemberAssignmentRecord(member,grp).catch(err=>console.error(err));
 }
@@ -2128,8 +2299,9 @@ function renderMembers(){
       <div class="m-info"><div class="m-name">${m.name}</div><div class="m-meta">Phone ${m.phone} - #${m.ticket} - ${m.groupName}</div></div>
       <div class="row-actions">
         ${m.prized?'<span class="badge bgold">Prized</span>':'<span class="badge bg">Active</span>'}
+        <button class="btn btn-icon btn-sm" type="button" onclick="openMemberModal(${m.id})">Edit</button>
         <button class="btn btn-icon btn-sm" onclick="togglePrize(${m.id})">Win</button>
-        <button class="btn btn-icon btn-sm btn-danger" onclick="removeMember(${m.id})">x</button>
+        <button class="btn btn-icon btn-sm btn-danger" type="button" onclick="removeMember(${m.id})">x</button>
       </div>
     </div>`).join('');
 }
@@ -2679,7 +2851,7 @@ function updateDB(){
   document.getElementById('d_mem').textContent=S.members.length;
   document.getElementById('d_mo').textContent=fmt(tm);
   document.getElementById('d_earn').textContent=fmt(te);
-  document.getElementById('d_chitList').innerHTML=S.chits.length?S.chits.map(c=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--ln);"><div><div style="font-weight:600;font-size:13px;color:var(--t1);">${c.name}</div><div style="font-size:11px;color:var(--t3);font-family:'IBM Plex Mono',monospace;">${fmt(c.value)} - ${c.members} members</div></div><span class="badge bg">Active</span></div>`).join(''):'<div class="empty"><div class="empty-icon">CF</div><p>No chit funds yet.</p></div>';
+  document.getElementById('d_chitList').innerHTML=S.chits.length?S.chits.map(c=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--ln);gap:10px;"><div style="min-width:0;flex:1;"><div style="font-weight:600;font-size:13px;color:var(--t1);">${c.name}</div><div style="font-size:11px;color:var(--t3);font-family:'IBM Plex Mono',monospace;">${fmt(c.value)} - ${c.members} members</div></div><div style="display:flex;align-items:center;gap:6px;flex-shrink:0;"><span class="badge bg">Active</span><button class="btn btn-icon btn-sm" type="button" title="Edit fund" onclick="openChitModal(${c.id})">Edit</button><button class="btn btn-icon btn-sm btn-danger" type="button" title="Delete fund" onclick="deleteForemanChit(${c.id})">Del</button></div></div>`).join(''):'<div class="empty"><div class="empty-icon">CF</div><p>No chit funds yet.</p></div>';
   document.getElementById('d_prog').innerHTML=S.chits.length?S.chits.map(c=>{const pk=Object.keys(S.payments).filter(k=>k.includes(`_${c.id}_`)&&S.payments[k]);const p=Math.min(100,c.members?pk.length/c.members*100:0);return `<div style="margin-bottom:12px;"><div style="display:flex;justify-content:space-between;font-size:11px;color:var(--t3);margin-bottom:4px;"><span>${c.name}</span><span>${p.toFixed(0)}%</span></div><div class="pb-track"><div class="pb-fill pb-teal" style="width:${p}%"></div></div></div>`;}).join(''):'<div class="empty"><div class="empty-icon">CF</div><p>No funds to track.</p></div>';
   const ap=Object.values(S.payments).filter(Boolean).length;
   document.getElementById('qs_paid').textContent=ap;
