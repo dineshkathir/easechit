@@ -1586,6 +1586,33 @@ function getMemberPaymentIdentity(member,groupId){
 function getSharedPaymentEntry(memberId,groupId,month){
   return sharedPayments.find(item=>String(item.memberId)===String(memberId)&&String(item.groupId)===String(groupId)&&Number(item.month)===Number(month))||null;
 }
+function isPaymentApproved(memberId,groupId,month){
+  const entry=getSharedPaymentEntry(memberId,groupId,month);
+  if(entry) return entry.status==='approved';
+  return !!S.payments[`${memberId}_${groupId}_${month}`];
+}
+function getNextApprovedPaymentMonth(memberId,groupId,month){
+  const target=Number(month);
+  if(!target) return 0;
+  const shared=sharedPayments
+    .filter(item=>String(item.memberId)===String(memberId)&&String(item.groupId)===String(groupId)&&Number(item.month)>target&&item.status==='approved')
+    .map(item=>Number(item.month))
+    .filter(Boolean);
+  const local=Object.keys(S.payments)
+    .filter(key=>S.payments[key])
+    .map(key=>{
+      const parts=key.split('_');
+      return {
+        memberId:parts[0],
+        groupId:parts[1],
+        month:Number(parts[2])
+      };
+    })
+    .filter(item=>String(item.memberId)===String(memberId)&&String(item.groupId)===String(groupId)&&item.month>target)
+    .map(item=>item.month);
+  const months=[...shared,...local].filter(item=>item>target).sort((a,b)=>a-b);
+  return months[0]||0;
+}
 function getPaymentStatusLabel(status){
   return status==='approved'?'Paid':status==='pending'?'Pending Approval':'Due';
 }
@@ -2429,6 +2456,13 @@ function renderPayTable(){
 async function setPaymentDecision(memberId,gid,mo,amt,memberEmail,memberName,memberTicket,groupName,nextStatus){
   const key=`${memberId}_${gid}_${mo}`;
   const existing=getSharedPaymentEntry(memberId,gid,mo);
+  if(nextStatus!=='approved'&&isPaymentApproved(memberId,gid,mo)){
+    const nextPaidMonth=getNextApprovedPaymentMonth(memberId,gid,mo);
+    if(nextPaidMonth){
+      toast(`Month ${mo} cannot be marked not paid because month ${nextPaidMonth} is already paid.`,true);
+      return;
+    }
+  }
   const resolvedEmail=normalizeEmail(memberEmail||existing&&existing.memberEmail||'');
   const resolvedName=memberName||existing&&existing.memberName||'';
   const resolvedTicket=Number(memberTicket||existing&&existing.memberTicket||0);
