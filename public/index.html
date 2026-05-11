@@ -338,7 +338,7 @@ tbody td:first-child{color:var(--t1);font-family:'IBM Plex Sans',sans-serif;font
 .page-title span{color:var(--gold);}
 
 /* ---------- MOBILE BOTTOM NAV ---------- */
-.mobile-nav{display:none;left:0;right:0;height:calc(64px + env(safe-area-inset-bottom,0px));background:var(--bg2);border-top:1px solid var(--ln);z-index:9000;padding:0;flex-shrink:0;transition:background .28s,border-color .28s;}
+.mobile-nav{display:none;position:fixed;left:0;right:0;bottom:0;height:calc(64px + env(safe-area-inset-bottom,0px));background:var(--bg2);border-top:1px solid var(--ln);z-index:9000;padding:0 0 env(safe-area-inset-bottom,0px);flex-shrink:0;transition:background .28s,border-color .28s;}
 .mn-inner{display:flex;height:64px;align-items:stretch;width:100%;}
 .mn-item{flex:1;height:64px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:6px 4px 4px;cursor:pointer;color:var(--t3);border:none;background:transparent;transition:color .2s;position:relative;touch-action:manipulation;-webkit-tap-highlight-color:transparent;min-width:0;outline:none;-webkit-user-select:none;user-select:none;}
 .mn-item:active{opacity:.7;}
@@ -361,7 +361,7 @@ tbody td:first-child{color:var(--t1);font-family:'IBM Plex Sans',sans-serif;font
   .footer-ad{display:none;}
   .mobile-nav{display:flex;}
   .shell{height:100dvh;}
-  .content{padding:14px 14px 14px;}
+  .content{padding:14px 14px calc(86px + env(safe-area-inset-bottom,0px));}
   .g4{grid-template-columns:1fr 1fr;}
   .g3{grid-template-columns:1fr 1fr;}
   .ad-strip{height:44px;margin-bottom:12px;}
@@ -381,7 +381,7 @@ tbody td:first-child{color:var(--t1);font-family:'IBM Plex Sans',sans-serif;font
   .stat{padding:12px;}
   .card{padding:14px;}
   .card-hd{margin-bottom:12px;}
-  .content{padding:12px 12px 12px;}
+  .content{padding:12px 12px calc(86px + env(safe-area-inset-bottom,0px));}
   .content>*+*{margin-top:12px;}
   .toast{bottom:calc(72px + env(safe-area-inset-bottom,0px));right:12px;left:12px;max-width:none;border-radius:14px;font-size:13px;}
   .modal-bg.center .modal{margin:0 12px;max-width:100%;}
@@ -459,6 +459,10 @@ tbody td:first-child{color:var(--t1);font-family:'IBM Plex Sans',sans-serif;font
 
 /* ---------- PAYMENT TRACKER REDESIGN ---------- */
 .pay-filter-bar{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+.payment-month-nav{display:grid;grid-template-columns:34px 1fr 34px;gap:6px;align-items:stretch;}
+.payment-month-nav select{min-width:0;}
+.payment-month-nav-btn{width:34px;height:100%;min-height:38px;padding:0;justify-content:center;background:var(--bg3);color:var(--t2);border:1px solid var(--ln);border-radius:8px;font-size:18px;line-height:1;}
+.payment-month-nav-btn:disabled{opacity:.35;cursor:not-allowed;}
 .pay-progress-card{background:var(--bg2);border:1px solid var(--ln);border-radius:16px;padding:18px;margin-bottom:14px;}
 .pay-progress-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
 .pay-progress-title{font-size:14px;font-weight:600;color:var(--t1);}
@@ -890,7 +894,11 @@ tbody td:first-child{color:var(--t1);font-family:'IBM Plex Sans',sans-serif;font
         </div>
         <div class="pay-filter-bar">
           <select id="pt_group" onchange="refreshPaymentMonthOptions('pt_month',this.value,'foreman'); refreshPaymentMemberOptions(); renderPayTable()"><option value="">- Select Group -</option></select>
-          <select id="pt_month" onchange="renderPayTable()"><option value="">- Select Month -</option></select>
+          <div class="payment-month-nav" id="pt_month_nav">
+            <button class="payment-month-nav-btn" id="pt_month_prev" type="button" title="Previous month" onclick="stepPaymentMonth(-1)">&lsaquo;</button>
+            <select id="pt_month" onchange="renderPayTable()"><option value="">- Select Month -</option></select>
+            <button class="payment-month-nav-btn" id="pt_month_next" type="button" title="Next month" onclick="stepPaymentMonth(1)">&rsaquo;</button>
+          </div>
           <select id="pt_member" onchange="renderPayTable()" style="display:none;"><option value="">- Select Member -</option></select>
         </div>
         <div class="pay-progress-card" id="pay_progress_card" style="display:none;">
@@ -1205,8 +1213,8 @@ let sharedAuctionSession=null;
 let sharedAuctionSessionUnsubscribe=null;
 const S={role:'foreman',theme:'dark',chits:[],members:[],payments:{},auctions:[],memberPayments:[],myChitFunds:[],liveBids:[],timerInterval:null,timerSecs:0,timerRunning:false,adCount:0,cur:'dashboard'};
 let paymentViewMode='month';
-const ACCESS_STORAGE_KEY='cv_admin_access_registry_v1';
-const ADMIN_SESSION_KEY='cv_admin_portal_session_v1';
+const ACCESS_STORAGE_KEY='cv_admin_access_registry_v9';
+const ADMIN_SESSION_KEY='cv_admin_portal_session_v9';
 const fmt=v=>'Rs.'+Number(v).toLocaleString('en-IN',{maximumFractionDigits:2});
 const fmtN=v=>Number(v).toLocaleString('en-IN',{maximumFractionDigits:2});
 const pct=v=>v.toFixed(2)+'%';
@@ -2272,11 +2280,32 @@ function refreshPaymentMemberOptions(){
   memberSelect.innerHTML='<option value="">- Select Member -</option>'+members.map(member=>`<option value="${member.id}">${member.name}${member.groupName?` - ${member.groupName}`:''}</option>`).join('');
   if(current) memberSelect.value=current;
 }
+function updatePaymentMonthNavState(){
+  const select=document.getElementById('pt_month');
+  const prev=document.getElementById('pt_month_prev');
+  const next=document.getElementById('pt_month_next');
+  if(!select||!prev||!next) return;
+  const months=Array.from(select.options).map(option=>Number(option.value)).filter(Boolean);
+  const current=Number(select.value);
+  prev.disabled=paymentViewMode!=='month'||!current||!months.some(month=>month<current);
+  next.disabled=paymentViewMode!=='month'||!current||!months.some(month=>month>current);
+}
+function stepPaymentMonth(delta){
+  const select=document.getElementById('pt_month');
+  if(!select) return;
+  const months=Array.from(select.options).map(option=>Number(option.value)).filter(Boolean).sort((a,b)=>a-b);
+  if(!months.length) return;
+  const current=Number(select.value)||months[0];
+  const index=Math.max(0,months.indexOf(current));
+  const nextIndex=Math.max(0,Math.min(months.length-1,index+delta));
+  select.value=String(months[nextIndex]);
+  renderPayTable();
+}
 function setPaymentView(mode){
   paymentViewMode=mode==='member'?'member':'month';
   const monthBtn=document.getElementById('ptViewMonth');
   const memberBtn=document.getElementById('ptViewMember');
-  const monthInput=document.getElementById('pt_month');
+  const monthInput=document.getElementById('pt_month_nav')||document.getElementById('pt_month');
   const memberSelect=document.getElementById('pt_member');
   if(monthBtn) monthBtn.className='role-btn'+(paymentViewMode==='month'?' active':'');
   if(memberBtn) memberBtn.className='role-btn'+(paymentViewMode==='member'?' active':'');
@@ -2400,6 +2429,7 @@ function renderPayTable(){
   const mo=ensureFundMonthSelection('pt_group','pt_month');
   const list=document.getElementById('payMemberList');
   const progCard=document.getElementById('pay_progress_card');
+  updatePaymentMonthNavState();
   if(!gid||!mo){
     progCard.style.display='none';
     list.innerHTML='<div style="text-align:center;padding:48px 20px;color:var(--t3);"><div style="font-size:36px;margin-bottom:12px;opacity:.3;">DL</div><p style="font-size:13px;">Select a group and month<br>to track payments</p></div>';
@@ -2467,6 +2497,9 @@ async function setPaymentDecision(memberId,gid,mo,amt,memberEmail,memberName,mem
   const resolvedName=memberName||existing&&existing.memberName||'';
   const resolvedTicket=Number(memberTicket||existing&&existing.memberTicket||0);
   S.payments[key]=nextStatus==='approved';
+  if(nextStatus==='none'&&existing){
+    sharedPayments=sharedPayments.filter(item=>String(item.memberId)!==String(memberId)||String(item.groupId)!==String(gid)||Number(item.month)!==Number(mo));
+  }
   renderPayTable();
   updateDB();
   try{
@@ -2486,6 +2519,7 @@ async function setPaymentDecision(memberId,gid,mo,amt,memberEmail,memberName,mem
     toast(nextStatus==='approved'?'Payment approved.':existing&&existing.status==='pending'?'Payment declined.':'Payment approval removed.');
   }catch(err){
     console.error(err);
+    if(existing&&!getSharedPaymentEntry(memberId,gid,mo)) sharedPayments.push(existing);
     S.payments[key]=existing&&existing.status==='approved';
     renderPayTable();
     updateDB();
@@ -2806,6 +2840,7 @@ function refreshPaymentMonthOptions(selectId,groupId,mode){
     const nextMonth=getFirstIncompleteMemberMonth(groupId,maxMonth);
     if(nextMonth>=1&&months.includes(nextMonth)) select.value=String(nextMonth);
   }else if(months.length===1) select.value=String(months[0]);
+  updatePaymentMonthNavState();
   return parseInt(select.value)||0;
 }
 function updateMpayDetail(){

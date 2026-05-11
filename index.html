@@ -338,7 +338,7 @@ tbody td:first-child{color:var(--t1);font-family:'IBM Plex Sans',sans-serif;font
 .page-title span{color:var(--gold);}
 
 /* ---------- MOBILE BOTTOM NAV ---------- */
-.mobile-nav{display:none;left:0;right:0;height:calc(64px + env(safe-area-inset-bottom,0px));background:var(--bg2);border-top:1px solid var(--ln);z-index:9000;padding:0;flex-shrink:0;transition:background .28s,border-color .28s;}
+.mobile-nav{display:none;position:fixed;left:0;right:0;bottom:0;height:calc(64px + env(safe-area-inset-bottom,0px));background:var(--bg2);border-top:1px solid var(--ln);z-index:9000;padding:0 0 env(safe-area-inset-bottom,0px);flex-shrink:0;transition:background .28s,border-color .28s;}
 .mn-inner{display:flex;height:64px;align-items:stretch;width:100%;}
 .mn-item{flex:1;height:64px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:6px 4px 4px;cursor:pointer;color:var(--t3);border:none;background:transparent;transition:color .2s;position:relative;touch-action:manipulation;-webkit-tap-highlight-color:transparent;min-width:0;outline:none;-webkit-user-select:none;user-select:none;}
 .mn-item:active{opacity:.7;}
@@ -361,7 +361,7 @@ tbody td:first-child{color:var(--t1);font-family:'IBM Plex Sans',sans-serif;font
   .footer-ad{display:none;}
   .mobile-nav{display:flex;}
   .shell{height:100dvh;}
-  .content{padding:14px 14px 14px;}
+  .content{padding:14px 14px calc(86px + env(safe-area-inset-bottom,0px));}
   .g4{grid-template-columns:1fr 1fr;}
   .g3{grid-template-columns:1fr 1fr;}
   .ad-strip{height:44px;margin-bottom:12px;}
@@ -381,7 +381,7 @@ tbody td:first-child{color:var(--t1);font-family:'IBM Plex Sans',sans-serif;font
   .stat{padding:12px;}
   .card{padding:14px;}
   .card-hd{margin-bottom:12px;}
-  .content{padding:12px 12px 12px;}
+  .content{padding:12px 12px calc(86px + env(safe-area-inset-bottom,0px));}
   .content>*+*{margin-top:12px;}
   .toast{bottom:calc(72px + env(safe-area-inset-bottom,0px));right:12px;left:12px;max-width:none;border-radius:14px;font-size:13px;}
   .modal-bg.center .modal{margin:0 12px;max-width:100%;}
@@ -459,6 +459,10 @@ tbody td:first-child{color:var(--t1);font-family:'IBM Plex Sans',sans-serif;font
 
 /* ---------- PAYMENT TRACKER REDESIGN ---------- */
 .pay-filter-bar{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+.payment-month-nav{display:grid;grid-template-columns:34px 1fr 34px;gap:6px;align-items:stretch;}
+.payment-month-nav select{min-width:0;}
+.payment-month-nav-btn{width:34px;height:100%;min-height:38px;padding:0;justify-content:center;background:var(--bg3);color:var(--t2);border:1px solid var(--ln);border-radius:8px;font-size:18px;line-height:1;}
+.payment-month-nav-btn:disabled{opacity:.35;cursor:not-allowed;}
 .pay-progress-card{background:var(--bg2);border:1px solid var(--ln);border-radius:16px;padding:18px;margin-bottom:14px;}
 .pay-progress-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
 .pay-progress-title{font-size:14px;font-weight:600;color:var(--t1);}
@@ -890,7 +894,11 @@ tbody td:first-child{color:var(--t1);font-family:'IBM Plex Sans',sans-serif;font
         </div>
         <div class="pay-filter-bar">
           <select id="pt_group" onchange="refreshPaymentMonthOptions('pt_month',this.value,'foreman'); refreshPaymentMemberOptions(); renderPayTable()"><option value="">- Select Group -</option></select>
-          <select id="pt_month" onchange="renderPayTable()"><option value="">- Select Month -</option></select>
+          <div class="payment-month-nav" id="pt_month_nav">
+            <button class="payment-month-nav-btn" id="pt_month_prev" type="button" title="Previous month" onclick="stepPaymentMonth(-1)">&lsaquo;</button>
+            <select id="pt_month" onchange="renderPayTable()"><option value="">- Select Month -</option></select>
+            <button class="payment-month-nav-btn" id="pt_month_next" type="button" title="Next month" onclick="stepPaymentMonth(1)">&rsaquo;</button>
+          </div>
           <select id="pt_member" onchange="renderPayTable()" style="display:none;"><option value="">- Select Member -</option></select>
         </div>
         <div class="pay-progress-card" id="pay_progress_card" style="display:none;">
@@ -1093,6 +1101,12 @@ tbody td:first-child{color:var(--t1);font-family:'IBM Plex Sans',sans-serif;font
             <select id="mp_grp" onchange="refreshPaymentMonthOptions('mp_mo',this.value,'member'); updateMpayDetail()"><option value="">- Select Group -</option></select>
             <select id="mp_mo" onchange="updateMpayDetail()"><option value="">- Select Month -</option></select>
           </div>
+          <div class="mpay-select-grid">
+            <label style="display:flex;align-items:center;gap:8px;margin:0;background:var(--bg3);border:1px solid var(--ln);border-radius:12px;padding:12px 13px;text-transform:none;letter-spacing:0;font-size:13px;color:var(--t2);">
+              <input id="mp_win" type="checkbox" onchange="updateMpayDetail()" style="width:auto;"> I won this month
+            </label>
+            <input id="mp_discount" type="number" placeholder="Discount Rs." inputmode="numeric" oninput="updateMpayDetail()">
+          </div>
           <div id="mp_det"></div>
           <button class="btn btn-teal btn-full" onclick="makePayment()" type="button" style="margin-top:4px;">Mark as Paid</button>
         </div>
@@ -1205,8 +1219,8 @@ let sharedAuctionSession=null;
 let sharedAuctionSessionUnsubscribe=null;
 const S={role:'foreman',theme:'dark',chits:[],members:[],payments:{},auctions:[],memberPayments:[],myChitFunds:[],liveBids:[],timerInterval:null,timerSecs:0,timerRunning:false,adCount:0,cur:'dashboard'};
 let paymentViewMode='month';
-const ACCESS_STORAGE_KEY='cv_admin_access_registry_v1';
-const ADMIN_SESSION_KEY='cv_admin_portal_session_v1';
+const ACCESS_STORAGE_KEY='cv_admin_access_registry_v9';
+const ADMIN_SESSION_KEY='cv_admin_portal_session_v9';
 const fmt=v=>'Rs.'+Number(v).toLocaleString('en-IN',{maximumFractionDigits:2});
 const fmtN=v=>Number(v).toLocaleString('en-IN',{maximumFractionDigits:2});
 const pct=v=>v.toFixed(2)+'%';
@@ -1619,6 +1633,31 @@ function getPaymentStatusLabel(status){
 function getPaymentStatusColor(status){
   return status==='approved'?'var(--green)':status==='pending'?'var(--gold2)':'var(--red)';
 }
+function getAuctionForPayment(fund,month){
+  if(!fund||!month) return null;
+  const fundName=String(fund.name||fund.groupName||'');
+  const fundId=String(fund.id||'');
+  return S.auctions.find(item=>
+    Number(item.month)===Number(month)&&(
+      String(item.groupId||'')===fundId||
+      String(item.gid||'')===fundId||
+      String(item.groupName||'')===fundName
+    )
+  )||null;
+}
+function getPaymentBreakdown(fund,month,opts={}){
+  const gross=fund&&fund.members?Number(fund.value||0)/Number(fund.members||1):0;
+  const auction=getAuctionForPayment(fund,month);
+  const manualDiscount=Number(opts.discount)||0;
+  const discount=auction?Number(auction.discount)||0:manualDiscount;
+  const dividend=discount&&fund&&fund.members?discount/Number(fund.members||1):Number(opts.dividend)||0;
+  const amount=Math.max(0,gross-dividend);
+  const winnerName=(auction&&auction.winner)||opts.winnerName||'';
+  const isWinner=!!(opts.isWinner||(winnerName&&opts.memberName&&normalizeEmail(winnerName)===normalizeEmail(opts.memberName)));
+  const comm=fund?Number(fund.comm||0)/100*Number(fund.value||0):0;
+  const prize=discount?Math.max(0,Number(fund&&fund.value||0)-comm-discount):Number(opts.prize)||0;
+  return {gross,discount,dividend,amount,winnerName,isWinner,prize,auction};
+}
 function formatPaymentDate(value,fallback=''){
   if(!value) return fallback;
   try{
@@ -1642,6 +1681,12 @@ async function setSharedPaymentStatus(opts){
       groupName:opts.groupName||'',
       month:Number(opts.month),
       amount:Number(opts.amount)||0,
+      grossAmount:Number(opts.grossAmount)||Number(opts.amount)||0,
+      discount:Number(opts.discount)||0,
+      dividend:Number(opts.dividend)||0,
+      isWinner:!!opts.isWinner,
+      winnerName:opts.winnerName||'',
+      prize:Number(opts.prize)||0,
       status:opts.status,
       paid:opts.status==='approved',
       requestedBy:opts.requestedBy||currentUser.email||currentUser.uid||'user',
@@ -2272,11 +2317,32 @@ function refreshPaymentMemberOptions(){
   memberSelect.innerHTML='<option value="">- Select Member -</option>'+members.map(member=>`<option value="${member.id}">${member.name}${member.groupName?` - ${member.groupName}`:''}</option>`).join('');
   if(current) memberSelect.value=current;
 }
+function updatePaymentMonthNavState(){
+  const select=document.getElementById('pt_month');
+  const prev=document.getElementById('pt_month_prev');
+  const next=document.getElementById('pt_month_next');
+  if(!select||!prev||!next) return;
+  const months=Array.from(select.options).map(option=>Number(option.value)).filter(Boolean);
+  const current=Number(select.value);
+  prev.disabled=paymentViewMode!=='month'||!current||!months.some(month=>month<current);
+  next.disabled=paymentViewMode!=='month'||!current||!months.some(month=>month>current);
+}
+function stepPaymentMonth(delta){
+  const select=document.getElementById('pt_month');
+  if(!select) return;
+  const months=Array.from(select.options).map(option=>Number(option.value)).filter(Boolean).sort((a,b)=>a-b);
+  if(!months.length) return;
+  const current=Number(select.value)||months[0];
+  const index=Math.max(0,months.indexOf(current));
+  const nextIndex=Math.max(0,Math.min(months.length-1,index+delta));
+  select.value=String(months[nextIndex]);
+  renderPayTable();
+}
 function setPaymentView(mode){
   paymentViewMode=mode==='member'?'member':'month';
   const monthBtn=document.getElementById('ptViewMonth');
   const memberBtn=document.getElementById('ptViewMember');
-  const monthInput=document.getElementById('pt_month');
+  const monthInput=document.getElementById('pt_month_nav')||document.getElementById('pt_month');
   const memberSelect=document.getElementById('pt_member');
   if(monthBtn) monthBtn.className='role-btn'+(paymentViewMode==='month'?' active':'');
   if(memberBtn) memberBtn.className='role-btn'+(paymentViewMode==='member'?' active':'');
@@ -2400,6 +2466,7 @@ function renderPayTable(){
   const mo=ensureFundMonthSelection('pt_group','pt_month');
   const list=document.getElementById('payMemberList');
   const progCard=document.getElementById('pay_progress_card');
+  updatePaymentMonthNavState();
   if(!gid||!mo){
     progCard.style.display='none';
     list.innerHTML='<div style="text-align:center;padding:48px 20px;color:var(--t3);"><div style="font-size:36px;margin-bottom:12px;opacity:.3;">DL</div><p style="font-size:13px;">Select a group and month<br>to track payments</p></div>';
@@ -2412,34 +2479,37 @@ function renderPayTable(){
     list.innerHTML='<div style="text-align:center;padding:40px 20px;color:var(--t3);"><div style="font-size:30px;margin-bottom:10px;opacity:.3;">DL</div><p style="font-size:13px;">No members in this group</p></div>';
     return;
   }
-  const mly=chit.value/chit.members;
+  const monthBreakdown=getPaymentBreakdown(chit,mo);
   let paid=0,due=0;
   const items=mems.map(m=>{
     const entry=getSharedPaymentEntry(m.id,gid,mo);
     const status=entry&&entry.status?entry.status:(S.payments[`${m.id}_${gid}_${mo}`]?'approved':'due');
     const paymentIdentity=getMemberPaymentIdentity(m,gid);
+    const breakdown=getPaymentBreakdown(chit,mo,{memberName:m.name});
     status==='approved'?paid++:due++;
-    return {m,status,mly,entry,paymentIdentity};
+    return {m,status,entry,paymentIdentity,breakdown};
   });
   const pp=mems.length?paid/mems.length*100:0;
   progCard.style.display='';
   document.getElementById('pay_group_title').textContent=chit.name+' - Month '+mo;
   document.getElementById('pt_pct').textContent=pp.toFixed(0)+'%';
   document.getElementById('pay_track_fill').style.width=pp+'%';
-  document.getElementById('pt_col').textContent=fmt(paid*mly);
-  document.getElementById('pt_out').textContent=fmt(due*mly);
+  document.getElementById('pt_col').textContent=fmt(paid*monthBreakdown.amount);
+  document.getElementById('pt_out').textContent=fmt(due*monthBreakdown.amount);
   document.getElementById('pt_cc').textContent=paid;
-  list.innerHTML=items.map(({m,status,entry,paymentIdentity})=>{
+  list.innerHTML=items.map(({m,status,entry,paymentIdentity,breakdown})=>{
     const requestedOn=entry?formatPaymentDate(entry.requestedAt||entry.updatedAt,'Not requested yet'):'No request yet';
     const approvedOn=status==='approved'&&entry?formatPaymentDate(entry.approvedAt||entry.updatedAt,'Approved online'):'Not approved yet';
     const requestedBy=entry&&entry.requestedBy?entry.requestedBy:'-';
     const approvedBy=entry&&entry.approvedBy?entry.approvedBy:'-';
+    const discountLine=breakdown.discount?`<br>Gross: ${fmtN(breakdown.gross)} - Dividend: ${fmtN(breakdown.dividend)} - Payable: ${fmtN(breakdown.amount)}`:'';
+    const winnerLine=breakdown.isWinner?`<br><span style="color:var(--gold2);font-weight:600;">Winner this month - Prize ${fmt(breakdown.prize)}</span>`:'';
     return `
     <div class="pay-member-item ${status==='approved'?'is-paid':'is-due'}">
       <div class="pay-av" style="background:${m.color}22;color:${m.color};border:1px solid ${m.color}33">${m.name[0].toUpperCase()}</div>
       <div style="flex:1;min-width:0;">
         <div class="pay-member-name">${m.name}</div>
-        <div class="pay-member-meta">#${m.ticket} - ${fmtN(mly)} - Month ${mo}</div>
+        <div class="pay-member-meta">#${m.ticket} - ${fmtN(breakdown.amount)} - Month ${mo}${discountLine}${winnerLine}</div>
         <div class="pay-member-meta" style="margin-top:4px;white-space:normal;line-height:1.5;">
           Requested: ${requestedOn} by ${requestedBy}<br>
           Approved: ${approvedOn}${approvedBy!=='-'?` by ${approvedBy}`:''}
@@ -2447,9 +2517,9 @@ function renderPayTable(){
       </div>
       <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end;">
         <span style="font-size:11px;font-weight:600;color:${getPaymentStatusColor(status)};">${getPaymentStatusLabel(status)}</span>
-        ${status!=='approved'?`<button class="btn btn-teal btn-sm" type="button" onclick="setPaymentDecision('${m.id}','${gid}','${mo}',${mly},'${escJsSingle(paymentIdentity.email)}','${escJsSingle(paymentIdentity.name)}','${paymentIdentity.ticket||0}','${escJsSingle(chit.name)}','approved')">${status==='pending'?'Approve':'Paid'}</button>`:''}
-        ${status==='pending'?`<button class="btn btn-danger btn-sm" type="button" onclick="setPaymentDecision('${m.id}','${gid}','${mo}',${mly},'${escJsSingle(paymentIdentity.email)}','${escJsSingle(paymentIdentity.name)}','${paymentIdentity.ticket||0}','${escJsSingle(chit.name)}','none')">Decline</button>`:''}
-        ${status==='approved'?`<button class="btn btn-danger btn-sm" type="button" onclick="setPaymentDecision('${m.id}','${gid}','${mo}',${mly},'${escJsSingle(paymentIdentity.email)}','${escJsSingle(paymentIdentity.name)}','${paymentIdentity.ticket||0}','${escJsSingle(chit.name)}','none')">Remove</button>`:''}
+        ${status!=='approved'?`<button class="btn btn-teal btn-sm" type="button" onclick="setPaymentDecision('${m.id}','${gid}','${mo}',${breakdown.amount},'${escJsSingle(paymentIdentity.email)}','${escJsSingle(paymentIdentity.name)}','${paymentIdentity.ticket||0}','${escJsSingle(chit.name)}','approved')">${status==='pending'?'Approve':'Paid'}</button>`:''}
+        ${status==='pending'?`<button class="btn btn-danger btn-sm" type="button" onclick="setPaymentDecision('${m.id}','${gid}','${mo}',${breakdown.amount},'${escJsSingle(paymentIdentity.email)}','${escJsSingle(paymentIdentity.name)}','${paymentIdentity.ticket||0}','${escJsSingle(chit.name)}','none')">Decline</button>`:''}
+        ${status==='approved'?`<button class="btn btn-danger btn-sm" type="button" onclick="setPaymentDecision('${m.id}','${gid}','${mo}',${breakdown.amount},'${escJsSingle(paymentIdentity.email)}','${escJsSingle(paymentIdentity.name)}','${paymentIdentity.ticket||0}','${escJsSingle(chit.name)}','none')">Remove</button>`:''}
       </div>
     </div>`;}).join('');
 }
@@ -2467,6 +2537,9 @@ async function setPaymentDecision(memberId,gid,mo,amt,memberEmail,memberName,mem
   const resolvedName=memberName||existing&&existing.memberName||'';
   const resolvedTicket=Number(memberTicket||existing&&existing.memberTicket||0);
   S.payments[key]=nextStatus==='approved';
+  if(nextStatus==='none'&&existing){
+    sharedPayments=sharedPayments.filter(item=>String(item.memberId)!==String(memberId)||String(item.groupId)!==String(gid)||Number(item.month)!==Number(mo));
+  }
   renderPayTable();
   updateDB();
   try{
@@ -2486,6 +2559,7 @@ async function setPaymentDecision(memberId,gid,mo,amt,memberEmail,memberName,mem
     toast(nextStatus==='approved'?'Payment approved.':existing&&existing.status==='pending'?'Payment declined.':'Payment approval removed.');
   }catch(err){
     console.error(err);
+    if(existing&&!getSharedPaymentEntry(memberId,gid,mo)) sharedPayments.push(existing);
     S.payments[key]=existing&&existing.status==='approved';
     renderPayTable();
     updateDB();
@@ -2510,15 +2584,16 @@ function renderMemberWisePaymentTable(){
     list.innerHTML='<div style="text-align:center;padding:40px 20px;color:var(--t3);"><div style="font-size:30px;margin-bottom:10px;opacity:.3;">DL</div><p style="font-size:13px;">Member or group not found</p></div>';
     return;
   }
-  const monthlyAmount=chit.value/chit.members;
   const rows=Array.from({length:Number(chit.duration)||0},(_,index)=>{
     const month=index+1;
     const entry=getSharedPaymentEntry(member.id,gid,month);
     const status=entry&&entry.status?entry.status:(S.payments[`${member.id}_${gid}_${month}`]?'approved':'due');
     const paymentIdentity=getMemberPaymentIdentity(member,gid);
+    const breakdown=getPaymentBreakdown(chit,month,{memberName:member.name});
     return {
       month,
-      amount:monthlyAmount,
+      amount:breakdown.amount,
+      breakdown,
       status,
       paymentIdentity,
       requestedOn:entry?formatPaymentDate(entry.requestedAt||entry.updatedAt,'Not requested yet'):'Not requested yet',
@@ -2530,19 +2605,24 @@ function renderMemberWisePaymentTable(){
   const paidCount=rows.filter(row=>row.status==='approved').length;
   const dueCount=rows.filter(row=>row.status!=='approved').length;
   const pct=rows.length?paidCount/rows.length*100:0;
+  const totalPaid=rows.filter(row=>row.status==='approved').reduce((sum,row)=>sum+row.amount,0);
+  const totalDue=rows.filter(row=>row.status!=='approved').reduce((sum,row)=>sum+row.amount,0);
   progCard.style.display='';
   document.getElementById('pay_group_title').textContent=`${member.name} - ${chit.name}`;
   document.getElementById('pt_pct').textContent=`${pct.toFixed(0)}%`;
   document.getElementById('pay_track_fill').style.width=`${pct}%`;
-  document.getElementById('pt_col').textContent=fmt(paidCount*monthlyAmount);
-  document.getElementById('pt_out').textContent=fmt(dueCount*monthlyAmount);
+  document.getElementById('pt_col').textContent=fmt(totalPaid);
+  document.getElementById('pt_out').textContent=fmt(totalDue);
   document.getElementById('pt_cc').textContent=paidCount;
-  list.innerHTML=rows.map(row=>`
+  list.innerHTML=rows.map(row=>{
+    const discountLine=row.breakdown.discount?`<br>Gross: ${fmtN(row.breakdown.gross)} - Dividend: ${fmtN(row.breakdown.dividend)} - Payable: ${fmtN(row.amount)}`:'';
+    const winnerLine=row.breakdown.isWinner?`<br><span style="color:var(--gold2);font-weight:600;">Winner this month - Prize ${fmt(row.breakdown.prize)}</span>`:'';
+    return `
     <div class="pay-member-item ${row.status==='approved'?'is-paid':'is-due'}">
       <div class="pay-av" style="background:${member.color}22;color:${member.color};border:1px solid ${member.color}33">M${row.month}</div>
       <div style="flex:1;min-width:0;">
         <div class="pay-member-name">Month ${row.month}</div>
-        <div class="pay-member-meta">${fmt(row.amount)} - ${getPaymentStatusLabel(row.status)}</div>
+        <div class="pay-member-meta">${fmt(row.amount)} - ${getPaymentStatusLabel(row.status)}${discountLine}${winnerLine}</div>
         <div class="pay-member-meta" style="margin-top:4px;white-space:normal;line-height:1.5;">
           Requested: ${row.requestedOn}${row.requestedBy!=='-'?` by ${row.requestedBy}`:''}<br>
           Approved: ${row.approvedOn}${row.approvedBy!=='-'?` by ${row.approvedBy}`:''}
@@ -2554,7 +2634,7 @@ function renderMemberWisePaymentTable(){
         ${row.status==='pending'?`<button class="btn btn-danger btn-sm" type="button" onclick="setPaymentDecision('${member.id}','${gid}','${row.month}',${row.amount},'${escJsSingle(row.paymentIdentity.email)}','${escJsSingle(row.paymentIdentity.name)}','${row.paymentIdentity.ticket||0}','${escJsSingle(chit.name)}','none')">Decline</button>`:''}
         ${row.status==='approved'?`<button class="btn btn-danger btn-sm" type="button" onclick="setPaymentDecision('${member.id}','${gid}','${row.month}',${row.amount},'${escJsSingle(row.paymentIdentity.email)}','${escJsSingle(row.paymentIdentity.name)}','${row.paymentIdentity.ticket||0}','${escJsSingle(chit.name)}','none')">Remove</button>`:''}
       </div>
-    </div>`).join('');
+    </div>`;}).join('');
 }
 
 /* -- AUCTION TIMER -- */
@@ -2733,6 +2813,9 @@ function resolveFund(val){
   // legacy fallback
   return S.chits.find(c=>c.id==val)||S.myChitFunds.find(f=>f.id==val)||null;
 }
+function resolveVisiblePaymentFund(gid){
+  return getVisibleMemberFunds().find(item=>String(item.key)===String(gid))||resolveFund(gid);
+}
 function getDefaultChitMonth(startValue,duration){
   if(!startValue) return 1;
   const parts=String(startValue).split('-');
@@ -2806,6 +2889,7 @@ function refreshPaymentMonthOptions(selectId,groupId,mode){
     const nextMonth=getFirstIncompleteMemberMonth(groupId,maxMonth);
     if(nextMonth>=1&&months.includes(nextMonth)) select.value=String(nextMonth);
   }else if(months.length===1) select.value=String(months[0]);
+  updatePaymentMonthNavState();
   return parseInt(select.value)||0;
 }
 function updateMpayDetail(){
@@ -2814,10 +2898,15 @@ function updateMpayDetail(){
   const mo=ensureFundMonthSelection('mp_grp','mp_mo');
   const el=document.getElementById('mp_det');
   if(!gid||!mo){el.innerHTML='';return;}
-  const c=resolveFund(gid);if(!c){el.innerHTML='';return;}
-  const mly=c.value/c.members;
+  const c=resolveVisiblePaymentFund(gid);if(!c){el.innerHTML='';return;}
+  const winInput=document.getElementById('mp_win');
+  const discountInput=document.getElementById('mp_discount');
+  const manualWinner=!!(winInput&&winInput.checked);
+  const manualDiscount=parseFloat(discountInput&&discountInput.value)||0;
+  const breakdown=getPaymentBreakdown(c,mo,{discount:manualDiscount,isWinner:manualWinner,memberName:c.memberName||currentUser&&currentUser.displayName||''});
   const gateNote=mo>1&&!isMemberMonthCompleted(gid,mo-1)?`<div style="margin-top:10px;font-size:12px;color:var(--red);line-height:1.5;">Complete payment for month ${mo-1} before paying month ${mo}.</div>`:'';
-  el.innerHTML=`<div class="mpay-amount-display"><div class="mpay-amount-lbl">Amount Due - Month ${mo}</div><div class="mpay-amount-val">${fmt(mly)}</div></div>${gateNote}`;
+  const discountNote=breakdown.discount?`<div style="margin-top:10px;font-size:12px;color:var(--t2);line-height:1.6;">Gross ${fmt(breakdown.gross)} - Dividend ${fmt(breakdown.dividend)} = Payable ${fmt(breakdown.amount)}${breakdown.isWinner?`<br><span style="color:var(--gold2);font-weight:600;">Winner payout: ${fmt(breakdown.prize)}</span>`:''}</div>`:'';
+  el.innerHTML=`<div class="mpay-amount-display"><div class="mpay-amount-lbl">Amount Due - Month ${mo}</div><div class="mpay-amount-val">${fmt(breakdown.amount)}</div></div>${discountNote}${gateNote}`;
 }
 function calcMemberEMI(){
   const val=parseFloat(document.getElementById('me_val').value)||0;
@@ -2882,7 +2971,7 @@ async function makePayment(){
   const gid=document.getElementById('mp_grp').value;
   const mo=ensureFundMonthSelection('mp_grp','mp_mo');
   if(!gid||!mo){toast('Select group and month!',true);return;}
-  const c=resolveFund(gid);if(!c){toast('Fund not found',true);return;}
+  const c=resolveVisiblePaymentFund(gid);if(!c){toast('Fund not found',true);return;}
   if(mo>1&&!isMemberMonthCompleted(gid,mo-1)){
     toast(`Month ${mo-1} must be paid before paying month ${mo}.`,true);
     return;
@@ -2891,12 +2980,26 @@ async function makePayment(){
   const already=S.memberPayments.find(p=>p.gid===gid&&p.month===mo)
     || sharedPayments.find(p=>`c_${p.groupId}`===gid&&Number(p.month)===mo&&normalizeEmail(p.memberEmail)===getCurrentUserEmail());
   if(already){toast('Month '+mo+' already paid!',true);return;}
-  const amount=c.value/c.members;
+  const manualWinner=!!(document.getElementById('mp_win')&&document.getElementById('mp_win').checked);
+  const manualDiscount=parseFloat(document.getElementById('mp_discount')&&document.getElementById('mp_discount').value)||0;
+  const breakdown=getPaymentBreakdown(c,mo,{discount:manualDiscount,isWinner:manualWinner,memberName:c.memberName||currentUser&&currentUser.displayName||''});
+  const amount=breakdown.amount;
   const nowIso=new Date().toISOString();
-  const record={gid,month:mo,groupName:c.name,amount,date:new Date().toLocaleDateString('en-IN'),status:'Pending Approval',statusKey:'pending',requestedAt:nowIso,approvedAt:'',requestedBy:getCurrentUserEmail()||'Member',approvedBy:''};
+  const isPersonalFund=gid.startsWith('m_');
+  const record={
+    gid,month:mo,groupName:c.name,amount,grossAmount:breakdown.gross,discount:breakdown.discount,dividend:breakdown.dividend,
+    isWinner:breakdown.isWinner,winnerName:breakdown.isWinner?(currentUser&&currentUser.displayName||'Me'):(breakdown.winnerName||''),prize:breakdown.prize,
+    date:new Date().toLocaleDateString('en-IN'),
+    status:isPersonalFund?'Paid':'Pending Approval',
+    statusKey:isPersonalFund?'approved':'pending',
+    requestedAt:nowIso,
+    approvedAt:isPersonalFund?nowIso:'',
+    requestedBy:getCurrentUserEmail()||'Member',
+    approvedBy:isPersonalFund?'Self':''
+  };
   S.memberPayments.push(record);
   // If it's a member-added fund, update the paid count
-  if(gid.startsWith('m_')){
+  if(isPersonalFund){
     const fid=gid.slice(2);
     const idx=S.myChitFunds.findIndex(f=>f.id==fid);
     if(idx>-1){
@@ -2905,7 +3008,7 @@ async function makePayment(){
     }
     renderMyChits();
     renderMPay();
-    toast(`Month ${mo} payment recorded!`);
+    toast(`Month ${mo} payment marked paid.`);
     queueCloudSave();
     return;
   }
@@ -2927,6 +3030,12 @@ async function makePayment(){
       groupId:assignment.groupId,
       month:mo,
       amount,
+      grossAmount:breakdown.gross,
+      discount:breakdown.discount,
+      dividend:breakdown.dividend,
+      isWinner:breakdown.isWinner,
+      winnerName:breakdown.winnerName,
+      prize:breakdown.prize,
       status:'pending',
       memberEmail:assignment.memberEmail,
       memberName:assignment.memberName,
